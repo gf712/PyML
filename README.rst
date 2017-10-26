@@ -1,7 +1,7 @@
 PyML
 ====
-
-[![Coverage Status](https://coveralls.io/repos/github/gf712/AbPyTools/badge.svg?branch=master)](https://coveralls.io/github/gf712/AbPyTools?branch=master)
-[![Build Status](https://travis-ci.org/gf712/AbPyTools.svg?branch=master)](https://travis-ci.org/gf712/AbPyTool]
-
+.. image:: https://coveralls.io/repos/github/gf712/PyML/badge.svg?branch=master
+    :target: https://coveralls.io/github/gf712/PyML?branch=master
+.. image:: https://travis-ci.org/gf712/PyML.svg?branch=master
+    :target: https://travis-ci.org/gf712/PyML
 PyML is a Python package with machine learning algorithms written in pure Python
