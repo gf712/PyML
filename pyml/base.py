@@ -4,9 +4,10 @@ class BaseLearner:
 
     def train(self, X, y=None):
         self._train(X, y)
+        return self
 
     def predict(self, X):
         return self._predict(X)
 
     def score(self, X, y_true):
-        return self._score(self.predict(X), y_true)
+        return self._score(X, y_true)
