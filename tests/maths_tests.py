@@ -1,5 +1,5 @@
 import unittest
-from pyml.maths.utils import *
+from pyml.maths.math_utils import *
 
 
 class MathsTest(unittest.TestCase):

@@ -1,4 +1,4 @@
-from pyml.maths.utils import argsort
+from pyml.maths.math_utils import argsort
 from pyml.metrics.distances import calculate_distance
 from pyml.base import BaseLearner
 

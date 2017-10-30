@@ -1,5 +1,5 @@
 from .base import KNNBase
-from ..maths.utils import max_occurence, mean
+from ..maths.math_utils import max_occurence, mean
 
 
 class KNNClassifier(KNNBase):
