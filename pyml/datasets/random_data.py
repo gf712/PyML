@@ -1,13 +1,10 @@
 import random
-import time
+from ..utils import set_seed
 
 
 def gaussian(n=100, d=2, labels=3, sigma=1, seed=None, shuffle=True):
-    if seed is None:
-        seed = time.time()
 
-    # set random seed
-    random.seed(seed)
+    set_seed(seed)
 
     means = [[random.random() for dim in range(d)] for label in range(labels)]
 

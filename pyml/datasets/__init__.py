@@ -1,1 +1,1 @@
-from .random_data import gaussian
+from .random_data import gaussian, regression
