@@ -8,3 +8,5 @@ def set_seed(seed=None):
 
     # set random seed
     random.seed(seed)
+
+    return seed

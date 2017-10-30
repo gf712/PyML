@@ -1,7 +1,6 @@
 from .base import LinearBase
-import time
-import random
-from ..maths import mean, dot_product, mean_squared_error
+from ..maths import mean, dot_product, mean_squared_error, mean_absolute_error
+from ..utils import set_seed
 
 
 class LinearRegression(LinearBase):
@@ -10,12 +9,7 @@ class LinearRegression(LinearBase):
                  epsilon=0.01, max_iterations=10000):
         LinearBase.__init__(self)
 
-        if seed is None:
-            self._seed = time.time()
-        else:
-            self._seed = seed
-
-        random.seed(self._seed)
+        self._seed = set_seed(seed)
         self.bias = bias
         self._error_function = error_function
         self.epsilon = epsilon
