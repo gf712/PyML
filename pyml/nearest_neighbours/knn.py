@@ -1,5 +1,5 @@
 from .base import KNNBase
-from ..maths.math_utils import max_occurence, mean
+from ..maths import max_occurence, mean, mean_squared_error, mean_absolute_error
 
 
 class KNNClassifier(KNNBase):
@@ -42,3 +42,9 @@ class KNNRegressor(KNNBase):
         """
         self._find_neighbours(X)
         return [mean(row) for row in self._neighbours]
+
+    def _score(self, X, y_true, scorer='mean_squared_error'):
+        if scorer == 'mean_squared_error':
+            return mean_squared_error(self.predict(X), y_true)
+        elif scorer == 'mean_absolute_error':
+            return mean_absolute_error(self.predict(X), y_true)
