@@ -40,7 +40,7 @@ class LinearRegression(LinearBase):
             gradients = list()
             for j in range(len(self._coefficients)):
                 gradients.append(mean([(prediction_i - y_i) * x_i[j]
-                                 for x_i, prediction_i, y_i in zip(self.X, prediction, self.y)]))
+                                       for x_i, prediction_i, y_i in zip(self.X, prediction, self.y)]))
 
             # update coefficients
             self._coefficients = [coefficient - self._learning_rate * gradient
@@ -53,9 +53,8 @@ class LinearRegression(LinearBase):
             self._iteration += 1
 
     def _predict(self, X):
-        if self.bias:
-            X = [[1] + row for row in X]
-        return [dot_product(row, self._coefficients) for row in X]
+        return [dot_product([1] + row, self._coefficients) if self.bias
+                else dot_product(row, self._coefficients) for row in X]
 
     def _score(self, X, y_true, scorer='mean_squared_error'):
         if scorer == 'mean_squared_error':

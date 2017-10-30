@@ -2,7 +2,7 @@ from .math_utils import mean
 
 
 def dot_product(u, v):
-    return sum([u_i * v_i for u_i, v_i in zip(u, v)])
+    return sum(i[0] * i[1] for i in zip(u, v))
 
 
 def transpose(m):
