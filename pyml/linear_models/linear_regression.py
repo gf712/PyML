@@ -30,6 +30,7 @@ class LinearRegression(LinearBase):
         J_new = mean_squared_error(self._predict(self.X), self.y)
         prediction = self._predict(X)
 
+        # gradient descent
         while abs(e) >= self.epsilon and self._iteration < self.max_iterations:
 
             J_old = J_new
@@ -59,6 +60,8 @@ class LinearRegression(LinearBase):
     def _score(self, X, y_true, scorer='mean_squared_error'):
         if scorer == 'mean_squared_error':
             return mean_squared_error(self.predict(X), y_true)
+        elif scorer == 'mean_absolute_error':
+            return mean_absolute_error(self.predict(X), y_true)
 
     @property
     def seed(self):
