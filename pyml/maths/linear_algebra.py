@@ -1,4 +1,6 @@
 from .math_utils import mean
+from itertools import starmap
+from operator import mul, sub
 
 
 def dot_product(u, v):
@@ -22,7 +24,7 @@ def dot_product(u, v):
     """
 
     if len(u) == len(v) and isinstance(u[0], (float, int)) and isinstance(v[0], (float, int)):
-        return sum([u_i * v_i for u_i, v_i in zip(u, v)])
+        return sum(starmap(mul, zip(u, v)))
     elif len(u[0]) == len(v):
         v = broadcast(v, len(u))
         return [dot_product(u[i], v[i]) for i in range(len(u))]
@@ -31,7 +33,7 @@ def dot_product(u, v):
 
 
 def matrix_vector_product(A, u):
-    v = broadcast(u, len(u))
+    u = broadcast(u, len(u))
     return [dot_product(A[i], u[i]) for i in range(len(u))]
 
 
@@ -49,3 +51,15 @@ def mean_absolute_error(y, y_true):
 
 def broadcast(u, n):
     return [u for i in range(n)]
+
+
+def subtract(u, v):
+    return list(starmap(sub, zip(u, v)))
+
+
+def power(u, n):
+    return [x ** n for x in u]
+
+
+def divide(u, n):
+    return [x / n for x in u]

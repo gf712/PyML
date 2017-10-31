@@ -1,5 +1,5 @@
 from .base import LinearBase
-from ..maths import mean, dot_product, mean_squared_error, mean_absolute_error
+from ..maths import mean, dot_product, mean_squared_error, mean_absolute_error, subtract, power, transpose, divide
 from ..utils import set_seed
 
 
@@ -16,20 +16,23 @@ class LinearRegression(LinearBase):
         self.epsilon = epsilon
         self.max_iterations = max_iterations
         self._learning_rate = learning_rate
-        self._cost = list()
-        self._errors = list()
 
     def _train(self, X, y=None):
         self.X = X
         self.y = y
 
+        self._m = len(X)
         self._n_features = len(X[0])
         self._initiate_weights(bias=self.bias)
+        self._cost = list()
+        self._errors = list()
 
         e = 1000
         self._iteration = 0
-        prediction = self._predict(X)
-        J_new = mean_squared_error(prediction, self.y)
+        h = self._predict(X)
+        loss = subtract(h, y)
+        J_new = sum(power(loss, 2)) / (2 * self._m)
+        X_transpose = transpose(self.X)
 
         # gradient descent
         while abs(e) >= self.epsilon and self._iteration < self.max_iterations:
@@ -38,17 +41,15 @@ class LinearRegression(LinearBase):
             self._cost.append(J_old)
 
             # calculate gradient for each feature
-            gradients = list()
-            for j in range(len(self._coefficients)):
-                gradients.append(mean([(prediction_i - y_i) * x_i[j]
-                                       for x_i, prediction_i, y_i in zip(self.X, prediction, self.y)]))
+            gradients = divide(dot_product(X_transpose, loss), self._m)
 
             # update coefficients
             self._coefficients = [coefficient - self._learning_rate * gradient
                                   for coefficient, gradient in zip(self._coefficients, gradients)]
 
-            prediction = self._predict(X)
-            J_new = mean_squared_error(prediction, self.y)
+            h = self._predict(X)
+            loss = subtract(h, y)
+            J_new = sum(power(loss, 2)) / (2 * self._m)
             e = float(J_old - J_new)
 
             self._iteration += 1
