@@ -6,7 +6,7 @@
 // Define vector dot product
 int vector_dot_product(PyObject* u, PyObject* v, int size) {
 
-    int result = 0;
+    float result = 0;
     int i;
 
     for (i = 0; i < size; ++i) {
