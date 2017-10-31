@@ -1,6 +1,7 @@
 from .math_utils import mean
 from itertools import starmap
-from operator import mul, sub
+from operator import sub
+import linearAlgebraModule
 
 
 def dot_product(u, v):
@@ -24,7 +25,7 @@ def dot_product(u, v):
     """
 
     if len(u) == len(v) and isinstance(u[0], (float, int)) and isinstance(v[0], (float, int)):
-        return sum(starmap(mul, zip(u, v)))
+        return linearAlgebraModule.dot_product(u, v)
     elif len(u[0]) == len(v):
         v = broadcast(v, len(u))
         return [dot_product(u[i], v[i]) for i in range(len(u))]
