@@ -1,6 +1,5 @@
 from ..base import BaseLearner
 import random
-from ..maths import dot_product, transpose
 
 
 class LinearBase(BaseLearner):
@@ -15,6 +14,3 @@ class LinearBase(BaseLearner):
             self.X = [[1] + row for row in self.X]
         else:
             self._coefficients = [random.gauss(0, 1) for x in range(self._n_features)]
-
-    def _gradient(self):
-        return -2 * dot_product(transpose(self.X), self._predict())

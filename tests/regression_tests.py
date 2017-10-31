@@ -21,7 +21,7 @@ class LinearRegressionTest(unittest.TestCase):
         self.assertAlmostEqual(self.regressor.coefficients, [0.49150589812917345, 0.9085120784208242])
 
     def test_cost(self):
-        self.assertAlmostEqual(self.regressor.cost[0], 28.153932606643423)
+        self.assertAlmostEqual(self.regressor.cost[0], 7.036387378719473)
         self.assertAlmostEqual(self.regressor.cost[-1], 0.9737540314752522)
 
     def test_predict(self):

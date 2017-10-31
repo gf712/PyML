@@ -7,6 +7,7 @@ class LinearRegression(LinearBase):
 
     def __init__(self, seed=None, bias=True, error_function='least_squares', learning_rate=0.01,
                  epsilon=0.01, max_iterations=10000):
+
         LinearBase.__init__(self)
 
         self._seed = set_seed(seed)
@@ -27,8 +28,8 @@ class LinearRegression(LinearBase):
 
         e = 1000
         self._iteration = 0
-        J_new = mean_squared_error(self._predict(self.X), self.y)
         prediction = self._predict(X)
+        J_new = mean_squared_error(prediction, self.y)
 
         # gradient descent
         while abs(e) >= self.epsilon and self._iteration < self.max_iterations:
@@ -53,8 +54,12 @@ class LinearRegression(LinearBase):
             self._iteration += 1
 
     def _predict(self, X):
-        return [dot_product([1] + row, self._coefficients) if self.bias
-                else dot_product(row, self._coefficients) for row in X]
+        # return [dot_product([1] + row, self._coefficients) if self.bias
+        #         else dot_product(row, self._coefficients) for row in X]
+        if self.bias:
+            return dot_product([[1] + row for row in X], self._coefficients)
+        else:
+            return dot_product(X, self.coefficients)
 
     def _score(self, X, y_true, scorer='mean_squared_error'):
         if scorer == 'mean_squared_error':
