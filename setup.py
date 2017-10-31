@@ -1,8 +1,13 @@
 from setuptools import setup
+from setuptools import Extension
 
 about = {}
 with open('./pyml/__about__.py', 'r') as f:
     exec(f.read(), about)
+
+linear_algebra_module = Extension('linearAlgebraModule',
+                                  sources=['./pyml/maths/src/linearalgebramodule.c'])
+
 
 setup(
     name='PyML',
@@ -27,5 +32,6 @@ setup(
     author=about['__author__'],
     author_email=about['__author_email__'],
     description='Pure python machine learning',
-    test_suite="tests"
+    test_suite="tests",
+    ext_modules=[linear_algebra_module]
 )
