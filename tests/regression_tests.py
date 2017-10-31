@@ -15,17 +15,18 @@ class LinearRegressionTest(unittest.TestCase):
         cls.regressor.train(X=cls.X_train, y=cls.y_train)
 
     def test_iterations(self):
-        self.assertEqual(self.regressor.iterations, 7)
+        self.assertEqual(self.regressor.iterations, 9)
 
     def test_coefficients(self):
-        self.assertListEqual(self.regressor.coefficients, [0.4907136205265401, 0.9034467828351432])
+        self.assertAlmostEqual(self.regressor.coefficients[0], 0.49321788756070506, delta=0.001)
+        self.assertAlmostEqual(self.regressor.coefficients[1], 1.0352620298061765, delta=0.001)
 
     def test_cost(self):
-        self.assertAlmostEqual(self.regressor.cost[0], 3.5181936893597365)
-        self.assertAlmostEqual(self.regressor.cost[-1], 0.49247697691721576)
+        self.assertAlmostEqual(self.regressor.cost[0], 6.058113023701938, delta=0.001)
+        self.assertAlmostEqual(self.regressor.cost[-1], 0.5841074648208295, delta=0.001)
 
     def test_predict(self):
-        self.assertAlmostEqual(self.regressor.predict(self.X_test)[0], 3.8176098320897065)
+        self.assertAlmostEqual(self.regressor.predict(self.X_test)[0], 3.0, delta=0.001)
 
     def test_mse(self):
-        self.assertAlmostEqual(self.regressor.score(self.X_test, self.y_test), 1.3280324597827904)
+        self.assertAlmostEqual(self.regressor.score(self.X_test, self.y_test), 1.4465282568357114, delta=0.001)
