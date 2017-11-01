@@ -54,7 +54,11 @@ def broadcast(u, n):
 
 
 def subtract(u, v):
-    return list(starmap(sub, zip(u, v)))
+    if not isinstance(u, list):
+        raise TypeError("Expected a list, but got {} instead.".format(type(u)))
+    if not isinstance(v, list):
+        raise TypeError("Expected a list, but got {} instead.".format(type(v)))
+    return linearAlgebraModule.subtract(u, v)
 
 
 def power(u, n):
