@@ -1,3 +1,6 @@
+from ..maths import subtract, power
+
+
 def calculate_distance(u, v, p):
     if p == 1:
         return manhattan_distance(u, v)
@@ -8,7 +11,7 @@ def calculate_distance(u, v, p):
 
 
 def norm(u, v, p):
-    return sum([abs(u_i - v_i) ** p for u_i, v_i in zip(u, v)]) ** (1 / p)
+    return sum(power(subtract(u, v), 2)) ** (1 / p)
 
 
 def euclidean_distance(u, v):
