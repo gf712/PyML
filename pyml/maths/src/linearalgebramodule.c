@@ -30,6 +30,7 @@ double * matrix_vector_dot_product(PyObject* A, PyObject* v, int ASize, int VSiz
     double* row_result = malloc(sizeof(double) * ASize);
     int i;
 
+    #pragma omp parallel for
     for (i = 0; i < ASize ; ++i) {
 
 

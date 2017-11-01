@@ -6,7 +6,8 @@ with open('./pyml/__about__.py', 'r') as f:
     exec(f.read(), about)
 
 linear_algebra_module = Extension('linearAlgebraModule',
-                                  sources=['./pyml/maths/src/linearalgebramodule.c'])
+                                  sources=['./pyml/maths/src/linearalgebramodule.c'],
+                                  extra_compile_args=['-static', '-lgomp', '-lblas', '-llapack'])
 
 
 setup(
