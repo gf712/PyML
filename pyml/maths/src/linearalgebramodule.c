@@ -266,7 +266,7 @@ static PyObject* version(PyObject* self) {
 
 static PyMethodDef linearAlgebraMethods[] = {
         // Python name    C function              argument representation  description
-        {"dot_product",   dot_product,            METH_VARARGS,            "Calculated the dot product of two vectors"},
+        {"dot_product",   dot_product,            METH_VARARGS,            "Calculate the dot product of two vectors"},
         {"power",         power,                  METH_VARARGS,            "Calculate element wise power"},
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},

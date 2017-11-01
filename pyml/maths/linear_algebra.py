@@ -32,11 +32,6 @@ def dot_product(u, v):
         raise NotImplementedError("This is not the code you are looking for.")
 
 
-def matrix_vector_product(A, u):
-    u = broadcast(u, len(u))
-    return [dot_product(A[i], u[i]) for i in range(len(u))]
-
-
 def transpose(m):
     return [[m[j][i] for j in range(len(m))] for i in range(len(m[0]))]
 
