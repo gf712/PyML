@@ -25,10 +25,9 @@ def dot_product(u, v):
     """
 
     if len(u) == len(v) and isinstance(u[0], (float, int)) and isinstance(v[0], (float, int)):
-        return linearAlgebraModule.dot_product(u, v)
+        return linearAlgebraModule.dot_product([u], v)
     elif len(u[0]) == len(v):
-        v = broadcast(v, len(u))
-        return [dot_product(u[i], v[i]) for i in range(len(u))]
+        return linearAlgebraModule.dot_product(u, v)
     else:
         raise NotImplementedError("This is not the code you are looking for.")
 
