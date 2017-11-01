@@ -29,7 +29,7 @@ class LinearRegression(LinearBase):
 
         e = 1000
         self._iteration = 0
-        h = self._predict(X)
+        h = self._predict(self.X)
         loss = subtract(h, y)
         J_new = sum(power(loss, 2)) / (2 * self._m)
         X_transpose = transpose(self.X)
@@ -47,7 +47,7 @@ class LinearRegression(LinearBase):
             self._coefficients = [coefficient - self._learning_rate * gradient
                                   for coefficient, gradient in zip(self._coefficients, gradients)]
 
-            h = self._predict(X)
+            h = self._predict(self.X)
             loss = subtract(h, y)
             J_new = sum(power(loss, 2)) / (2 * self._m)
             e = float(J_old - J_new)
@@ -57,10 +57,14 @@ class LinearRegression(LinearBase):
     def _predict(self, X):
         # return [dot_product([1] + row, self._coefficients) if self.bias
         #         else dot_product(row, self._coefficients) for row in X]
-        if self.bias:
-            return dot_product([[1] + row for row in X], self._coefficients)
-        else:
+        if self.bias and len(X[0]) == self._n_features + 1:
             return dot_product(X, self.coefficients)
+        elif self.bias and len(X[0]) == self._n_features:
+            return dot_product([[1] + row for row in X], self._coefficients)
+        elif not self.bias:
+            return dot_product(X, self.coefficients)
+        else:
+            raise ValueError("Something went wrong.")
 
     def _score(self, X, y_true, scorer='mean_squared_error'):
         if scorer == 'mean_squared_error':
