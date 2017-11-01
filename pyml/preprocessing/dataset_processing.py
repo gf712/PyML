@@ -13,6 +13,8 @@ def train_test_split(X, y, train_split=0.3, shuffle=True, seed=None):
         data = list(zip(X, y))
         random.shuffle(data)
         X, y = zip(*data)
+        X = list(X)
+        y = list(y)
 
     n_train = int(len(X) * train_split)
 
