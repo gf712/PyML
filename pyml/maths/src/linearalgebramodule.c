@@ -1,5 +1,6 @@
 #include <Python.h>
 #include <stdio.h>
+#include <math.h>
 
 // Handle errors
 // static PyObject *algebraError;
@@ -46,6 +47,25 @@ double * matrix_vector_dot_product(PyObject* A, PyObject* v, int ASize, int VSiz
 //
 //}
 
+double * vector_power(PyObject* A, int pPower, int ASize) {
+
+    double* power_result = malloc(sizeof(double) * ASize);
+    int i;
+
+    for (i = 0; i < ASize; ++i) {
+
+        PyObject *A_item = PyList_GetItem(A, i);
+        double pElement = PyFloat_AsDouble(A_item);
+
+        power_result[i] = pow(pElement, pPower);
+
+    }
+
+    return power_result;
+
+}
+
+
 double * vector_subtract(PyObject* u, PyObject* v, int ASize) {
 
     double* subtract_result = malloc(sizeof(double) * ASize);
@@ -88,7 +108,6 @@ PyObject *Convert_1DArray(double array[], int length) {
 
     return pylist;
 }
-
 
 
 // Define dot product using python lists
@@ -136,7 +155,58 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
 
     free(result);
 
-    return Py_BuildValue("O", result_py_list);
+    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    Py_DECREF(result_py_list);
+
+    return FinalResult;
+}
+
+
+static PyObject* power(PyObject* self, PyObject *args) {
+
+    // prepare to handle python objects (two lists U and V), and U and V items and then n
+    int sizeOfA;
+
+    // pointers to python lists
+    PyObject *pAArray;
+    PyObject *pPower;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pAArray, &pPower)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and an integer!");
+        return NULL;
+    }
+
+    // use PyList_Size to get size of vector
+    sizeOfA = PyList_Size(pAArray);
+
+    if (sizeOfA == 0){
+        PyErr_SetString(PyExc_ValueError, "Argument U is empty");
+        return NULL;
+    }
+
+
+    if (pPower < 0) {
+        PyErr_SetString(PyExc_ValueError, "Power must be greater than 0.");
+    }
+
+    double *result;
+    PyObject *result_py_list;
+
+    result = vector_power(pAArray, pPower, sizeOfA);
+
+    result_py_list = Convert_1DArray(result, sizeOfA);
+
+    free(result);
+
+    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    Py_DECREF(result_py_list);
+
+    return FinalResult;
+}
+
 
 static PyObject* subtract(PyObject* self, PyObject *args) {
 
@@ -197,6 +267,7 @@ static PyObject* version(PyObject* self) {
 static PyMethodDef linearAlgebraMethods[] = {
         // Python name    C function              argument representation  description
         {"dot_product",   dot_product,            METH_VARARGS,            "Calculated the dot product of two vectors"},
+        {"power",         power,                  METH_VARARGS,            "Calculate element wise power"},
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {NULL, NULL, 0, NULL}

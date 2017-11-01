@@ -62,7 +62,7 @@ def subtract(u, v):
 
 
 def power(u, n):
-    return [x ** n for x in u]
+    return linearAlgebraModule.power(u, n)
 
 
 def divide(u, n):
