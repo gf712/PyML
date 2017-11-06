@@ -1,7 +1,7 @@
 from .base import LinearBase
 from ..maths import dot_product, mean_squared_error, mean_absolute_error, subtract, power, transpose, divide
 from ..utils import set_seed
-import gradientDescentModule
+from pyml.maths import gradient_descent
 
 
 class LinearRegression(LinearBase):

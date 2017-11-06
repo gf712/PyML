@@ -330,6 +330,6 @@ static struct PyModuleDef linearAlgebraModule = {
 };
 
 
-PyMODINIT_FUNC PyInit_linearAlgebraModule(void) {
+PyMODINIT_FUNC PyInit_Clinear_algebra(void) {
     return PyModule_Create(&linearAlgebraModule);
 }

@@ -1,5 +1,5 @@
 from .math_utils import mean
-import linearAlgebraModule
+from pyml.maths import Clinear_algebra
 
 
 def dot_product(u, v):
@@ -24,9 +24,9 @@ def dot_product(u, v):
     """
 
     if len(u) == len(v) and isinstance(u[0], (float, int)) and isinstance(v[0], (float, int)):
-        return linearAlgebraModule.dot_product([u], v)
+        return Clinear_algebra.dot_product([u], v)
     elif len(u[0]) == len(v):
-        return linearAlgebraModule.dot_product(u, v)
+        return Clinear_algebra.dot_product(u, v)
     else:
         raise NotImplementedError("This is not the code you are looking for.")
 
@@ -52,11 +52,11 @@ def subtract(u, v):
         raise TypeError("Expected a list, but got {} instead.".format(type(u)))
     if not isinstance(v, list):
         raise TypeError("Expected a list, but got {} instead.".format(type(v)))
-    return linearAlgebraModule.subtract(u, v)
+    return Clinear_algebra.subtract(u, v)
 
 
 def power(u, n):
-    return linearAlgebraModule.power(u, n)
+    return Clinear_algebra.power(u, n)
 
 
 def divide(u, n):

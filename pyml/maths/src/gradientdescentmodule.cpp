@@ -268,6 +268,6 @@ static struct PyModuleDef gradientDescentModule = {
         gradientDescentMethods // method defs
 };
 
-PyMODINIT_FUNC PyInit_gradientDescentModule(void) {
+PyMODINIT_FUNC PyInit_gradient_descent(void) {
     return PyModule_Create(&gradientDescentModule);
 }
