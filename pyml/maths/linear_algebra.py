@@ -1,11 +1,10 @@
 from .math_utils import mean
-from itertools import starmap
-from operator import sub
 import linearAlgebraModule
 
 
 def dot_product(u, v):
     """
+    Dot product using C extension.
 
     :param u:
     :param v:
@@ -20,7 +19,7 @@ def dot_product(u, v):
     >>> x = [2, 1, 0]
     >>> result = dot_product(A, x)
     >>> print(result)
-    [[1], [-3]]
+    [1, -3]
 
     """
 
