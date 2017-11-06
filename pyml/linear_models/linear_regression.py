@@ -62,4 +62,4 @@ class LinearRegression(LinearBase):
 
     @property
     def iterations(self):
-        return self._iteration
+        return self._iterations
