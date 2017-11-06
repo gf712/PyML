@@ -30,7 +30,6 @@ double * matrix_vector_dot_product(PyObject* A, PyObject* v, int ASize, int VSiz
     double* row_result = malloc(sizeof(double) * ASize);
     int i;
 
-    #pragma omp parallel for
     for (i = 0; i < ASize ; ++i) {
 
 
@@ -85,6 +84,26 @@ double * vector_subtract(PyObject* u, PyObject* v, int ASize) {
     }
 
     return subtract_result;
+
+}
+
+
+double vector_sum(PyObject* u, int size) {
+
+    double sum_result = 0;
+    int i;
+
+    for (i = 0; i < size; ++i) {
+
+        PyObject *uItem = PyList_GetItem(u, i);
+
+        double pUElement = PyFloat_AsDouble(uItem);
+
+        sum_result += pUElement;
+
+    }
+
+    return sum_result;
 
 }
 
@@ -261,8 +280,40 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
 }
 
 
+static PyObject* sum(PyObject* self, PyObject *args) {
+
+    // prepare to handle python objects (two lists U and V), and U and V items and then n
+    int sizeOfA;
+
+    // pointers to python lists
+    PyObject *pAArray;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!", &PyList_Type, &pAArray)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and an integer!");
+        return NULL;
+    }
+
+    // use PyList_Size to get size of vector
+    sizeOfA = PyList_Size(pAArray);
+
+    if (sizeOfA == 0){
+        PyErr_SetString(PyExc_ValueError, "Argument U is empty");
+        return NULL;
+    }
+
+    double result;
+
+    result = vector_sum(pAArray, sizeOfA);
+
+    PyObject *FinalResult = Py_BuildValue("d", result);
+
+    return FinalResult;
+}
+
+
 static PyObject* version(PyObject* self) {
-    return Py_BuildValue("s", "Version 0.1");
+    return Py_BuildValue("s", "Version 0.2");
 }
 
 static PyMethodDef linearAlgebraMethods[] = {
@@ -270,6 +321,7 @@ static PyMethodDef linearAlgebraMethods[] = {
         {"dot_product",   dot_product,            METH_VARARGS,            "Calculate the dot product of two vectors"},
         {"power",         power,                  METH_VARARGS,            "Calculate element wise power"},
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
+        {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {NULL, NULL, 0, NULL}
 };
