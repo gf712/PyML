@@ -101,6 +101,16 @@ void updateWeights(PyObject* theta, const double* gradients, double learningRate
 }
 
 
+double calculateCost(PyObject* X, PyObject* theta, double* prediction, PyObject* y, double* loss, int n, int m) {
+    // first prediction
+    predict(X, theta, prediction, n, m);
+
+    // calculate initial cost and store result
+    subtract(prediction, y, loss, n);
+    return cost(loss, n);
+}
+
+
 int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration, double epsilon, double learningRate, int n, int m, double* costArray) {
 
     // variable initialisation
@@ -123,21 +133,11 @@ int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration,
     loss = new double[n];
     gradients = new double[m];
 
-
     // X transpose (m by n matrix)
     // X is a n by m matrix
     transpose(X, X_transpose, n, m);
 
-//    // make sure that X_transpose is correct
-//    if (PyFloat_AsDouble(PyList_GetItem(PyList_GetItem(X, 5), 50)) != X_transpose[5][50])
-//        PyErr_SetString(PyExc_ValueError, "Error!!!!!!!!");
-
-    // first prediction
-    predict(X, theta, prediction, n, m);
-
-    // calculate initial cost and store result
-    subtract(prediction, y, loss, n);
-    JNew = cost(loss, n);
+    JNew = calculateCost(X, theta, prediction, y, loss, n, m);
     costArray[iteration] = JNew;
 
     // gradient descent
@@ -153,13 +153,9 @@ int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration,
         updateWeights(theta, gradients, learningRate, m);
 
         // calculate cost for new weights
-        predict(X, theta, prediction, n, m);
-        subtract(prediction, y, loss, n);
-        JNew = cost(loss, n);
+        JNew = calculateCost(X, theta, prediction, y, loss, n, m);
         e = JOld - JNew;
-
         costArray[iteration+1] = JNew;
-
 
         iteration += 1;
     }
@@ -174,6 +170,8 @@ int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration,
     delete [] loss;
     delete [] gradients;
 
+
+    // return number of iterations needed to reach convergence
     return iteration;
 }
 
