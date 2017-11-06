@@ -1,10 +1,10 @@
 from .base import LinearBase
-from ..maths import mean, dot_product, mean_squared_error, mean_absolute_error, subtract, power, transpose, divide
+from ..maths import dot_product, mean_squared_error, mean_absolute_error, subtract, power, transpose, divide
 from ..utils import set_seed
+import gradientDescentModule
 
 
 class LinearRegression(LinearBase):
-
     def __init__(self, seed=None, bias=True, error_function='least_squares', learning_rate=0.01,
                  epsilon=0.01, max_iterations=10000):
 
@@ -21,42 +21,18 @@ class LinearRegression(LinearBase):
         self.X = X
         self.y = y
 
-        self._m = len(X)
         self._n_features = len(X[0])
         self._initiate_weights(bias=self.bias)
-        self._cost = list()
-        self._errors = list()
 
-        e = 1000
-        self._iteration = 0
-        h = self._predict(self.X)
-        loss = subtract(h, y)
-        J_new = sum(power(loss, 2)) / (2 * self._m)
-        X_transpose = transpose(self.X)
-
-        # gradient descent
-        while abs(e) >= self.epsilon and self._iteration < self.max_iterations:
-
-            J_old = J_new
-            self._cost.append(J_old)
-
-            # calculate gradient for each feature
-            gradients = divide(dot_product(X_transpose, loss), self._m)
-
-            # update coefficients
-            self._coefficients = [coefficient - self._learning_rate * gradient
-                                  for coefficient, gradient in zip(self._coefficients, gradients)]
-
-            h = self._predict(self.X)
-            loss = subtract(h, y)
-            J_new = sum(power(loss, 2)) / (2 * self._m)
-            e = float(J_old - J_new)
-
-            self._iteration += 1
+        self._coefficients, self._cost, self._iterations = gradientDescentModule.gradient_descent(self.X,
+                                                                                                  self.coefficients,
+                                                                                                  self.y,
+                                                                                                  self.max_iterations,
+                                                                                                  self.epsilon,
+                                                                                                  self._learning_rate)
 
     def _predict(self, X):
-        # return [dot_product([1] + row, self._coefficients) if self.bias
-        #         else dot_product(row, self._coefficients) for row in X]
+
         if self.bias and len(X[0]) == self._n_features + 1:
             return dot_product(X, self.coefficients)
         elif self.bias and len(X[0]) == self._n_features:

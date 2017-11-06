@@ -6,9 +6,11 @@ with open('./pyml/__about__.py', 'r') as f:
     exec(f.read(), about)
 
 linear_algebra_module = Extension('linearAlgebraModule',
-                                  sources=['./pyml/maths/src/linearalgebramodule.c'],
-                                  extra_compile_args=['-static', '-lgomp', '-lblas', '-llapack'])
+                                  sources=['./pyml/maths/src/linearalgebramodule.c'])
 
+gradient_descent_module = Extension('gradientDescentModule',
+                                    sources=['./pyml/maths/src/gradientdescentmodule.cpp'],
+                                    extra_compile_args=['-std=c++11'])
 
 setup(
     name='PyML',
@@ -32,7 +34,7 @@ setup(
     license=about['__license__'],
     author=about['__author__'],
     author_email=about['__author_email__'],
-    description='Pure python machine learning',
+    description='Machine learning with Python and C/C++',
     test_suite="tests",
-    ext_modules=[linear_algebra_module]
+    ext_modules=[linear_algebra_module, gradient_descent_module]
 )
