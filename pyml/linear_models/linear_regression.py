@@ -23,12 +23,11 @@ class LinearRegression(LinearBase):
         self._n_features = len(X[0])
         self._initiate_weights(bias=self.bias)
 
-        self._coefficients, self._cost, self._iterations = gradientDescentModule.gradient_descent(self.X,
-                                                                                                  self.coefficients,
-                                                                                                  self.y,
-                                                                                                  self.max_iterations,
-                                                                                                  self.epsilon,
-                                                                                                  self._learning_rate)
+        self._coefficients, self._cost, self._iterations = gradient_descent.gradient_descent(self.X, self.coefficients,
+                                                                                             self.y,
+                                                                                             self.max_iterations,
+                                                                                             self.epsilon,
+                                                                                             self._learning_rate)
 
     def _predict(self, X):
 
