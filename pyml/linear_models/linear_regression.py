@@ -5,14 +5,13 @@ import gradientDescentModule
 
 
 class LinearRegression(LinearBase):
-    def __init__(self, seed=None, bias=True, error_function='least_squares', learning_rate=0.01,
+    def __init__(self, seed=None, bias=True, learning_rate=0.01,
                  epsilon=0.01, max_iterations=10000):
 
         LinearBase.__init__(self)
 
         self._seed = set_seed(seed)
         self.bias = bias
-        self._error_function = error_function
         self.epsilon = epsilon
         self.max_iterations = max_iterations
         self._learning_rate = learning_rate
