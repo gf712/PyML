@@ -5,15 +5,16 @@ about = {}
 with open('./pyml/__about__.py', 'r') as f:
     exec(f.read(), about)
 
-linear_algebra_module = Extension('linearAlgebraModule',
 linear_algebra_module = Extension('pyml.maths.Clinear_algebra',
                                   sources=['./pyml/maths/src/linearalgebramodule.cpp'],
-                                  extra_compile_args=['-std=c++11'])
+                                  extra_compile_args=['-std=c++11'],
+                                  language='c++')
 
-gradient_descent_module = Extension('gradientDescentModule',
-                                    sources=['./pyml/maths/src/gradientdescentmodule.cpp'],
-                                    extra_compile_args=['-std=c++11'])
 gradient_descent_module = Extension('pyml.maths.gradient_descent',
+                                    sources=['./pyml/maths/src/gradientdescentmodule.cpp',
+                                             './pyml/maths/src/linearalgebramodule.cpp'],
+                                    extra_compile_args=['-std=c++11'],
+                                    language='c++')
 
 setup(
     name='PyML',
@@ -39,5 +40,5 @@ setup(
     author_email=about['__author_email__'],
     description='Machine learning with Python and C/C++',
     test_suite="tests",
-    ext_modules=[linear_algebra_module, gradient_descent_module]
+    ext_modules=[linear_algebra_module, gradient_descent_module],
 )

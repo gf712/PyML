@@ -1,54 +1,10 @@
 #include <Python.h>
 #include <iostream>
-
-
-void pyDotProduct(PyObject* X, PyObject* w, double* prediction, int rows, int cols) {
-
-    for (int i = 0; i < rows; ++i) {
-        PyObject* row = PyList_GetItem(X, i);
-        prediction[i] = 0;
-        for (int j = 0; j < cols; ++j) {
-            double w_j = PyFloat_AsDouble(PyList_GetItem(w, j));
-            prediction[i] += PyFloat_AsDouble(PyList_GetItem(row, j)) * w_j;
-        }
-    }
-}
+#include "../include/linearalgebramodule.h"
 
 
 void predict(PyObject* X, PyObject* w, double* prediction, int rows, int cols) {
-    pyDotProduct(X, w, prediction, rows, cols);
-}
-
-
-void dotProduct(double** X, const double * w, double* prediction, int rows, int cols) {
-
-    for (int i = 0; i < rows; ++i) {
-        prediction[i] = 0;
-        for (int j = 0; j < cols; ++j) {
-            prediction[i] += X[i][j] * w[j];
-        }
-    }
-}
-
-
-void subtract(const double* prediction, PyObject* y, double* loss, int rows) {
-
-    for (int i = 0; i < rows; ++i) {
-        loss[i] = prediction[i] - PyFloat_AsDouble(PyList_GetItem(y, i));
-    }
-
-}
-
-
-double sum(const double* array, int rows) {
-
-    double result=0;
-
-    for (int i = 0; i < rows; ++i) {
-        result += array[i];
-    }
-
-    return result;
+    pypyMatrixVectorDotProduct(X, w, rows, cols, prediction);
 }
 
 
@@ -72,21 +28,15 @@ void transpose(PyObject* X, double** result, int rows, int cols) {
 double cost(double* loss, int rows){
     double result[rows];
     power(loss, 2, rows, result);
-    return sum(result, rows) / (2 * rows);
+    return cVectorSum(result, rows) / (2 * rows);
 }
 
-
-void divide(double* X, int n, int size) {
-    for (int i = 0; i < size; ++i) {
-        X[i] /= (double)n;
-    }
-}
 
 
 void gradientCalculation(double** X, double* loss, double* gradients, int rows, int cols) {
 
-    dotProduct(X, loss, gradients, rows, cols);
-    divide(gradients, cols, rows);
+    ccMatrixVectorDotProduct(X, loss, gradients, rows, cols);
+    cVectorDivide(gradients, cols, rows);
 
 }
 
@@ -106,7 +56,7 @@ double calculateCost(PyObject* X, PyObject* theta, double* prediction, PyObject*
     predict(X, theta, prediction, n, m);
 
     // calculate initial cost and store result
-    subtract(prediction, y, loss, n);
+    cPyVectorSubtract(prediction, y, loss, n);
     return cost(loss, n);
 }
 
@@ -174,29 +124,6 @@ int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration,
     // return number of iterations needed to reach convergence
     return iteration;
 }
-
-
-PyObject* Convert_1DArray(double* array, int length) {
-
-    PyObject* pylist;
-    PyObject* item;
-    int i;
-
-    pylist = PyList_New(length);
-
-    if (pylist != nullptr) {
-
-        for (i=0; i<length; i++) {
-            item = PyFloat_FromDouble(array[i]);
-            PyList_SET_ITEM(pylist, i, item);
-
-        }
-
-    }
-
-    return pylist;
-}
-
 
 
 static PyObject *gradient_descent(PyObject *self, PyObject *args) {

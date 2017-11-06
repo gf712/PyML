@@ -1,4 +1,5 @@
 #include <Python.h>
+#include "../include/linearalgebramodule.h"
 
 // Handle errors
 // static PyObject *algebraError;
@@ -23,18 +24,27 @@ double vector_dot_product(PyObject* u, PyObject* v, int size) {
     return result;
 }
 
-void matrix_vector_dot_product(PyObject* A, PyObject* v, int ASize, int VSize, double* result) {
+void pypyMatrixVectorDotProduct(PyObject* A, PyObject* v, int ASize, int VSize, double* result) {
 
     int i;
 
     for (i = 0; i < ASize ; ++i) {
-
 
         PyObject *A_item = PyList_GetItem(A, i);
 
         result[i] = vector_dot_product(A_item, v, VSize);
     }
 
+}
+
+void ccMatrixVectorDotProduct(double** X, const double * w, double* prediction, int rows, int cols) {
+
+    for (int i = 0; i < rows; ++i) {
+        prediction[i] = 0;
+        for (int j = 0; j < cols; ++j) {
+            prediction[i] += X[i][j] * w[j];
+        }
+    }
 }
 
 //double * matrix_matrix_dot_product(PyObject *A, PyObject *B, int ASize, int BSize) {
@@ -59,7 +69,7 @@ void vector_power(PyObject* A, int pPower, int ASize, double* result) {
 }
 
 
-double * vector_subtract(PyObject* u, PyObject* v, int ASize, double* result) {
+void pyCVectorSubtract(PyObject* u, PyObject* v, int ASize, double* result) {
 
     int i;
 
@@ -74,13 +84,18 @@ double * vector_subtract(PyObject* u, PyObject* v, int ASize, double* result) {
         result[i] = pUElement - pVElement;
 
     }
+}
 
-    return result;
+void cPyVectorSubtract(const double* prediction, PyObject* y, double* loss, int rows) {
+
+    for (int i = 0; i < rows; ++i) {
+        loss[i] = prediction[i] - PyFloat_AsDouble(PyList_GetItem(y, i));
+    }
 
 }
 
 
-double vector_sum(PyObject* u, int size) {
+double pyVectorSum(PyObject* u, int size) {
 
     double sum_result = 0;
     int i;
@@ -97,6 +112,24 @@ double vector_sum(PyObject* u, int size) {
 
     return sum_result;
 
+}
+
+double cVectorSum(const double* array, int rows) {
+
+    double result=0;
+
+    for (int i = 0; i < rows; ++i) {
+        result += array[i];
+    }
+
+    return result;
+}
+
+
+void cVectorDivide(double* X, int n, int size) {
+    for (int i = 0; i < size; ++i) {
+        X[i] /= (double)n;
+    }
 }
 
 
@@ -159,7 +192,7 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
     PyObject *result_py_list;
 
 
-    matrix_vector_dot_product(pAArray, pVVector, sizeOfA, sizeOfV, result);
+    pypyMatrixVectorDotProduct(pAArray, pVVector, sizeOfA, sizeOfV, result);
 
     result_py_list = Convert_1DArray(result, sizeOfA);
 
@@ -260,7 +293,7 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    result = vector_subtract(pUVector, pVVector, sizeOfU, result);
+    pyCVectorSubtract(pUVector, pVVector, sizeOfU, result);
 
     result_py_list = Convert_1DArray(result, sizeOfU);
 
@@ -298,7 +331,7 @@ static PyObject* sum(PyObject* self, PyObject *args) {
 
     double result;
 
-    result = vector_sum(pAArray, sizeOfA);
+    result = pyVectorSum(pAArray, sizeOfA);
 
     PyObject *FinalResult = Py_BuildValue("d", result);
 
