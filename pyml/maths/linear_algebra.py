@@ -20,6 +20,11 @@ def dot_product(u, v):
     >>> result = dot_product(A, x)
     >>> print(result)
     [1, -3]
+    >>> A = [[0, -4, 4], [-3, -2, 0]]
+    >>> B = [[0, 1], [2, 1], [-1, 3]]
+    >>> result = dot_product(A, B)
+    >>> print(result)
+    [[0.0, -10.0], [-3.0, -1.0]]
 
     """
     if isinstance(u[0], list) and isinstance(v[0], list):

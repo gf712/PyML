@@ -66,7 +66,7 @@ void pypyMatrixMatrixProduct(PyObject* A, PyObject* B, int rows, int cols, doubl
 
     pyTranspose(B, other, cols, rows);
 
-    for (int i = 0; i < cols; ++i) {
+    for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < rows; ++j) {
             result[i][j] = pyCDotProduct(PyList_GetItem(A, i), other[j], cols);
         }
