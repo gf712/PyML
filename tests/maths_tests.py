@@ -25,7 +25,14 @@ class LinearAlgebraTest(unittest.TestCase):
 
         set_seed(1970)
 
-        cls.A = [[random.random() for e in range(10)] for x in range(10)]
+        cls.A = [[random.random() for e in range(8)] for x in range(10)]
+        cls.B = [[random.random() for e in range(10)] for x in range(8)]
 
     def test_transpose(self):
-        self.assertAlmostEqual(transpose(self.A)[5][8], 0.7441599310937185)
+        self.assertAlmostEqual(transpose(self.A)[5][8], 0.38628163852256203)
+
+    def test_matrix_product(self):
+        self.assertAlmostEqual(dot_product(self.A, self.B)[5][8], 2.2269865779018874)
+
+    def test_dot_product(self):
+        self.assertAlmostEqual(dot_product(self.A[0], transpose(self.B)[0])[0], 0.691239893627)
