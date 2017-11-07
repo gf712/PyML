@@ -21,6 +21,7 @@ void vector_power(PyObject* A, int pPower, int ASize, double* result);
 void pyCVectorSubtract(PyObject* u, PyObject* v, int ASize, double* result);
 double pyVectorSum(PyObject* u, int size);
 PyObject* Convert_2DArray(double** array, int rows, int cols);
+void pypyMatrixMatrixProduct(PyObject* A, PyObject* B, int ASize, int BSize, double** result);
 
 #ifdef __cplusplus
 }

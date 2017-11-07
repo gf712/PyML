@@ -4,7 +4,7 @@ from pyml.maths import Clinear_algebra
 
 def dot_product(u, v):
     """
-    Dot product using C extension.
+    Dot product using C++ extension.
 
     :param u:
     :param v:
@@ -22,8 +22,9 @@ def dot_product(u, v):
     [1, -3]
 
     """
-
-    if len(u) == len(v) and isinstance(u[0], (float, int)) and isinstance(v[0], (float, int)):
+    if isinstance(u[0], list) and isinstance(v[0], list):
+        return matrix_product(u, v)
+    elif len(u) == len(v) and isinstance(u[0], (float, int)) and isinstance(v[0], (float, int)):
         return Clinear_algebra.dot_product([u], v)
     elif len(u[0]) == len(v):
         return Clinear_algebra.dot_product(u, v)
@@ -61,3 +62,7 @@ def power(u, n):
 
 def divide(u, n):
     return [x / n for x in u]
+
+
+def matrix_product(m, n):
+    return Clinear_algebra.matrix_product(m, n)

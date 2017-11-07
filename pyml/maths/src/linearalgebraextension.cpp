@@ -241,9 +241,86 @@ static PyObject* transpose(PyObject* self, PyObject *args) {
     return FinalResult;
 }
 
+
+static PyObject* matrix_product(PyObject* self, PyObject *args) {
+
+    int rowsA, rowsB, colsA, colsB;
+
+    // pointers to python lists
+    PyObject *pAArray;
+    PyObject *pBArray;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pAArray, &PyList_Type, &pBArray)) {
+        PyErr_SetString(PyExc_TypeError, "Expected two lists!");
+        return nullptr;
+    }
+
+    if (!PyList_Check(PyList_GetItem(pAArray, 0))) {
+        PyErr_SetString(PyExc_TypeError, "Expected A to be a list of lists!");
+        return nullptr;
+    }
+
+    if (!PyList_Check(PyList_GetItem(pBArray, 0))) {
+        PyErr_SetString(PyExc_TypeError, "Expected B to be a list of lists!");
+        return nullptr;
+    }
+
+    // use PyList_Size to get size of vectors
+    rowsA = PyList_Size(pAArray);
+    colsA = PyList_Size(PyList_GetItem(pAArray, 0));
+    rowsB = PyList_Size(pBArray);
+    colsB = PyList_Size(PyList_GetItem(pBArray, 0));
+
+    if (rowsA != colsB){
+        PyErr_SetString(PyExc_ValueError, "Number of rows in A must be the same as the number of columns in B");
+        return nullptr;
+    }
+
+    if (colsA != rowsB){
+        PyErr_SetString(PyExc_ValueError, "Number of columns in A must be the same as the number of rows in B");
+        return nullptr;
+    }
+
+    double** result = nullptr;
+
+    result = new double *[rowsA];
+
+    for (int i = 0; i < rowsA; ++i) {
+        result[i] = new double [rowsA];
+    }
+
+    PyObject *result_py_list;
+
+    pypyMatrixMatrixProduct(pAArray, pBArray, rowsA, colsA, result);
+
+    result_py_list = Convert_2DArray(result, rowsA, colsB);
+
+    for (int i = 0; i < rowsA; ++i) {
+        delete [] result[i];
+    }
+    delete [] result;
+
+    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    Py_DECREF(result_py_list);
+
+    return FinalResult;
+
+//    PyObject *FinalResult = Py_BuildValue("i", rowsA);
+//    return FinalResult;
+
+}
+
+static PyObject* version(PyObject* self) {
+    return Py_BuildValue("s", "Version 0.3");
+}
+
+
 static PyMethodDef linearAlgebraMethods[] = {
         // Python name    C function              argument representation  description
         {"dot_product",   dot_product,            METH_VARARGS,            "Calculate the dot product of two vectors"},
+        {"matrix_product",matrix_product,         METH_VARARGS,            "Calculate the product of two matrices"},
         {"power",         power,                  METH_VARARGS,            "Calculate element wise power"},
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
         {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
