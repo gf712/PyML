@@ -6,14 +6,15 @@ with open('./pyml/__about__.py', 'r') as f:
     exec(f.read(), about)
 
 linear_algebra_module = Extension('pyml.maths.Clinear_algebra',
-                                  sources=['./pyml/maths/src/linearalgebramodule.cpp'],
+                                  sources=['pyml/maths/src/linearalgebramodule.cpp',
+                                           'pyml/maths/src/linearalgebraextension.cpp'],
                                   extra_compile_args=['-std=c++11'],
                                   include_dirs=['pyml/maths/include'],
                                   language='c++')
 
 gradient_descent_module = Extension('pyml.maths.gradient_descent',
-                                    sources=['./pyml/maths/src/gradientdescentmodule.cpp',
-                                             './pyml/maths/src/linearalgebramodule.cpp'],
+                                    sources=['pyml/maths/src/gradientdescentmodule.cpp',
+                                             'pyml/maths/src/linearalgebramodule.cpp'],
                                     extra_compile_args=['-std=c++11'],
                                     include_dirs=['pyml/maths/include'],
                                     language='c++')
