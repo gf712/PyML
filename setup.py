@@ -1,5 +1,13 @@
 from setuptools import setup
 from setuptools import Extension
+import distutils.sysconfig
+
+# Workaround setuptools -Wstrict-prototypes warnings
+# From https://stackoverflow.com/a/29634231/23845
+cfg_vars = distutils.sysconfig.get_config_vars()
+for key, value in cfg_vars.items():
+    if type(value) == str:
+        cfg_vars[key] = value.replace("-Wstrict-prototypes", "")
 
 about = {}
 with open('./pyml/__about__.py', 'r') as f:
