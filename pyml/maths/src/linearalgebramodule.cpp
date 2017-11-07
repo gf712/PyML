@@ -387,13 +387,14 @@ static PyObject* transpose(PyObject* self, PyObject *args) {
 
     // return error if we don't get all the arguments
     if(!PyArg_ParseTuple(args, "O!", &PyList_Type, &pArray)) {
-        PyErr_SetString(PyExc_TypeError, "Expected a list and an integer!");
-        return NULL;
+        PyErr_SetString(PyExc_TypeError, "Expected a list!");
+        return nullptr;
     }
 
     // use PyList_Size to get dimensions of array
     cols = PyList_Size(pArray);
     rows = PyList_Size(PyList_GetItem(pArray, 0));
+
 
     if (cols == 0){
         PyErr_SetString(PyExc_ValueError, "Argument U is empty");
@@ -402,8 +403,8 @@ static PyObject* transpose(PyObject* self, PyObject *args) {
 
     // allocate memory for result
     result = new double *[cols];
-    for (int i = 0; i < rows; ++i) {
-        result[i] = new double[i];
+    for (int i = 0; i < cols; ++i) {
+        result[i] = new double[rows];
     }
 
     pyTranspose(pArray, result, rows, cols);
