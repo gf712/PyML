@@ -1,5 +1,5 @@
 #include <Python.h>
-#include "../include/linearalgebramodule.h"
+#include "linearalgebramodule.h"
 
 // Handle errors
 // static PyObject *algebraError;
@@ -152,6 +152,36 @@ PyObject *Convert_1DArray(double array[], int length) {
     }
 
     return pylist;
+}
+
+
+PyObject* Convert_2DArray(double** array, int rows, int cols) {
+    PyObject* twoDResult;
+    PyObject* row;
+    PyObject* item;
+
+    twoDResult = PyList_New(rows);
+
+    for (int j = 0; j < rows; ++j) {
+        row = PyList_New(cols);
+        for (int k = 0; k < cols; ++k) {
+            item = PyFloat_FromDouble(array[j][k]);
+            PyList_SET_ITEM(row, k, item);
+        }
+        PyList_SET_ITEM(twoDResult, j, row);
+    }
+
+    return twoDResult;
+}
+
+
+void pyTranspose(PyObject* X, double** result, int rows, int cols) {
+    for (int i = 0; i < rows; ++i) {
+        PyObject* row = PyList_GetItem(X, i);
+        for (int j = 0; j < cols; ++j) {
+            result[j][i] = PyFloat_AsDouble(PyList_GetItem(row, j));
+        }
+    }
 }
 
 
@@ -343,12 +373,62 @@ static PyObject* version(PyObject* self) {
     return Py_BuildValue("s", "Version 0.2");
 }
 
+
+static PyObject* transpose(PyObject* self, PyObject *args) {
+
+    // declarations
+    double** result;
+    int cols, rows;
+    PyObject* pyResult;
+
+
+    // pointers to python lists
+    PyObject* pArray;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!", &PyList_Type, &pArray)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and an integer!");
+        return NULL;
+    }
+
+    // use PyList_Size to get dimensions of array
+    cols = PyList_Size(pArray);
+    rows = PyList_Size(PyList_GetItem(pArray, 0));
+
+    if (cols == 0){
+        PyErr_SetString(PyExc_ValueError, "Argument U is empty");
+        return nullptr;
+    }
+
+    // allocate memory for result
+    result = new double *[cols];
+    for (int i = 0; i < rows; ++i) {
+        result[i] = new double[i];
+    }
+
+    pyTranspose(pArray, result, rows, cols);
+
+    pyResult = Convert_2DArray(result, cols, rows);
+
+    PyObject* FinalResult = Py_BuildValue("O", pyResult);
+
+    for (int i = 0; i < cols; ++i) {
+        delete [] result[i];
+    }
+    delete [] result;
+
+    Py_DECREF(pyResult);
+
+    return FinalResult;
+}
+
 static PyMethodDef linearAlgebraMethods[] = {
         // Python name    C function              argument representation  description
         {"dot_product",   dot_product,            METH_VARARGS,            "Calculate the dot product of two vectors"},
         {"power",         power,                  METH_VARARGS,            "Calculate element wise power"},
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
         {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
+        {"transpose",     transpose,              METH_VARARGS,            "Transpose a 2D matrix"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {nullptr, nullptr, 0, nullptr}
 };

@@ -16,6 +16,7 @@ void ccMatrixVectorDotProduct(double** X, const double * w, double* prediction, 
 void cPyVectorSubtract(const double* prediction, PyObject* y, double* loss, int rows);
 double cVectorSum(const double* array, int rows);
 void cVectorDivide(double* X, int n, int size);
+void pyTranspose(PyObject* X, double** result, int rows, int cols);
 
 #ifdef __cplusplus
 }

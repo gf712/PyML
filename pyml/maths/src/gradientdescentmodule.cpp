@@ -1,6 +1,6 @@
 #include <Python.h>
 #include <iostream>
-#include "../include/linearalgebramodule.h"
+#include "linearalgebramodule.h"
 
 
 void predict(PyObject* X, PyObject* w, double* prediction, int rows, int cols) {
@@ -12,15 +12,6 @@ void power(const double* array, int n, int rows, double* result) {
 
     for (int i = 0; i < rows; ++i) {
         result[i] = pow(array[i], n);
-    }
-}
-
-void transpose(PyObject* X, double** result, int rows, int cols) {
-    for (int i = 0; i < rows; ++i) {
-        PyObject* row = PyList_GetItem(X, i);
-        for (int j = 0; j < cols; ++j) {
-            result[j][i] = PyFloat_AsDouble(PyList_GetItem(row, j));
-        }
     }
 }
 
@@ -66,7 +57,7 @@ int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration,
     // variable initialisation
     double JOld;
     double JNew;
-    double** X_transpose;
+    double** X_pyTranspose;
     int iteration = 0;
     double e = 1000;
     double* prediction = nullptr;
@@ -74,18 +65,18 @@ int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration,
     double* gradients = nullptr;
 
     // memory allocation
-    X_transpose = new double *[m];
+    X_pyTranspose = new double *[m];
     for (int i = 0; i < m; ++i) {
-        X_transpose[i] = new double [n];
+        X_pyTranspose[i] = new double [n];
     }
 
     prediction = new double[n];
     loss = new double[n];
     gradients = new double[m];
 
-    // X transpose (m by n matrix)
+    // X pyTranspose (m by n matrix)
     // X is a n by m matrix
-    transpose(X, X_transpose, n, m);
+    pyTranspose(X, X_pyTranspose, n, m);
 
     JNew = calculateCost(X, theta, prediction, y, loss, n, m);
     costArray[iteration] = JNew;
@@ -97,7 +88,7 @@ int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration,
         JOld = JNew;
 
         // calculate gradient
-        gradientCalculation(X_transpose, loss, gradients, m, n);
+        gradientCalculation(X_pyTranspose, loss, gradients, m, n);
 
         // update coefficients
         updateWeights(theta, gradients, learningRate, m);
@@ -112,11 +103,11 @@ int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration,
 
     // free up memory
     for (int i = 0; i < m; ++i) {
-        delete [] X_transpose[i];
+        delete [] X_pyTranspose[i];
     }
 
     delete [] prediction;
-    delete [] X_transpose;
+    delete [] X_pyTranspose;
     delete [] loss;
     delete [] gradients;
 

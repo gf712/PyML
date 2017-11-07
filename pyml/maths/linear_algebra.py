@@ -32,7 +32,7 @@ def dot_product(u, v):
 
 
 def transpose(m):
-    return [[m[j][i] for j in range(len(m))] for i in range(len(m[0]))]
+    return Clinear_algebra.transpose(m)
 
 
 def mean_squared_error(y, y_true):

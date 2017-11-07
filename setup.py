@@ -8,12 +8,14 @@ with open('./pyml/__about__.py', 'r') as f:
 linear_algebra_module = Extension('pyml.maths.Clinear_algebra',
                                   sources=['./pyml/maths/src/linearalgebramodule.cpp'],
                                   extra_compile_args=['-std=c++11'],
+                                  include_dirs=['pyml/maths/include'],
                                   language='c++')
 
 gradient_descent_module = Extension('pyml.maths.gradient_descent',
                                     sources=['./pyml/maths/src/gradientdescentmodule.cpp',
                                              './pyml/maths/src/linearalgebramodule.cpp'],
                                     extra_compile_args=['-std=c++11'],
+                                    include_dirs=['pyml/maths/include'],
                                     language='c++')
 
 setup(
@@ -22,7 +24,11 @@ setup(
                  'Intended Audience :: Science/Research',
                  'License :: OSI Approved :: MIT License',
                  'Natural Language :: English',
-                 'Programming Language :: Python :: 3 :: Only'],
+                 'Programming Language :: Python :: 3 :: Only',
+                 'Programming Language :: Python :: Implementation :: CPython'
+                 'Programming Language :: C++',
+                 'Programming Language :: C',
+                 'Topic :: Scientific/Engineering :: Artificial Intelligence'],
     keywords='machine learning',
     version=about['__version__'],
     package_dir={'pyml': 'pyml'},
