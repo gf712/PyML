@@ -186,12 +186,6 @@ static PyObject* sum(PyObject* self, PyObject *args) {
     return FinalResult;
 }
 
-
-static PyObject* version(PyObject* self) {
-    return Py_BuildValue("s", "Version 0.2");
-}
-
-
 static PyObject* transpose(PyObject* self, PyObject *args) {
 
     // declarations
@@ -210,8 +204,8 @@ static PyObject* transpose(PyObject* self, PyObject *args) {
     }
 
     // use PyList_Size to get dimensions of array
-    cols = PyList_Size(pArray);
-    rows = PyList_Size(PyList_GetItem(pArray, 0));
+    rows = PyList_Size(pArray);
+    cols = PyList_Size(PyList_GetItem(pArray, 0));
 
 
     if (cols == 0){

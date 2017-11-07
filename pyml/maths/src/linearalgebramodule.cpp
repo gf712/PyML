@@ -5,7 +5,7 @@
 // static PyObject *algebraError;
 
 // Define vector dot product
-double vector_dot_product(PyObject* u, PyObject* v, int size) {
+double pypyDotProduct(PyObject* u, PyObject* v, int size) {
 
     double result = 0;
     int i;
@@ -224,6 +224,14 @@ void pyTranspose(PyObject* X, double** result, int rows, int cols) {
         PyObject* row = PyList_GetItem(X, i);
         for (int j = 0; j < cols; ++j) {
             result[j][i] = PyFloat_AsDouble(PyList_GetItem(row, j));
+        }
+    }
+}
+
+void cTranspose(double** X, double** result, int rows, int cols) {
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            result[j][i] = X[i][j];
         }
     }
 }
