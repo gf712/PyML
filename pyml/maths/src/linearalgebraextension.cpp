@@ -301,10 +301,60 @@ static PyObject* matrix_product(PyObject* self, PyObject *args) {
 
     return FinalResult;
 
-//    PyObject *FinalResult = Py_BuildValue("i", rowsA);
-//    return FinalResult;
-
 }
+
+
+static PyObject* least_square(PyObject* self, PyObject *args) {
+
+    int m, n, ySize;
+
+    // pointers to python lists
+    PyObject *X;
+    PyObject *y;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &X, &PyList_Type, &y)) {
+        PyErr_SetString(PyExc_TypeError, "Expected two lists!");
+        return nullptr;
+    }
+
+    if (!PyList_Check(PyList_GetItem(X, 0))) {
+        PyErr_SetString(PyExc_TypeError, "Expected A to be a list of lists!");
+        return nullptr;
+    }
+
+
+    // use PyList_Size to get size of vectors
+    n = PyList_Size(X);
+    m = PyList_Size(PyList_GetItem(X, 0));
+    ySize = PyList_Size(y);
+
+    if (n != ySize){
+        PyErr_SetString(PyExc_ValueError, "Number of rows of X must be the same as the number of training examples");
+        return nullptr;
+    }
+
+    double* theta = nullptr;
+
+    theta = new double [m];
+
+    PyObject *result_py_list;
+
+    pyLeastSquares(X, y, theta, n, m);
+
+
+
+    result_py_list = Convert_1DArray(theta, m);
+
+    delete [] theta;
+
+    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    Py_DECREF(result_py_list);
+
+    return FinalResult;
+}
+
 
 static PyObject* version(PyObject* self) {
     return Py_BuildValue("s", "Version 0.3");
@@ -319,6 +369,7 @@ static PyMethodDef linearAlgebraMethods[] = {
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
         {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
         {"transpose",     transpose,              METH_VARARGS,            "Transpose a 2D matrix"},
+        {"least_squares", least_square,           METH_VARARGS,            "Perform least squares"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {nullptr, nullptr, 0, nullptr}
 };

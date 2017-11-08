@@ -71,3 +71,7 @@ def divide(u, n):
 
 def matrix_product(m, n):
     return Clinear_algebra.matrix_product(m, n)
+
+
+def least_squares(X, y):
+    return Clinear_algebra.least_squares(X, y)
