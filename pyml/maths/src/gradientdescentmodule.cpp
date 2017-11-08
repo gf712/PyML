@@ -1,6 +1,7 @@
 #include <Python.h>
 #include <iostream>
 #include "linearalgebramodule.h"
+#include "pythonconverters.h"
 
 
 void predict(PyObject* X, PyObject* w, double* prediction, int rows, int cols) {

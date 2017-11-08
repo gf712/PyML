@@ -3,6 +3,7 @@
 //
 #include <Python.h>
 #include <linearalgebramodule.h>
+#include "pythonconverters.h"
 
 static PyObject* dot_product(PyObject* self, PyObject *args) {
 
