@@ -10,17 +10,14 @@
 extern "C" {
 #endif
 
-void pypyMatrixVectorDotProduct(PyObject* A, PyObject* v, int ASize, int VSize, double* result);
-void ccMatrixVectorDotProduct(double** X, const double * w, double* prediction, int rows, int cols);
-void cPyVectorSubtract(const double* prediction, PyObject* y, double* loss, int rows);
-double cVectorSum(const double* array, int rows);
-void cVectorDivide(double* X, int n, int size);
-void pyTranspose(PyObject* X, double** result, int rows, int cols);
-void vector_power(PyObject* A, int pPower, int ASize, double* result);
-void pyCVectorSubtract(PyObject* u, PyObject* v, int ASize, double* result);
-double pyVectorSum(PyObject* u, int size);
-void pypyMatrixMatrixProduct(PyObject* A, PyObject* B, int ASize, int BSize, double** result);
-void pyLeastSquares(PyObject* X, PyObject* y, double* theta, int n, int m);
+void matrixVectorDotProduct(double** A, double* v, int ASize, int VSize, double* result);
+double vectorSum(const double* array, int rows);
+void matrixTranspose(double** X, double** result, int rows, int cols);
+void vectorPower(double* A, int pPower, int ASize, double* result);
+void vectorSubtract(const double* u, const double* v, int size, double* result);
+void matrixMatrixProduct(double** A, double** B, int ASize, int BSize, double** result);
+void leastSquares(double** X, double* y, double* theta, int n, int m);
+void vectorDivide(double* X, int n, int size);
 
 #ifdef __cplusplus
 }

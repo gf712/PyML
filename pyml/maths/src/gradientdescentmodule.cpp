@@ -4,8 +4,8 @@
 #include "pythonconverters.h"
 
 
-void predict(PyObject* X, PyObject* w, double* prediction, int rows, int cols) {
-    pypyMatrixVectorDotProduct(X, w, rows, cols, prediction);
+void predict(double** X, double* w, double* prediction, int rows, int cols) {
+    matrixVectorDotProduct(X, w, rows, cols, prediction);
 }
 
 
@@ -18,42 +18,41 @@ void power(const double* array, int n, int rows, double* result) {
 
 
 double cost(double* loss, int rows){
-    double result[rows];
+    double* result;
+    result = new double[rows];
     power(loss, 2, rows, result);
-    return cVectorSum(result, rows) / (2 * rows);
+    return vectorSum(result, rows) / (2 * rows);
 }
 
 
 
 void gradientCalculation(double** X, double* loss, double* gradients, int rows, int cols) {
 
-    ccMatrixVectorDotProduct(X, loss, gradients, rows, cols);
-    cVectorDivide(gradients, cols, rows);
+    matrixVectorDotProduct(X, loss, rows, cols, gradients);
+    vectorDivide(gradients, cols, rows);
 
 }
 
 
-void updateWeights(PyObject* theta, const double* gradients, double learningRate, int size) {
+void updateWeights(double* theta, const double* gradients, double learningRate, int size) {
 
     for (int i = 0; i < size; ++i) {
-        double theta_i = PyFloat_AsDouble(PyList_GetItem(theta, i));
-        theta_i -= gradients[i] * learningRate;
-        PyList_SetItem(theta, i, PyFloat_FromDouble(theta_i));
+        theta[i] -= gradients[i] * learningRate;
     }
 }
 
 
-double calculateCost(PyObject* X, PyObject* theta, double* prediction, PyObject* y, double* loss, int n, int m) {
+double calculateCost(double** X, double* theta, double* prediction, double* y, double* loss, int n, int m) {
     // first prediction
     predict(X, theta, prediction, n, m);
 
     // calculate initial cost and store result
-    cPyVectorSubtract(prediction, y, loss, n);
+    vectorSubtract(prediction, y, n, loss);
     return cost(loss, n);
 }
 
 
-int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration, double epsilon, double learningRate, int n, int m, double* costArray) {
+int gradientDescent(double** X, double* y, double* theta, int maxIteration, double epsilon, double learningRate, int n, int m, double* costArray) {
 
     // variable initialisation
     double JOld;
@@ -77,7 +76,7 @@ int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration,
 
     // X pyTranspose (m by n matrix)
     // X is a n by m matrix
-    pyTranspose(X, X_pyTranspose, n, m);
+    matrixTranspose(X, X_pyTranspose, n, m);
 
     JNew = calculateCost(X, theta, prediction, y, loss, n, m);
     costArray[iteration] = JNew;
@@ -123,25 +122,30 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     // variable declaration
     int m;
     int n;
-    PyObject* theta;
-    PyObject* X;
-    PyObject* y;
+    PyObject* ptheta;
+    PyObject* pX;
+    PyObject* py;
     int maxIterations;
     double epsilon;
     double learningRate;
     int iterations;
     double* costArray = nullptr;
+    double** X = nullptr;
+    double* y = nullptr;
+    double* theta = nullptr;
+    PyObject* pyCostArray;
+    PyObject* pyTheta;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!O!idd", &PyList_Type, &X, &PyList_Type, &theta, &PyList_Type, &y, &maxIterations, &epsilon, &learningRate)) {
+    if(!PyArg_ParseTuple(args, "O!O!O!idd", &PyList_Type, &pX, &PyList_Type, &ptheta, &PyList_Type, &py, &maxIterations, &epsilon, &learningRate)) {
         PyErr_SetString(PyExc_TypeError, "Check arguments!");
         return nullptr;
     }
 
-    n = (int) PyList_Size(X);
-    m = (int) PyList_Size(PyList_GetItem(X, 0));
+    n = (int) PyList_Size(pX);
+    m = (int) PyList_Size(PyList_GetItem(pX, 0));
 
-    if (PyList_Size(theta) != m) {
+    if (PyList_Size(ptheta) != m) {
         PyErr_SetString(PyExc_ValueError, "Theta should be the same size as the number of features.");
         return nullptr;
     }
@@ -151,16 +155,39 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
         return nullptr;
     }
 
-    costArray = new double[maxIterations];
-    PyObject* pyCostArray;
+    // memory allocation
+    X = new double *[n];
+    for (int j = 0; j < n; ++j) {
+        X[j] = new double [m];
+    }
+    y = new double [n];
+    theta = new double [m];
 
+    costArray = new double[maxIterations];
+
+    // convert python lists to C++ arrays
+    convertPy_1DArray(py, y, n);
+    convertPy_1DArray(ptheta, theta, m);
+    convertPy_2DArray(pX, X, n, m);
+
+
+    // gradient descent
     iterations = gradientDescent(X, y, theta, maxIterations, epsilon, learningRate, n, m, costArray);
 
+    // convert cost array and theta to lists
     pyCostArray = Convert_1DArray(costArray, iterations);
+    pyTheta = Convert_1DArray(theta, m);
 
+    PyObject* FinalResult = Py_BuildValue("OOi", pyTheta, pyCostArray, iterations);
+
+    // memory deallocation
     delete [] costArray;
-
-    PyObject* FinalResult = Py_BuildValue("OOi", theta, pyCostArray, iterations);
+    delete [] theta;
+    delete [] y;
+    for (int i = 0; i < n; ++i) {
+        delete [] X[i];
+    }
+    delete [] X;
 
     Py_DECREF(pyCostArray);
 

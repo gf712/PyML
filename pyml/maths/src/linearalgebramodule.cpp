@@ -4,58 +4,7 @@
 // Handle errors
 // static PyObject *algebraError;
 
-// Define vector dot product
-double pypyDotProduct(PyObject* u, PyObject* v, int size) {
-
-    double result = 0;
-
-    for (int i = 0; i < size; ++i) {
-
-        PyObject *v_item = PyList_GetItem(v, i);
-        PyObject *u_item = PyList_GetItem(u, i);
-
-        double pUItem = PyFloat_AsDouble(u_item);
-        double pVItem = PyFloat_AsDouble(v_item);
-
-        result += pUItem * pVItem;
-    }
-
-    return result;
-}
-
-double pyCDotProduct(PyObject* u, const double* v, int size) {
-
-    double result = 0;
-
-    for (int i = 0; i < size; ++i) {
-
-        PyObject *u_item = PyList_GetItem(u, i);
-
-        double pUItem = PyFloat_AsDouble(u_item);
-
-        result += pUItem * v[i];
-    }
-
-    return result;
-}
-
-double cPyDotProduct(double* u, PyObject* v, int size) {
-
-    double result = 0;
-
-    for (int i = 0; i < size; ++i) {
-
-        PyObject *v_item = PyList_GetItem(v, i);
-
-        double pVItem = PyFloat_AsDouble(v_item);
-
-        result += pVItem * u[i];
-    }
-
-    return result;
-}
-
-double ccDotProduct(const double* u, const double* v, int size) {
+double dotProduct(const double* u, const double* v, int size) {
 
     double result = 0;
 
@@ -68,19 +17,18 @@ double ccDotProduct(const double* u, const double* v, int size) {
 }
 
 
-void pypyMatrixVectorDotProduct(PyObject* A, PyObject* v, int ASize, int VSize, double* result) {
+void matrixVectorDotProduct(double** A, double* v, int ASize, int VSize, double* result) {
 
     for (int i = 0; i < ASize ; ++i) {
 
-        PyObject *A_item = PyList_GetItem(A, i);
+        result[i] = dotProduct(A[i], v, VSize);
 
-        result[i] = pypyDotProduct(A_item, v, VSize);
     }
 
 }
 
 
-void pypyMatrixMatrixProduct(PyObject* A, PyObject* B, int rows, int cols, double** result) {
+void matrixMatrixProduct(double** A, double** B, int rows, int cols, double** result) {
 
     // it's easier to just transpose B
     double** other = nullptr;
@@ -90,11 +38,11 @@ void pypyMatrixMatrixProduct(PyObject* A, PyObject* B, int rows, int cols, doubl
         other[i] = new double [cols];
     }
 
-    pyTranspose(B, other, cols, rows);
+    matrixTranspose(B, other, cols, rows);
 
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < rows; ++j) {
-            result[i][j] = pyCDotProduct(PyList_GetItem(A, i), other[j], cols);
+            result[i][j] = dotProduct(A[i], other[j], cols);
         }
     }
 
@@ -106,85 +54,37 @@ void pypyMatrixMatrixProduct(PyObject* A, PyObject* B, int rows, int cols, doubl
 
 }
 
-
-void ccMatrixVectorDotProduct(double** X, const double * w, double* prediction, int rows, int cols) {
-
-    for (int i = 0; i < rows; ++i) {
-        prediction[i] = 0;
-        for (int j = 0; j < cols; ++j) {
-            prediction[i] += X[i][j] * w[j];
-        }
-    }
-}
-
 //double * matrix_matrix_dot_product(PyObject *A, PyObject *B, int ASize, int BSize) {
 //
 //
 //
 //}
 
-void vector_power(PyObject* A, int pPower, int ASize, double* result) {
+void vectorPower(double* A, int pPower, int size, double* result) {
 
-    int i;
-
-    for (i = 0; i < ASize; ++i) {
-
-        PyObject *A_item = PyList_GetItem(A, i);
-        double pElement = PyFloat_AsDouble(A_item);
-
-        result[i] = pow(pElement, pPower);
-
-    }
-
-}
-
-
-void pyCVectorSubtract(PyObject* u, PyObject* v, int ASize, double* result) {
-
-    int i;
-
-    for (i = 0; i < ASize; ++i) {
-
-        PyObject *uItem = PyList_GetItem(u, i);
-        PyObject *vItem = PyList_GetItem(v, i);
-
-        double pUElement = PyFloat_AsDouble(uItem);
-        double pVElement = PyFloat_AsDouble(vItem);
-
-        result[i] = pUElement - pVElement;
-
-    }
-}
-
-void cPyVectorSubtract(const double* prediction, PyObject* y, double* loss, int rows) {
-
-    for (int i = 0; i < rows; ++i) {
-        loss[i] = prediction[i] - PyFloat_AsDouble(PyList_GetItem(y, i));
-    }
-
-}
-
-
-double pyVectorSum(PyObject* u, int size) {
-
-    double sum_result = 0;
     int i;
 
     for (i = 0; i < size; ++i) {
 
-        PyObject *uItem = PyList_GetItem(u, i);
-
-        double pUElement = PyFloat_AsDouble(uItem);
-
-        sum_result += pUElement;
+        result[i] = pow(A[i], pPower);
 
     }
 
-    return sum_result;
-
 }
 
-double cVectorSum(const double* array, int rows) {
+
+void vectorSubtract(const double* u, const double* v, int size, double* result) {
+
+    int i;
+
+    for (i = 0; i < size; ++i) {
+
+        result[i] = u[i] - v[i];
+
+    }
+}
+
+double vectorSum(const double* array, int rows) {
 
     double result=0;
 
@@ -196,64 +96,19 @@ double cVectorSum(const double* array, int rows) {
 }
 
 
-void cVectorDivide(double* X, int n, int size) {
+void vectorDivide(double* X, int n, int size) {
     for (int i = 0; i < size; ++i) {
         X[i] /= (double)n;
     }
 }
 
 
-void pyTranspose(PyObject* X, double** result, int rows, int cols) {
-    for (int i = 0; i < rows; ++i) {
-        PyObject* row = PyList_GetItem(X, i);
-        for (int j = 0; j < cols; ++j) {
-            result[j][i] = PyFloat_AsDouble(PyList_GetItem(row, j));
-        }
-    }
-}
-
-void cTranspose(double** X, double** result, int rows, int cols) {
+void matrixTranspose(double** X, double** result, int rows, int cols) {
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
             result[j][i] = X[i][j];
         }
     }
-}
-
-
-void cPyMatrixMatrixProduct(double** A, PyObject* B, int rows, int cols, double** result) {
-
-    // it's easier to just transpose B
-    double** other = nullptr;
-
-    other = new double *[rows];
-    for (int i = 0; i < rows; ++i) {
-        other[i] = new double [cols];
-    }
-
-    pyTranspose(B, other, cols, rows);
-
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < rows; ++j) {
-            result[i][j] = ccDotProduct(A[i], other[j], cols);
-        }
-    }
-
-    for (int i = 0; i < rows; ++i) {
-        delete other[i];
-    }
-
-    delete [] other;
-
-}
-
-void cPyMatrixVectorDotProduct(double** A, PyObject* v, int ASize, int VSize, double* result) {
-
-    for (int i = 0; i < ASize ; ++i) {
-
-        result[i] = cPyDotProduct(A[i], v, VSize);
-    }
-
 }
 
 
@@ -342,7 +197,7 @@ void gaussianElimination(double** A, int n, double* result) {
 }
 
 
-void pyLeastSquares(PyObject* X, PyObject* y, double* theta, int n, int m) {
+void leastSquares(double** X, double* y, double* theta, int n, int m) {
 
     // variable declaration
     double** XTX = nullptr;
@@ -371,17 +226,17 @@ void pyLeastSquares(PyObject* X, PyObject* y, double* theta, int n, int m) {
     // start algorithm
 
     // first transpose X and get XT
-    pyTranspose(X, XT, n, m);
+    matrixTranspose(X, XT, n, m);
 
     // XT is a m by n matrix
     // an m by n matrix multiplied by a n by m matrix results in a m by m matrix
     // so XTX is a m by m matrix
-    cPyMatrixMatrixProduct(XT, X, m, n, XTX);
+    matrixMatrixProduct(XT, X, m, n, XTX);
 
     // XT is a m by n matrix
     // y is a n dimensional vector
     // the result is a m dimensional vector called right (since it fits to the right of the A matrix)
-    cPyMatrixVectorDotProduct(XT, y, m, n, right);
+    matrixVectorDotProduct(XT, y, m, n, right);
 
 
     // fill in A which is a m by m + 1 matrix
