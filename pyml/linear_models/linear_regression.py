@@ -1,11 +1,11 @@
 from .base import LinearBase
-from ..maths import dot_product, mean_squared_error, mean_absolute_error, subtract, power, transpose, divide
+from ..maths import dot_product, mean_squared_error, mean_absolute_error, least_squares
 from ..utils import set_seed
 from pyml.maths import gradient_descent
 
 
 class LinearRegression(LinearBase):
-    def __init__(self, seed=None, bias=True, learning_rate=0.01,
+    def __init__(self, seed=None, bias=True, solver='OLS', learning_rate=0.01,
                  epsilon=0.01, max_iterations=10000):
 
         LinearBase.__init__(self)
@@ -15,6 +15,8 @@ class LinearRegression(LinearBase):
         self.epsilon = epsilon
         self.max_iterations = max_iterations
         self._learning_rate = learning_rate
+        if solver in ['OLS', 'gradient_descent']:
+            self._solver = solver
 
     def _train(self, X, y=None):
         self.X = X
@@ -23,11 +25,17 @@ class LinearRegression(LinearBase):
         self._n_features = len(X[0])
         self._initiate_weights(bias=self.bias)
 
-        self._coefficients, self._cost, self._iterations = gradient_descent.gradient_descent(self.X, self.coefficients,
-                                                                                             self.y,
-                                                                                             self.max_iterations,
-                                                                                             self.epsilon,
-                                                                                             self._learning_rate)
+        if self._solver == 'gradient_descent':
+            self._coefficients, self._cost, self._iterations = gradient_descent.gradient_descent(self.X,
+                                                                                                 self.coefficients,
+                                                                                                 self.y,
+                                                                                                 self.max_iterations,
+                                                                                                 self.epsilon,
+                                                                                                 self._learning_rate)
+        else:
+            self._cost = 'NaN'
+            self._iterations = 'NaN'
+            self._coefficients = least_squares(self.X, self.y)
 
     def _predict(self, X):
 
