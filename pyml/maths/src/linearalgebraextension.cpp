@@ -305,7 +305,7 @@ static PyObject* matrix_product(PyObject* self, PyObject *args) {
 }
 
 
-static PyObject* least_square(PyObject* self, PyObject *args) {
+static PyObject* least_squares(PyObject* self, PyObject *args) {
 
     int m, n, ySize;
 
@@ -324,12 +324,12 @@ static PyObject* least_square(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-
     // use PyList_Size to get size of vectors
     n = PyList_Size(X);
     m = PyList_Size(PyList_GetItem(X, 0));
     ySize = PyList_Size(y);
 
+    // sanity check
     if (n != ySize){
         PyErr_SetString(PyExc_ValueError, "Number of rows of X must be the same as the number of training examples");
         return nullptr;
@@ -370,7 +370,7 @@ static PyMethodDef linearAlgebraMethods[] = {
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
         {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
         {"transpose",     transpose,              METH_VARARGS,            "Transpose a 2D matrix"},
-        {"least_squares", least_square,           METH_VARARGS,            "Perform least squares"},
+        {"least_squares", least_squares,           METH_VARARGS,            "Perform least squares"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {nullptr, nullptr, 0, nullptr}
 };

@@ -291,8 +291,11 @@ void swapRows(double** A, int row1, int row2, int size) {
 
 void gaussianElimination(double** A, int n, double* result) {
 
+    // based on https://martin-thoma.com/images/2013/05/Gaussian-elimination.png
+
     double* maxResult = nullptr;
     maxResult = new double [2];
+    double c;
 
     for (int i = 0; i < n; ++i) {
         // Search for maximum in this column
@@ -304,7 +307,7 @@ void gaussianElimination(double** A, int n, double* result) {
         // Make all rows below this one 0 in current column
         for (int k=i+1; k<n; k++) {
 
-            double c = -A[k][i]/A[i][i];
+            c = -A[k][i]/A[i][i];
 
             for (int j=i; j<n+1; j++) {
 
@@ -323,11 +326,17 @@ void gaussianElimination(double** A, int n, double* result) {
     }
 
     for (int i=n-1; i>=0; i--) {
+
         result[i] = A[i][n]/A[i][i];
+
         for (int k=i-1;k>=0; k--) {
+
             A[k][n] -= A[k][i] * result[i];
+
         }
     }
+
+    // now A is the U matrix
 
     delete [] maxResult;
 }
