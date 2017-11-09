@@ -24,50 +24,6 @@ def argsort(array):
     return [sorted_array.index(i) for i in array]
 
 
-# def quicksort(array, low, high):
-#     """
-#     quicksort helper function
-#     :param array:
-#     :param low:
-#     :param high:
-#     :return:
-#     """
-#     if low < high:
-#         p = partition(array, low, high)
-#         quicksort(array, low, p - 1)
-#         quicksort(array, p + 1, high)
-#
-#
-# def partition(array, low, high):
-#     """
-#     partition the array (see quicksort implementation)
-#     :param array:
-#     :param low:
-#     :param high:
-#     :return:
-#     """
-#     pivot = array[low]
-#     left = low + 1
-#     right = high
-#
-#     while True:
-#
-#         while left <= right and array[left] <= pivot:
-#             left += 1
-#
-#         while array[right] >= pivot and right >= left:
-#             right -= 1
-#
-#         if right < left:
-#             break
-#         else:
-#             swap(array, left, right)
-#
-#     swap(array, low, right)
-#
-#     return right
-
-
 def swap(array, i, j):
     """
     swap two elements of an array
@@ -93,7 +49,7 @@ def max_occurence(array):
 
 def mean(array, axis=None):
     """
-    mean of array
+    numpy style mean of array
     :param array:
     :param axis:
     :return:
