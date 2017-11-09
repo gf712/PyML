@@ -82,7 +82,7 @@ static PyObject* norm(PyObject* self, PyObject *args) {
     // if A is a matrix
     else if (rowsA > 0) {
         // if B is a vector
-        if (rowsB == 0) {
+        if (rowsB == 0 && colsA == colsB) {
             double** A = nullptr;
             double* B = nullptr;
             double* result = nullptr;
@@ -105,7 +105,7 @@ static PyObject* norm(PyObject* self, PyObject *args) {
 
             pylistResult = Convert_1DArray(result, rowsA);
 
-            FinalResult = Py_BuildValue("O", FinalResult);
+            FinalResult = Py_BuildValue("O", pylistResult);
 
             // memory deallocation
             for (int i = 0; i < rowsA; ++i) {
@@ -118,6 +118,11 @@ static PyObject* norm(PyObject* self, PyObject *args) {
             Py_DECREF(pylistResult);
 
             return FinalResult;
+        }
+
+        else if (rowsB == 0 && colsA != colsB) {
+            PyErr_SetString(PyExc_TypeError, "Number of columns of A must match number of columns of B!");
+            return nullptr;
         }
 
         else {
@@ -146,7 +151,7 @@ static PyObject* norm(PyObject* self, PyObject *args) {
 
             pylistResult = Convert_1DArray(result, rowsA);
 
-            FinalResult = Py_BuildValue("O", FinalResult);
+            FinalResult = Py_BuildValue("O", pylistResult);
 
             // memory deallocation
             for (int i = 0; i < rowsA; ++i) {

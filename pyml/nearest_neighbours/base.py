@@ -27,7 +27,7 @@ class KNNBase(BaseLearner):
 
         # for each data point find n closest points in training set
         for x_i in X:
-            distances_i = [self._distance(x, x_i, self.norm) for x in self.X]
+            distances_i = self._distance(self.X, x_i, self.norm)
 
             # get order of distances
             sorted_distances = argsort(distances_i)

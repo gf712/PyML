@@ -2,6 +2,13 @@ from .CMetrics import norm
 
 
 def calculate_distance(u, v, p):
+
+    if isinstance(u, (float, int)):
+        u = [u]
+
+    if isinstance(v, (float, int)):
+        v = [v]
+
     if p == 1:
         return manhattan_distance(u, v)
     elif p == 2:
