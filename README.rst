@@ -40,6 +40,7 @@ Version 0.2:
  - Minor:
     - Clean up C++ code
     - Norm is calculated with pure C++ (Python only used to provide `euclidean_distance` and `manhattan_distance` interface
+    - Faster implementation of quick sort algorithm (with C++)
 
 
 Version 0.1:
