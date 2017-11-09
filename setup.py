@@ -29,6 +29,15 @@ gradient_descent_module = Extension('pyml.maths.gradient_descent',
                                     include_dirs=['pyml/maths/include'],
                                     language='c++')
 
+distances = Extension('pyml.metrics.CMetrics',
+                      sources=['pyml/metrics/src/metricspythonextension.cpp',
+                               'pyml/metrics/src/distances.cpp',
+                               'pyml/maths/src/pythonconverters.cpp'],
+                      extra_compile_args=['-std=c++11'],
+                      include_dirs=['pyml/metrics/include',
+                                    'pyml/maths/include'],
+                      language='c++')
+
 setup(
     name='PyML',
     classifiers=['Development Status :: 2 - Pre-Alpha',
@@ -50,12 +59,13 @@ setup(
               'pyml.datasets',
               'pyml.preprocessing',
               'pyml.linear_models',
-              'pyml.utils'],
+              'pyml.utils',
+              'pyml.cluster'],
     url='https://github.com/gf712/PyML',
     license=about['__license__'],
     author=about['__author__'],
     author_email=about['__author_email__'],
     description='Machine learning with Python and C/C++',
     test_suite="tests",
-    ext_modules=[linear_algebra_module, gradient_descent_module],
+    ext_modules=[linear_algebra_module, gradient_descent_module, distances],
 )

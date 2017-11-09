@@ -93,10 +93,32 @@ def max_occurence(array):
     return max(count, key=count.get)
 
 
-def mean(array):
+def mean(array, axis=None):
     """
     mean of array
     :param array:
+    :param axis:
     :return:
     """
-    return sum(array) / len(array)
+    if isinstance(array, list) and len(array) > 0:
+        # in this case we have a 2D matrix
+        if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
+            dim = len(array[0])
+            if axis == 1:
+                return [mean([array[x][d] for d in range(dim)]) for x in range(len(array))]
+            elif axis == 0:
+                return [mean([array[x][d] for x in range(len(array))]) for d in range(dim)]
+            else:
+                return mean([mean([array[x][d] for d in range(dim)]) for x in range(len(array))])
+
+        elif isinstance(array[0], (int, float)):
+            return sum(array) / len(array)
+
+        else:
+            raise ValueError("Expected a list of lists or a list of int/floats")
+
+    elif isinstance(array, list):
+        raise ValueError("Empty list")
+
+    else:
+        raise ValueError("Expected a list")
