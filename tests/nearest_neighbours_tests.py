@@ -41,9 +41,9 @@ class TestKNNRegressor(unittest.TestCase):
 
     def test_predict(self):
         predictions = self.regressor.predict(X=self.X_test)
-        self.assertEqual(predictions[:5], [3.9480567651450267, 5.452254884573706, 4.965593590149487,
-                                           8.563128852210657, 3.411917068520404])
+        self.assertEqual(predictions[:5], [3.1161666191379163, 4.933573052500679, 6.611283497257544,
+                                           9.185848057766739, 3.110023909806445])
 
     def test_score(self):
         accuracy = self.regressor.score(X=self.X_test, y_true=self.y_test)
-        self.assertEqual(accuracy, 2.455084184274903)
+        self.assertEqual(accuracy, 1.5470835956432736)
