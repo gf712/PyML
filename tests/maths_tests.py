@@ -15,7 +15,7 @@ class MathsTest(unittest.TestCase):
     def test_argsort(self):
         array = [-5, 3, 10, 2, 1, -1]
         argsorted_array = argsort(array)
-        self.assertEqual(argsorted_array, [0, 4, 5, 3, 2, 1])
+        self.assertEqual(argsorted_array, [0, 5, 4, 3, 1, 2])
 
 
 class LinearAlgebraTest(unittest.TestCase):

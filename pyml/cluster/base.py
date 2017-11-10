@@ -51,7 +51,7 @@ class ClusterBase(BaseLearner):
         distances = [euclidean_distance(X, self._centroids[i]) for i in range(self.k)]
         distances_T = transpose(distances)
         # return label of closest cluster to each data point
-        return [argsort(x).index(0) for x in distances_T]
+        return [argsort(x)[0] for x in distances_T]
 
     def _changes(self):
         change_n = 0

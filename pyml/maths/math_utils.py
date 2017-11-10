@@ -7,21 +7,19 @@ def sort(array):
     """
     sort array elements in ascending order using the quicksort algorithm
     :param array:
-    :return: a sorted array
+    :return: sorted array in ascending order
     """
-    return quick_sort(array)
+    return quick_sort(array)[0]
 
 
 def argsort(array):
     """
     calculate order of elements in array
     :param array:
-    :return:
+    :return: sorted indices in ascending order
     """
 
-    sorted_array = sort(array)
-
-    return [sorted_array.index(i) for i in array]
+    return quick_sort(array)[1]
 
 
 def swap(array, i, j):

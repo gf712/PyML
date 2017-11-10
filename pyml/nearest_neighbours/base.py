@@ -33,7 +33,7 @@ class KNNBase(BaseLearner):
             sorted_distances = argsort(distances_i)
 
             # get k points
-            k_nearest_neighbours = [self.y[sorted_distances.index(i)] for i in range(self.n)]
+            k_nearest_neighbours = [self.y[sorted_distances[0]] for i in range(self.n)]
 
             # majority vote
             self._neighbours.append(k_nearest_neighbours)
