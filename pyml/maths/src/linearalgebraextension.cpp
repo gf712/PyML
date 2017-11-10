@@ -4,6 +4,7 @@
 #include <Python.h>
 #include <linearalgebramodule.h>
 #include "pythonconverters.h"
+#include <iostream>
 
 static PyObject* dot_product(PyObject* self, PyObject *args) {
 
@@ -201,9 +202,10 @@ static PyObject* sum(PyObject* self, PyObject *args) {
 static PyObject* pyTranspose(PyObject* self, PyObject *args) {
 
     // declarations
-    double** result = nullptr;
-    double** A = nullptr;
+    double* result = nullptr;
+    double* A = nullptr;
     int cols, rows;
+//    int block_size;
     PyObject* pyResult;
     PyObject* pArray;
 
@@ -217,32 +219,23 @@ static PyObject* pyTranspose(PyObject* self, PyObject *args) {
     rows = static_cast<int>(PyList_Size(pArray));
     cols = static_cast<int>(PyList_Size(PyList_GetItem(pArray, 0)));
 
+//    if (block_size <= 0) {
+//        block_size = 1;
+//    }
 
     // allocate memory for result
-    result = new double *[cols];
-    for (int i = 0; i < cols; ++i) {
-        result[i] = new double[rows];
-    }
-    A = new double *[rows];
-    for (int i = 0; i < rows; ++i) {
-        A[i] = new double[cols];
-    }
+    result = new double [rows * cols];
+    A = new double [rows * cols];
 
-    convertPy_2DArray(pArray, A, rows, cols);
+    convertPy2D_flat2DArray(pArray, A, rows, cols);
 
-    matrixTranspose(A, result, rows, cols);
+    flatMatrixTranspose(A, result, rows, cols);
 
-    pyResult = Convert_2DArray(result, cols, rows);
+    pyResult = ConvertFlat2DArray_2DPy(result, cols, rows);
 
     PyObject* FinalResult = Py_BuildValue("O", pyResult);
 
-    for (int i = 0; i < cols; ++i) {
-        delete [] result[i];
-    }
     delete [] result;
-    for (int i = 0; i < rows; ++i) {
-        delete [] A[i];
-    }
     delete [] A;
 
     Py_DECREF(pyResult);

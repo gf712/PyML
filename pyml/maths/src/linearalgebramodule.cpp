@@ -1,5 +1,7 @@
 #include <Python.h>
 #include "linearalgebramodule.h"
+#include <omp.h>
+#include <iostream>
 
 // Handle errors
 // static PyObject *algebraError;
@@ -38,7 +40,7 @@ void matrixMatrixProduct(double** A, double** B, int rows, int cols, double** re
         other[i] = new double [cols];
     }
 
-    matrixTranspose(B, other, cols, rows);
+    matrixTranspose(B, other, cols, rows, 16);
 
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < rows; ++j) {
@@ -103,11 +105,23 @@ void vectorDivide(double* X, int n, int size) {
 }
 
 
-void matrixTranspose(double** X, double** result, int rows, int cols) {
+void matrixTranspose(double** X, double** result, int rows, int cols, int block_size) {
+
+    #pragma omp parallel for
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
             result[j][i] = X[i][j];
         }
+    }
+}
+
+void flatMatrixTranspose(double* X, double* result, int rows, int cols) {
+
+//    #pragma omp parallel for
+    for (int n = 0; n < rows * cols; n++) {
+        int i = n / rows;
+        int j = n % rows;
+        result[n] = X[cols * j + i];
     }
 }
 
@@ -226,7 +240,7 @@ void leastSquares(double** X, double* y, double* theta, int n, int m) {
     // start algorithm
 
     // first transpose X and get XT
-    matrixTranspose(X, XT, n, m);
+    matrixTranspose(X, XT, n, m, 16);
 
     // XT is a m by n matrix
     // an m by n matrix multiplied by a n by m matrix results in a m by m matrix
