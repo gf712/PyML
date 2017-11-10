@@ -11,6 +11,7 @@ static PyObject* quick_sort(PyObject* self, PyObject *args) {
     // variable instantiation
     int size;
     double* A;
+    long* order;
 
     // pointers to python lists
     PyObject* pA;
@@ -24,22 +25,29 @@ static PyObject* quick_sort(PyObject* self, PyObject *args) {
     size = static_cast<int>(PyList_GET_SIZE(pA));
 
     A = new double [size];
+    order = new long[size];
+
+    for (int i = 0; i < size; ++i) {
+        order[i] = i;
+    }
 
     convertPy_1DArray(pA, A, size);
 
     // calculate dot product
-    quicksort(A, 0, size);
+    quicksort(A, order, 0, size);
 //    quickSort(A, 0, size - 1);
     // convert result to python list
     PyObject* result_py_list = Convert_1DArray(A, size);
+    PyObject* order_py_list = Convert_1DArrayInt(order, size);
 
     // build python object
-    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+    PyObject *FinalResult = Py_BuildValue("OO", result_py_list, order_py_list);
 
     // free up memory
     delete [] A;
 
     Py_DECREF(result_py_list);
+    Py_DECREF(order_py_list);
 
     return FinalResult;
 }

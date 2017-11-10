@@ -4,9 +4,16 @@
 #include "maths.h"
 
 
-void swap(double * a, double * b)
+void swapDouble(double* a, double* b)
 {
     double t = *a;
+    *a = *b;
+    *b = t;
+}
+
+void swapLong(long* a, long* b)
+{
+    long t = *a;
     *a = *b;
     *b = t;
 }
@@ -28,7 +35,7 @@ void permutations(double* array, double** result, int size) {
     for(int i=0;i<fact;i++) {
         int j = i % (size-1);
 
-        swap(&array[j], &array[j+1]);
+        swapDouble(&array[j], &array[j+1]);
 
         for (int k = 0; k < size; ++k) {
             result[i][k] = array[k];
@@ -39,58 +46,27 @@ void permutations(double* array, double** result, int size) {
 }
 
 
-int partition(double* array, int low, int high) {
+int partition(double* array, long* order, int low, int high) {
     double pivot = array[low];
     int i = low;
 
     for (int j = i + 1; j < high; ++j) {
         if (array[j] <= pivot) {
             i++;
-            swap(&array[i], &array[j]);
+            swapDouble(&array[i], &array[j]);
+            swapLong(&order[i], &order[j]);
         }
     }
-    swap(&array[i], &array[low]);
+    swapDouble(&array[i], &array[low]);
+    swapLong(&order[i], &order[low]);
     return i;
 }
 
 
-void quicksort(double* array, int low, int high) {
+void quicksort(double* array, long* order, int low, int high) {
     if (low < high) {
-        int p = partition(array, low, high);
-        quicksort(array, low, p);
-        quicksort(array, p + 1, high);
+        int p = partition(array, order, low, high);
+        quicksort(array, order, low, p);
+        quicksort(array, order, p + 1, high);
     }
 }
-
-
-//void quickSort(vector<int>& A, int p,int q)
-//{
-//    int r;
-//    if(p<q)
-//    {
-//        r=partition(A, p,q);
-//        quickSort(A,p,r);
-//        quickSort(A,r+1,q);
-//    }
-//}
-//
-//
-//int partition(vector<int>& A, int p,int q)
-//{
-//    int x= A[p];
-//    int i=p;
-//    int j;
-//
-//    for(j=p+1; j<q; j++)
-//    {
-//        if(A[j]<=x)
-//        {
-//            i=i+1;
-//            swap(A[i],A[j]);
-//        }
-//
-//    }
-//
-//    swap(A[i],A[p]);
-//    return i;
-//}
