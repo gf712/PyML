@@ -22,19 +22,6 @@ def argsort(array):
     return quick_sort(array)[1]
 
 
-def swap(array, i, j):
-    """
-    swap two elements of an array
-    :param array:
-    :param i:
-    :param j:
-    :return:
-    """
-    old = array[i]
-    array[i] = array[j]
-    array[j] = old
-
-
 def max_occurence(array):
     """
     find the element with highest occurrence in an array
