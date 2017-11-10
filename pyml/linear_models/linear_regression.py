@@ -1,5 +1,6 @@
 from .base import LinearBase
-from ..maths import dot_product, mean_squared_error, mean_absolute_error, least_squares
+from ..maths import dot_product, least_squares
+from pyml.metrics.scores import mean_squared_error, mean_absolute_error
 from ..utils import set_seed
 from pyml.maths import gradient_descent
 
