@@ -14,7 +14,7 @@ def calculate_distance(u, v, p):
     elif p == 2:
         return euclidean_distance(u, v)
     else:
-        norm(u, v, p)
+        return norm(u, v, p)
 
 
 def euclidean_distance(u, v):
