@@ -89,7 +89,7 @@ static PyObject* power(PyObject* self, PyObject *args) {
     }
 
     // use PyList_Size to get size of vector
-    sizeOfA = PyList_Size(pAArray);
+    sizeOfA = static_cast<int>(PyList_Size(pAArray));
 
     // memory allocation
     result = new double[sizeOfA];
@@ -137,8 +137,8 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
     }
 
     // use PyList_Size to get size of vectors
-    sizeOfU = PyList_Size(pUVector);
-    sizeOfV = PyList_Size(pVVector);
+    sizeOfU = static_cast<int>(PyList_Size(pUVector));
+    sizeOfV = static_cast<int>(PyList_Size(pVVector));
 
     if (sizeOfU != sizeOfV){
         PyErr_SetString(PyExc_ValueError, "Vector must be of same dimensions");
@@ -187,7 +187,7 @@ static PyObject* sum(PyObject* self, PyObject *args) {
     }
 
     // use PyList_Size to get size of vector
-    sizeOfA = PyList_Size(pAArray);
+    sizeOfA = static_cast<int>(PyList_Size(pAArray));
 
     convertPy_1DArray(pAArray, A, sizeOfA);
 
@@ -214,8 +214,8 @@ static PyObject* pyTranspose(PyObject* self, PyObject *args) {
     }
 
     // use PyList_Size to get dimensions of array
-    rows = PyList_Size(pArray);
-    cols = PyList_Size(PyList_GetItem(pArray, 0));
+    rows = static_cast<int>(PyList_Size(pArray));
+    cols = static_cast<int>(PyList_Size(PyList_GetItem(pArray, 0)));
 
 
     // allocate memory for result
@@ -279,10 +279,10 @@ static PyObject* matrix_product(PyObject* self, PyObject *args) {
     }
 
     // use PyList_Size to get size of vectors
-    rowsA = PyList_Size(pAArray);
-    colsA = PyList_Size(PyList_GetItem(pAArray, 0));
-    rowsB = PyList_Size(pBArray);
-    colsB = PyList_Size(PyList_GetItem(pBArray, 0));
+    rowsA = static_cast<int>(PyList_Size(pAArray));
+    colsA = static_cast<int>(PyList_Size(PyList_GetItem(pAArray, 0)));
+    rowsB = static_cast<int>(PyList_Size(pBArray));
+    colsB = static_cast<int>(PyList_Size(PyList_GetItem(pBArray, 0)));
 
     if (rowsA != colsB){
         PyErr_SetString(PyExc_ValueError, "Number of rows in A must be the same as the number of columns in B");
@@ -366,9 +366,9 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
     }
 
     // use PyList_Size to get size of vectors
-    n = PyList_Size(pX);
-    m = PyList_Size(PyList_GetItem(pX, 0));
-    ySize = PyList_Size(py);
+    n = static_cast<int>(PyList_Size(pX));
+    m = static_cast<int>(PyList_Size(PyList_GetItem(pX, 0)));
+    ySize = static_cast<int>(PyList_Size(py));
 
     // sanity check
     if (n != ySize){
@@ -405,9 +405,50 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
     Py_DECREF(result_py_list);
 
     return FinalResult;
+}
 
-//    PyObject *FinalResult = Py_BuildValue("i", 0);
-//    return FinalResult;
+
+static PyObject* mean(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    int rows, cols, ySize, axis;
+    PyObject *pX;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pX, &axis)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and one integer!");
+        return nullptr;
+    }
+
+    if (PyFloat_Check(PyList_GetItem(pX, 0))) {
+        // if the first element is a float we assume this is an array
+
+        // variable declaration
+        double result = 0;
+        double* X = nullptr;
+        double size;
+
+        // get size of array
+        cols = static_cast<int> PyList_GET_SIZE(pX);
+
+        // memory allocation
+        X = new double[cols];
+
+        convertPy_1DArray(pX, X, cols);
+
+        result = vectorMean(X, cols);
+
+        PyObject *FinalResult = Py_BuildValue("d", result);
+
+        // memory deallocation
+        delete [] X;
+
+        return FinalResult;
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Can only handle arrays at the moment!");
+        return nullptr;
+    }
 }
 
 
@@ -425,6 +466,7 @@ static PyMethodDef linearAlgebraMethods[] = {
         {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
         {"transpose",     pyTranspose,            METH_VARARGS,            "Transpose a 2D matrix"},
         {"least_squares", least_squares,          METH_VARARGS,            "Perform least squares"},
+        {"Cmean",         mean,                   METH_VARARGS,            "Array mean"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {nullptr, nullptr, 0, nullptr}
 };

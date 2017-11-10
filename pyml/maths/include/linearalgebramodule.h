@@ -18,6 +18,7 @@ void vectorSubtract(const double* u, const double* v, int size, double* result);
 void matrixMatrixProduct(double** A, double** B, int ASize, int BSize, double** result);
 void leastSquares(double** X, double* y, double* theta, int n, int m);
 void vectorDivide(double* X, int n, int size);
+double vectorMean(const double* array, int size);
 
 #ifdef __cplusplus
 }

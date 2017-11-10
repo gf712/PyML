@@ -271,3 +271,17 @@ void leastSquares(double** X, double* y, double* theta, int n, int m) {
     delete [] right;
 
 }
+
+
+double vectorMean(const double* array, int size) {
+
+    double result = 0;
+
+    for (int i = 0; i < size; ++i) {
+        result += array[i];
+    }
+
+    return result / static_cast<double>(size);
+
+}
+

@@ -1,5 +1,5 @@
 from ..base import BaseLearner
-from ..maths import mean, transpose, argsort
+from ..maths import mean, transpose
 from ..metrics.distances import euclidean_distance
 import random
 

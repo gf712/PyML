@@ -1,5 +1,6 @@
 from collections import Counter
 from .CMaths import quick_sort
+from .Clinear_algebra import Cmean
 
 
 def sort(array):
@@ -50,7 +51,7 @@ def mean(array, axis=None):
                 return mean([mean([array[x][d] for d in range(dim)]) for x in range(len(array))])
 
         elif isinstance(array[0], (int, float)):
-            return sum(array) / len(array)
+            return Cmean(array, 0)
 
         else:
             raise ValueError("Expected a list of lists or a list of int/floats")
