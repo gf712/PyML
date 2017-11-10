@@ -55,15 +55,8 @@ class ClusterBase(BaseLearner):
 
     def _changes(self):
         change_n = 0
-        stop = False
         for cluster in range(self.k):
-            indices = self._get_cluster(cluster_label=cluster)
-            for i in indices:
-                if i not in self._old_indices[cluster]:
-                    change_n += 1
-                    if change_n > self.min_change:
-                        stop = True
-                        break
-            if stop:
-                break
+            indices_set = set(self._get_cluster(cluster_label=cluster))
+            old_indices = set(self._old_indices[cluster])
+            change_n += len(old_indices - indices_set)
         return change_n
