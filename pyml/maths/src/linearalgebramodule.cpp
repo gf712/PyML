@@ -285,3 +285,26 @@ double vectorMean(const double* array, int size) {
 
 }
 
+
+void matrixMean(double** array, int cols, int rows, int axis, double* result) {
+
+    if (axis == 0) {
+        // mean of each column
+
+        for (int i = 0; i < cols; ++i) {
+            result[i] = 0;
+            for (int j = 0; j < rows; ++j) {
+                result[i] += array[j][i];
+            }
+            result[i] /= rows;
+        }
+    }
+
+    else {
+        // mean of each row
+        for (int i = 0; i < rows; ++i) {
+            result[i] = vectorMean(array[i], cols);
+        }
+    }
+}
+

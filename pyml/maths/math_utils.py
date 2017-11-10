@@ -44,11 +44,14 @@ def mean(array, axis=None):
         if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
             dim = len(array[0])
             if axis == 1:
-                return [mean([array[x][d] for d in range(dim)]) for x in range(len(array))]
+                # return [mean([array[x][d] for d in range(dim)]) for x in range(len(array))]
+                return Cmean(array, 1)
             elif axis == 0:
-                return [mean([array[x][d] for x in range(len(array))]) for d in range(dim)]
+                # return [mean([array[x][d] for x in range(len(array))]) for d in range(dim)]
+                return Cmean(array, 0)
             else:
-                return mean([mean([array[x][d] for d in range(dim)]) for x in range(len(array))])
+                # return mean([mean([array[x][d] for d in range(dim)]) for x in range(len(array))])
+                return Cmean(Cmean(array, 0), 0)
 
         elif isinstance(array[0], (int, float)):
             return Cmean(array, 0)

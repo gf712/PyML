@@ -411,7 +411,7 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
 static PyObject* mean(PyObject* self, PyObject *args) {
 
     // variable declaration
-    int rows, cols, ySize, axis;
+    int axis;
     PyObject *pX;
 
     // return error if we don't get all the arguments
@@ -421,12 +421,12 @@ static PyObject* mean(PyObject* self, PyObject *args) {
     }
 
     if (PyFloat_Check(PyList_GetItem(pX, 0))) {
-        // if the first element is a float we assume this is an array
+        // if the first element is a float we assume this is a 1D array/vector
 
         // variable declaration
         double result = 0;
         double* X = nullptr;
-        double size;
+        int cols;
 
         // get size of array
         cols = static_cast<int> PyList_GET_SIZE(pX);
@@ -445,8 +445,60 @@ static PyObject* mean(PyObject* self, PyObject *args) {
 
         return FinalResult;
     }
+    else if (PyList_Check(PyList_GET_ITEM(pX, 0))){
+        // if it is a list we assume this is a 2D array/matrix
+
+        // variable declaration
+        int rows, cols;
+        double* result = nullptr;
+        double **X = nullptr;
+        PyObject *result_py_list;
+
+        // get size of array
+        rows = static_cast<int> PyList_GET_SIZE(pX);
+        cols = static_cast<int> PyList_GET_SIZE(PyList_GET_ITEM(pX, 0));
+
+        // memory allocation
+        X = new double *[rows];
+        for (int i = 0; i < rows; ++i) {
+            X[i] = new double [cols];
+        }
+
+        if (axis == 0) {
+            result = new double[cols];
+        }
+        else {
+            result = new double[rows];
+        }
+
+        convertPy_2DArray(pX, X, rows, cols);
+
+        matrixMean(X, cols, rows, axis, result);
+
+        if (axis == 0) {
+            result_py_list = Convert_1DArray(result, cols);
+        }
+        else {
+            result_py_list = Convert_1DArray(result, rows);
+        }
+
+        PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+        // memory deallocation
+        for (int j = 0; j < rows; ++j) {
+            delete [] X[j];
+        }
+        delete [] X;
+
+        delete [] result;
+
+        Py_DECREF(result_py_list);
+
+        return FinalResult;
+
+    }
     else {
-        PyErr_SetString(PyExc_TypeError, "Can only handle arrays at the moment!");
+        PyErr_SetString(PyExc_TypeError, "Can only handle 2D float arrays at the moment!");
         return nullptr;
     }
 }
@@ -466,7 +518,7 @@ static PyMethodDef linearAlgebraMethods[] = {
         {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
         {"transpose",     pyTranspose,            METH_VARARGS,            "Transpose a 2D matrix"},
         {"least_squares", least_squares,          METH_VARARGS,            "Perform least squares"},
-        {"Cmean",         mean,                   METH_VARARGS,            "Array mean"},
+        {"Cmean",         mean,                   METH_VARARGS,            "Numpy style array mean"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {nullptr, nullptr, 0, nullptr}
 };
