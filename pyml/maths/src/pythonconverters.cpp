@@ -29,6 +29,29 @@ PyObject* Convert_1DArray(double* array, int size) {
 }
 
 
+PyObject* Convert_1DArrayInt(long* array, int size) {
+
+    // converts a C++ 1D array to a python list
+
+    PyObject *pylist;
+    PyObject *item;
+    int i;
+
+    pylist = PyList_New(size);
+
+    if (pylist != nullptr) {
+
+        for (i=0; i < size; i++) {
+            item = PyLong_FromLong(array[i]);
+            PyList_SET_ITEM(pylist, i, item);
+
+        }
+    }
+
+    return pylist;
+}
+
+
 PyObject* Convert_2DArray(double** array, int rows, int cols) {
 
     // converts a C++ 2D array to a python list
