@@ -50,7 +50,6 @@ void flat2DArrays::startEmptyArray(int rows, int cols) {
     array = new double [rows * cols];
 }
 
-flat2DArrays::~flat2DArrays() = default;
 flat2DArrays* flat2DArrays::transpose() {
     // faster transpose method
     auto result = new flat2DArrays;

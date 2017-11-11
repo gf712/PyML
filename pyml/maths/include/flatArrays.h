@@ -13,11 +13,13 @@ class flat2DArrays {
 private:
     int rows;
     int cols;
-    double* array;
+    double *array;
 
 public:
     flat2DArrays();
-    ~flat2DArrays();
+    ~flat2DArrays() {
+        delete [] array;
+    };
     void readFromPythonList(PyObject *pyList);
     void startEmptyArray(int rows_, int cols_);
     int getRows();
