@@ -4,6 +4,7 @@
 #include <Python.h>
 #include "pythonconverters.h"
 #include <iostream>
+#include "flatArrays.h"
 
 
 PyObject* Convert_1DArray(double* array, int size) {
@@ -86,7 +87,7 @@ PyObject* Convert_2DArray(double** array, int rows, int cols) {
 }
 
 
-PyObject* ConvertFlat2DArray_2DPy(double* array, int rows, int cols) {
+PyObject* ConvertFlat2DArray_2DPy(flat2DArrays* array) {
 
     // converts a 1D C++ array representation of a 2D array to a python list of lists
 
@@ -97,17 +98,17 @@ PyObject* ConvertFlat2DArray_2DPy(double* array, int rows, int cols) {
     // internal representation of the array
     int n = 0;
 
-    twoDResult = PyList_New(rows);
+    twoDResult = PyList_New(array->getRows());
 
     if (twoDResult != nullptr) {
 
-        for (int j = 0; j < rows; ++j) {
-            row = PyList_New(cols);
+        for (int j = 0; j < array->getRows(); ++j) {
+            row = PyList_New(array->getCols());
 
             if (row != nullptr) {
 
-                for (int k = 0; k < cols; ++k) {
-                    item = PyFloat_FromDouble(array[n]);
+                for (int k = 0; k < array->getCols(); ++k) {
+                    item = PyFloat_FromDouble(array->getElement(j, k));
                     PyList_SET_ITEM(row, k, item);
                     n++;
                 }

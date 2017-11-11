@@ -1,7 +1,7 @@
 #include <Python.h>
 #include "linearalgebramodule.h"
-#include <omp.h>
-#include <iostream>
+#include "iostream"
+#include <flatArrays.h>
 
 // Handle errors
 // static PyObject *algebraError;
@@ -115,13 +115,14 @@ void matrixTranspose(double** X, double** result, int rows, int cols, int block_
     }
 }
 
-void flatMatrixTranspose(double* X, double* result, int rows, int cols) {
+void flatMatrixTranspose(flat2DArrays* X, flat2DArrays* result) {
 
+//    PyErr_SetString(PyExc_ValueError, std::to_string(X->getElement(0,0)).c_str());
 //    #pragma omp parallel for
-    for (int n = 0; n < rows * cols; n++) {
-        int i = n / rows;
-        int j = n % rows;
-        result[n] = X[cols * j + i];
+    for (int i = 0; i < X->getCols(); i++) {
+        for (int j = 0; j < X->getRows(); ++j) {
+            result->setElement(X->getElement(j, i), i, j);
+        }
     }
 }
 

@@ -76,7 +76,7 @@ int gradientDescent(double** X, double* y, double* theta, int maxIteration, doub
 
     // X pyTranspose (m by n matrix)
     // X is a n by m matrix
-    matrixTranspose(X, X_pyTranspose, n, m);
+    matrixTranspose(X, X_pyTranspose, n, m, 16);
 
     JNew = calculateCost(X, theta, prediction, y, loss, n, m);
     costArray[iteration] = JNew;
