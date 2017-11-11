@@ -221,9 +221,11 @@ static PyObject* pyTranspose(PyObject* self, PyObject *args) {
 
     A->readFromPythonList(pArray);
 
-    result->startEmptyArray(A->getCols(), A->getRows());
+//    result->startEmptyArray(A->getCols(), A->getRows());
+//
+//    flatMatrixTranspose(A, result);
 
-    flatMatrixTranspose(A, result);
+    result = A->transpose();
 
     pyResult = ConvertFlat2DArray_2DPy(result);
 

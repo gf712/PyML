@@ -26,7 +26,10 @@ public:
     void setCols(int cols);
     double* getArray();
     double getElement(int row, int col);
-    double setElement(double value, int row, int col);
+    void setElement(double value, int row, int col);
+    flat2DArrays* transpose();
+    double getNElement(int n);
+    void setNElement(double value, int n);
 
 };
 

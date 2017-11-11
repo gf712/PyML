@@ -40,7 +40,7 @@ double flat2DArrays::getElement(int row, int col) {
     return array[cols*row+col%cols];
 }
 
-double flat2DArrays::setElement(double value, int row, int col) {
+void flat2DArrays::setElement(double value, int row, int col) {
     array[cols*row+col%cols] = value;
 }
 
@@ -51,5 +51,28 @@ void flat2DArrays::startEmptyArray(int rows, int cols) {
 }
 
 flat2DArrays::~flat2DArrays() = default;
+flat2DArrays* flat2DArrays::transpose() {
+    // faster transpose method
+    auto result = new flat2DArrays;
+
+    result->startEmptyArray(cols, rows);
+
+    for (int n = 0; n < rows * cols; ++n) {
+        int row = n / rows;
+        int column = n % rows * cols;
+
+        result->setNElement(getNElement(row + column), n);
+    }
+
+    return result;
+}
+
+double flat2DArrays::getNElement(int n) {
+    return array[n];
+}
+
+void flat2DArrays::setNElement(double value, int n) {
+    array[n] = value;
+}
 
 flat2DArrays::flat2DArrays() = default;

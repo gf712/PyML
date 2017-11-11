@@ -107,7 +107,7 @@ void vectorDivide(double* X, int n, int size) {
 
 void matrixTranspose(double** X, double** result, int rows, int cols, int block_size) {
 
-    #pragma omp parallel for
+//    #pragma omp parallel for
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
             result[j][i] = X[i][j];
