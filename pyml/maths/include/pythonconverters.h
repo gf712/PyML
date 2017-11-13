@@ -16,8 +16,8 @@ PyObject* Convert_1DArrayInt(long* array, int size);
 PyObject* Convert_2DArray(double** array, int rows, int cols);
 void convertPy_1DArray(PyObject* array, double* result, int size);
 void convertPy_2DArray(PyObject* array, double** result, int rows, int cols);
-void convertPy2D_flat2DArray(PyObject *array, double *result, int rows, int cols);
-PyObject* ConvertFlat2DArray_2DPy(flat2DArrays* array);
+void convertPy_flatArray(PyObject *array, flatArray *result);
+PyObject* ConvertFlat2DArray_2DPy(flatArray *array);
 
 #ifdef __cplusplus
 }
