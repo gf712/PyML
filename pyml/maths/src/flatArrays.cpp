@@ -67,7 +67,7 @@ flatArray* flatArray::transpose() {
         int column = n / rows;
         int row = n % rows * cols;
 
-        result->setNElement(getNElement(row + column), n);
+        result->setNElement(array[row + column], n);
         }
     return result;
 }
@@ -82,4 +82,11 @@ void flatArray::setNElement(double value, int n) {
 
 int flatArray::getSize() {
     return size;
+}
+
+double flatArray::sum() {
+    double result = 0;
+    for (int n = 0; n < size; ++n) {
+        result += array[n];
+    };
 }

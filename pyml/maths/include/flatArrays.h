@@ -39,6 +39,7 @@ public:
     double getNElement(int n);
     void setNElement(double value, int n);
     int getSize();
+    double sum();
 };
 
 #ifdef __cplusplus

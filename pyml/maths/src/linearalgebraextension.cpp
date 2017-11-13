@@ -135,11 +135,11 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
 
 static PyObject* sum(PyObject* self, PyObject *args) {
 
+    // sum of all elements in a matrix/vector
+
     // variable declaration
-    int sizeOfA;
+    auto A = new flatArray;
     PyObject *pAArray;
-    double result;
-    double* A;
 
     // return error if we don't get all the arguments
     if(!PyArg_ParseTuple(args, "O!", &PyList_Type, &pAArray)) {
@@ -148,11 +148,9 @@ static PyObject* sum(PyObject* self, PyObject *args) {
     }
 
     // use PyList_Size to get size of vector
-    sizeOfA = static_cast<int>(PyList_Size(pAArray));
+    A->readFromPythonList(pAArray);
 
-    convertPy_1DArray(pAArray, A, sizeOfA);
-
-    result = vectorSum(A, sizeOfA);
+    double result = A->sum();
 
     PyObject *FinalResult = Py_BuildValue("d", result);
 
