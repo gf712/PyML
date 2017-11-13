@@ -63,19 +63,13 @@ flatArray* flatArray::transpose() {
 
     result->startEmptyArray(cols, rows);
 
-//    for (int n = 0; n < rows * cols; ++n) {
-//        int column = n / rows;
-//        int row = n % rows * cols;
-//
-//        result->setNElement(getNElement(row + column), n);
-//    }
+//    #pragma omp parallel for
+    for (int n = 0; n < rows * cols; ++n) {
+        int column = n / rows;
+        int row = n % rows * cols;
 
-    for (int i = 0; i < cols; i++) {
-        for (int j = 0; j < rows; ++j) {
-            result->setElement(getElement(j, i), i, j);
+        result->setNElement(getNElement(row + column), n);
         }
-    }
-
     return result;
 }
 
