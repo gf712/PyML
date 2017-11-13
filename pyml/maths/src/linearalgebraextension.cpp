@@ -198,12 +198,13 @@ static PyObject* pyTranspose(PyObject* self, PyObject *args) {
 static PyObject* matrix_product(PyObject* self, PyObject *args) {
 
     // variable declaration
-    int rowsA, rowsB, colsA, colsB;
+    auto A = new flatArray;
+    auto B = new flatArray;
+    auto result = new flatArray;
+
+    // python list pointers
     PyObject *pAArray;
     PyObject *pBArray;
-    double** result = nullptr;
-    double** A = nullptr;
-    double** B = nullptr;
     PyObject *result_py_list;
 
     // return error if we don't get all the arguments
@@ -212,74 +213,32 @@ static PyObject* matrix_product(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    if (!PyList_Check(PyList_GetItem(pAArray, 0))) {
-        PyErr_SetString(PyExc_TypeError, "Expected A to be a list of lists!");
-        return nullptr;
-    }
 
-    if (!PyList_Check(PyList_GetItem(pBArray, 0))) {
-        PyErr_SetString(PyExc_TypeError, "Expected B to be a list of lists!");
-        return nullptr;
-    }
+    // read in matrices
+    A->readFromPythonList(pAArray);
+    B->readFromPythonList(pBArray);
 
-    // use PyList_Size to get size of vectors
-    rowsA = static_cast<int>(PyList_Size(pAArray));
-    colsA = static_cast<int>(PyList_Size(PyList_GetItem(pAArray, 0)));
-    rowsB = static_cast<int>(PyList_Size(pBArray));
-    colsB = static_cast<int>(PyList_Size(PyList_GetItem(pBArray, 0)));
 
-    if (rowsA != colsB){
-        PyErr_SetString(PyExc_ValueError, "Number of rows in A must be the same as the number of columns in B");
-        return nullptr;
-    }
-
-    if (colsA != rowsB){
+    if (A->getCols() != B->getRows()){
         PyErr_SetString(PyExc_ValueError, "Number of columns in A must be the same as the number of rows in B");
         return nullptr;
     }
 
     // memory allocation
-    result = new double *[rowsA];
+    result->startEmptyArray(A->getRows(), B->getCols());
 
-    for (int i = 0; i < rowsA; ++i) {
-        result[i] = new double [rowsA];
-    }
-    A = new double *[rowsA];
+    flatMatrixMatrixProduct(A, B, result);
 
-    for (int i = 0; i < rowsA; ++i) {
-        A[i] = new double [colsA];
-    }
-    B = new double *[rowsB];
+    // convert to python list
+    result_py_list = ConvertFlatArray_PyList(result);
 
-    for (int i = 0; i < rowsB; ++i) {
-        B[i] = new double [colsB];
-    }
-
-    // convert python lists of lists to 2D C++ arrays
-    convertPy_2DArray(pAArray, A, rowsA, colsA);
-    convertPy_2DArray(pBArray, B, rowsB, colsB);
-
-    matrixMatrixProduct(A, B, rowsA, colsA, result);
-
-    result_py_list = Convert_2DArray(result, rowsA, rowsA);
+    PyObject* FinalResult = Py_BuildValue("O", result_py_list);
 
     // memory deallocation
-    for (int i = 0; i < rowsA; ++i) {
-        delete [] result[i];
-    }
-    delete [] result;
+    delete A;
+    delete B;
+    delete result;
 
-    for (int i = 0; i < rowsA; ++i) {
-        delete [] A[i];
-    }
-    delete [] A;
-
-    for (int i = 0; i < rowsB; ++i) {
-        delete [] B[i];
-    }
-    delete [] B;
-
-    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
 
     Py_DECREF(result_py_list);
 

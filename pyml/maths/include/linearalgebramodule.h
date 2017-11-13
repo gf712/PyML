@@ -23,6 +23,7 @@ void matrixMean(double **array, int cols, int rows, int axis, double* result);
 void flatMatrixVectorDotProduct(flatArray *A, flatArray *V, flatArray *result);
 void flatMatrixPower(flatArray *A, int p);
 void flatArraySubtract(flatArray *A, flatArray *B, flatArray *result);
+void flatMatrixMatrixProduct(flatArray *A, flatArray *B, flatArray *result);
 
 #ifdef __cplusplus
 }
