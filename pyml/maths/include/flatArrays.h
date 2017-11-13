@@ -9,16 +9,22 @@
 extern "C" {
 #endif
 
-class flat2DArrays {
+class flatArray {
 private:
     int rows;
     int cols;
+    int size;
     double *array;
 
 public:
-    flat2DArrays();
-    ~flat2DArrays() {
-        delete [] array;
+    flatArray() {
+        array = nullptr;
+        rows = 0;
+        cols = 0;
+        size = 0;
+    };
+    ~flatArray() {
+        delete array;
     };
     void readFromPythonList(PyObject *pyList);
     void startEmptyArray(int rows_, int cols_);
@@ -29,10 +35,10 @@ public:
     double* getArray();
     double getElement(int row, int col);
     void setElement(double value, int row, int col);
-    flat2DArrays* transpose();
+    flatArray* transpose();
     double getNElement(int n);
     void setNElement(double value, int n);
-
+    int getSize();
 };
 
 #ifdef __cplusplus

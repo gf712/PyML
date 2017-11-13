@@ -2,76 +2,91 @@
 // Created by gil on 10/11/17.
 //
 #include "pythonconverters.h"
-#include "flatArrays.h"
-#include <Python.h>
 
-void flat2DArrays::readFromPythonList(PyObject *pyList) {
+void flatArray::readFromPythonList(PyObject *pyList) {
+
     // read in array from Python list
-    rows = static_cast<int>(PyList_GET_SIZE(pyList));
-    cols = static_cast<int>(PyList_GET_SIZE(PyList_GET_ITEM(pyList, 0)));
-
+    if (PyFloat_Check(PyList_GET_ITEM(pyList, 0)) || PyLong_Check(PyList_GET_ITEM(pyList, 0))) {
+        cols = static_cast<int>(PyList_GET_SIZE(pyList));
+        rows = 1;
+    }
+    else {
+        rows = static_cast<int>(PyList_GET_SIZE(pyList));
+        cols = static_cast<int>(PyList_GET_SIZE(PyList_GET_ITEM(pyList, 0)));
+    }
     // memory allocation of array
-    array = new double [rows * cols];
+    startEmptyArray(rows, cols);
 
-    convertPy2D_flat2DArray(pyList, array, rows, cols);
+
+    convertPy_flatArray(pyList, this);
 }
 
-int flat2DArrays::getRows() {
-    return flat2DArrays::rows;
+
+int flatArray::getRows() {
+    return flatArray::rows;
 }
 
-int flat2DArrays::getCols() {
-    return flat2DArrays::cols;
+int flatArray::getCols() {
+    return flatArray::cols;
 }
 
-void flat2DArrays::setRows(int rows) {
-    flat2DArrays::rows = rows;
+void flatArray::setRows(int rows) {
+    flatArray::rows = rows;
 }
 
-void flat2DArrays::setCols(int cols) {
-    flat2DArrays::cols = cols;
+void flatArray::setCols(int cols) {
+    flatArray::cols = cols;
 }
 
-double *flat2DArrays::getArray() {
-    return flat2DArrays::array;
+double *flatArray::getArray() {
+    return flatArray::array;
 }
 
-double flat2DArrays::getElement(int row, int col) {
+double flatArray::getElement(int row, int col) {
     return array[cols*row+col%cols];
 }
 
-void flat2DArrays::setElement(double value, int row, int col) {
+void flatArray::setElement(double value, int row, int col) {
     array[cols*row+col%cols] = value;
 }
 
-void flat2DArrays::startEmptyArray(int rows, int cols) {
-    flat2DArrays::rows = rows;
-    flat2DArrays::cols = cols;
-    array = new double [rows * cols];
+void flatArray::startEmptyArray(int rows, int cols) {
+    flatArray::rows = rows;
+    flatArray::cols = cols;
+    flatArray::size = rows * cols;
+    array = new double [size];
 }
 
-flat2DArrays* flat2DArrays::transpose() {
+flatArray* flatArray::transpose() {
     // faster transpose method
-    auto result = new flat2DArrays;
+    auto result = new flatArray;
 
     result->startEmptyArray(cols, rows);
 
-    for (int n = 0; n < rows * cols; ++n) {
-        int row = n / rows;
-        int column = n % rows * cols;
+//    for (int n = 0; n < rows * cols; ++n) {
+//        int column = n / rows;
+//        int row = n % rows * cols;
+//
+//        result->setNElement(getNElement(row + column), n);
+//    }
 
-        result->setNElement(getNElement(row + column), n);
+    for (int i = 0; i < cols; i++) {
+        for (int j = 0; j < rows; ++j) {
+            result->setElement(getElement(j, i), i, j);
+        }
     }
 
     return result;
 }
 
-double flat2DArrays::getNElement(int n) {
+double flatArray::getNElement(int n) {
     return array[n];
 }
 
-void flat2DArrays::setNElement(double value, int n) {
+void flatArray::setNElement(double value, int n) {
     array[n] = value;
 }
 
-flat2DArrays::flat2DArrays() = default;
+int flatArray::getSize() {
+    return size;
+}
