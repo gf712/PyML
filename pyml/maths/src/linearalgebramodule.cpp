@@ -56,6 +56,48 @@ void matrixMatrixProduct(double** A, double** B, int rows, int cols, double** re
 }
 
 
+void flatMatrixMatrixProduct(flatArray *A, flatArray *B, flatArray *result) {
+
+    int n = 0;
+    int rRows = result->getRows();
+    int rCols = result->getCols();
+    int N = A->getCols();
+    int M = B->getCols();
+
+    for (int i = 0; i < rRows; ++i) {
+        for (int j = 0; j < rCols; ++j) {
+
+            int posA = i * N;
+            int posB = j;
+            double eResult = 0;
+
+            for (int k = 0; k < N; ++k) {
+                eResult += A->getNElement(posA) * B->getNElement(posB);
+
+                posA++;
+                posB += M;
+            }
+
+            result->setNElement(eResult, n);
+            n++;
+        }
+    }
+}
+
+
+void flatMatrixVectorDotProduct(flatArray *X, flatArray *V, flatArray *result) {
+    int n = 0;
+    for (int i = 0; i < X->getRows(); ++i) {
+        double row_result  = 0;
+        for (int j = 0; j < X->getCols(); ++j) {
+            row_result += X->getNElement(n) * V->getNElement(j);
+            n++;
+        }
+        result->setNElement(row_result, i);
+    }
+}
+
+
 void flatMatrixPower(flatArray *A, int p) {
     for (int n = 0; n < A->getSize(); ++n) {
         A->setNElement(pow(A->getNElement(n), p), n);
@@ -303,16 +345,3 @@ void matrixMean(double** array, int cols, int rows, int axis, double* result) {
         }
     }
 }
-
-void flatMatrixVectorDotProduct(flatArray *X, flatArray *V, flatArray *result) {
-    int n = 0;
-    for (int i = 0; i < X->getRows(); ++i) {
-        double row_result  = 0;
-        for (int j = 0; j < X->getCols(); ++j) {
-            row_result += X->getNElement(n) * V->getNElement(j);
-            n++;
-        }
-        result->setNElement(row_result, i);
-    }
-}
-

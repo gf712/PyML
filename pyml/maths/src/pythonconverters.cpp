@@ -86,7 +86,7 @@ PyObject* Convert_2DArray(double** array, int rows, int cols) {
 }
 
 
-PyObject* ConvertFlat2DArray_2DPy(flatArray* array) {
+PyObject* ConvertFlatArray_PyList(flatArray *array) {
 
     // converts a 1D C++ array representation of a 2D array to a python list of lists
 
