@@ -94,50 +94,38 @@ static PyObject* power(PyObject* self, PyObject *args) {
 static PyObject* subtract(PyObject* self, PyObject *args) {
 
     // variable instantiation
-    int sizeOfU;
-    int sizeOfV;
-    PyObject *pUVector;
-    PyObject *pVVector;
-    double* result = nullptr;
+    auto A = new flatArray;
+    auto B = new flatArray;
+    auto result = new flatArray;
+
+    PyObject *pA;
+    PyObject *pB;
     PyObject *result_py_list;
-    double* U = nullptr;
-    double* V = nullptr;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pUVector, &PyList_Type, &pVVector)) {
+    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pA, &PyList_Type, &pB)) {
         PyErr_SetString(PyExc_TypeError, "Expected two lists!");
         return nullptr;
     }
 
-    // use PyList_Size to get size of vectors
-    sizeOfU = static_cast<int>(PyList_Size(pUVector));
-    sizeOfV = static_cast<int>(PyList_Size(pVVector));
-
-    if (sizeOfU != sizeOfV){
-        PyErr_SetString(PyExc_ValueError, "Vector must be of same dimensions");
-        return nullptr;
-    }
+    // get python lists
+    A->readFromPythonList(pA);
+    B->readFromPythonList(pB);
 
     // memory allocation
-    result = new double[sizeOfU];
-    U = new double[sizeOfU];
-    V = new double[sizeOfV];
-
-    // convert lists to C++ arrays
-    convertPy_1DArray(pUVector, U, sizeOfU);
-    convertPy_1DArray(pVVector, V, sizeOfV);
+    result->startEmptyArray(A->getRows(), A->getCols());
 
     // calculation
-    vectorSubtract(U, V, sizeOfU, result);
+    flatArraySubtract(A, B, result);
 
-    result_py_list = Convert_1DArray(result, sizeOfU);
+    result_py_list = ConvertFlat2DArray_2DPy(result);
 
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
 
     // memory deallocation
-    delete [] result;
-    delete [] U;
-    delete [] V;
+    delete result;
+    delete A;
+    delete B;
 
     Py_DECREF(result_py_list);
 

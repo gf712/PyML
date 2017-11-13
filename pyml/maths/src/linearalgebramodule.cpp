@@ -65,12 +65,17 @@ void flatMatrixPower(flatArray *A, int p) {
 
 void vectorSubtract(const double* u, const double* v, int size, double* result) {
 
-    int i;
-
-    for (i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i) {
 
         result[i] = u[i] - v[i];
 
+    }
+}
+
+void flatArraySubtract(flatArray *A, flatArray *B, flatArray *result) {
+
+    for (int n = 0; n < A->getSize(); ++n) {
+        result->setNElement(A->getNElement(n) - B->getNElement(n), n);
     }
 }
 

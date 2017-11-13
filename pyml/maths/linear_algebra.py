@@ -50,12 +50,14 @@ def broadcast(u, n):
     return [u for i in range(n)]
 
 
-def subtract(u, v):
-    if not isinstance(u, list):
-        raise TypeError("Expected a list, but got {} instead.".format(type(u)))
-    if not isinstance(v, list):
-        raise TypeError("Expected a list, but got {} instead.".format(type(v)))
-    return Clinear_algebra.subtract(u, v)
+def subtract(A, B):
+    """
+    Calculates elementwise difference of each element in a list (vector) or list of lists (matrix)
+    :param A: either a list or a list of lists
+    :param B: either a list or a list of lists
+    :return: same format as A (list or list of lists)
+    """
+    return Clinear_algebra.subtract(A, B)
 
 
 def power(A, n):
