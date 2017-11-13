@@ -5,17 +5,15 @@
 #include <linearalgebramodule.h>
 #include "pythonconverters.h"
 #include <iostream>
-#include "flatArrays.h"
 
 static PyObject* dot_product(PyObject* self, PyObject *args) {
 
     // variable instantiation
     // A is a list of lists (matrix)
     // u is a list (vector)
-    int colsA, rowsA, sizeOfV;
-    double** A = nullptr;
-    double* V = nullptr;
-    double* result = nullptr;
+    auto A = new flatArray;
+    auto V = new flatArray;
+    auto result = new flatArray;
 
     // pointers to python lists
     PyObject * pAArray;
@@ -27,45 +25,28 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    rowsA = static_cast<int>(PyList_GET_SIZE(pAArray));
-    colsA = static_cast<int>(PyList_GET_SIZE(PyList_GET_ITEM(pAArray, 0)));
-    sizeOfV = static_cast<int>(PyList_GET_SIZE(pVVector));
+    A->readFromPythonList(pAArray);
+    V->readFromPythonList(pVVector);
+    result->startEmptyArray(1, A->getRows());
 
-    if (colsA != sizeOfV){
+    if (A->getCols() != V->getCols()){
         PyErr_SetString(PyExc_ValueError, "A and v must have the same size");
         return nullptr;
     }
 
-    A = new double *[rowsA];
-    for (int i = 0; i < rowsA; ++i) {
-        A[i] = new double [colsA];
-    }
-
-    V = new double [sizeOfV];
-
-    convertPy_2DArray(pAArray, A, rowsA, colsA);
-
-    convertPy_1DArray(pVVector, V, sizeOfV);
-
-
-    // memory allocation of dot product result
-    result = new double[rowsA];
 
     // calculate dot product
-    matrixVectorDotProduct(A, V, rowsA, colsA, result);
+    flatMatrixVectorDotProduct(A, V, result);
 
     // convert result to python list
-    PyObject* result_py_list = Convert_1DArray(result, rowsA);
+    PyObject* result_py_list = ConvertFlat2DArray_2DPy(result);
 
     // build python object
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
 
-    // free up memory
-    for (int i = 0; i < rowsA; ++i) {
-        delete [] A[i];
-    }
-    delete [] A;
-    delete [] V;
+    delete result;
+    delete A;
+    delete V;
 
     Py_DECREF(result_py_list);
 
@@ -203,8 +184,8 @@ static PyObject* sum(PyObject* self, PyObject *args) {
 static PyObject* pyTranspose(PyObject* self, PyObject *args) {
 
     // declarations
-    auto result = new flat2DArrays;
-    auto A = new flat2DArrays;
+//    auto result = new flatArray;
+    auto A = new flatArray;
 //    int block_size;
     PyObject* pyResult;
     PyObject* pArray;
@@ -221,15 +202,13 @@ static PyObject* pyTranspose(PyObject* self, PyObject *args) {
 
     A->readFromPythonList(pArray);
 
-//    result->startEmptyArray(A->getCols(), A->getRows());
-//
-//    flatMatrixTranspose(A, result);
-
-    result = A->transpose();
+    flatArray *result = A->transpose();
 
     pyResult = ConvertFlat2DArray_2DPy(result);
 
     PyObject* FinalResult = Py_BuildValue("O", pyResult);
+
+//    PyObject* FinalResult = Py_BuildValue("i", 0);
 
     delete result;
     delete A;

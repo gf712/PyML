@@ -1,7 +1,6 @@
 #include <Python.h>
 #include "linearalgebramodule.h"
-#include "iostream"
-#include <flatArrays.h>
+#include <iostream>
 
 // Handle errors
 // static PyObject *algebraError;
@@ -115,10 +114,10 @@ void matrixTranspose(double** X, double** result, int rows, int cols, int block_
     }
 }
 
-void flatMatrixTranspose(flat2DArrays* X, flat2DArrays* result) {
+void flatMatrixTranspose(flatArray* X, flatArray* result) {
 
-//    PyErr_SetString(PyExc_ValueError, std::to_string(X->getElement(0,0)).c_str());
-//    #pragma omp parallel for
+//    PyErr_SetString(PyExc_ValueError, std::to_string(X->getElement(0, 0)).c_str());
+    //    #pragma omp parallel for
     for (int i = 0; i < X->getCols(); i++) {
         for (int j = 0; j < X->getRows(); ++j) {
             result->setElement(X->getElement(j, i), i, j);
@@ -320,6 +319,18 @@ void matrixMean(double** array, int cols, int rows, int axis, double* result) {
         for (int i = 0; i < rows; ++i) {
             result[i] = vectorMean(array[i], cols);
         }
+    }
+}
+
+void flatMatrixVectorDotProduct(flatArray *X, flatArray *V, flatArray *result) {
+    int n = 0;
+    for (int i = 0; i < X->getRows(); ++i) {
+        double row_result  = 0;
+        for (int j = 0; j < X->getCols(); ++j) {
+            row_result += X->getNElement(n) * V->getNElement(j);
+            n++;
+        }
+        result->setNElement(row_result, i);
     }
 }
 

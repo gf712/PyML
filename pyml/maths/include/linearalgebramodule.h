@@ -21,7 +21,8 @@ void leastSquares(double** X, double* y, double* theta, int n, int m);
 void vectorDivide(double* X, int n, int size);
 double vectorMean(const double* array, int size);
 void matrixMean(double **array, int cols, int rows, int axis, double* result);
-void flatMatrixTranspose(flat2DArrays *X, flat2DArrays *result);
+void flatMatrixVectorDotProduct(flatArray *A, flatArray *V, flatArray *result);
+void flatMatrixTranspose(flatArray* X, flatArray* result);
 
 #ifdef __cplusplus
 }
