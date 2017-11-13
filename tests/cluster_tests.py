@@ -4,7 +4,7 @@ from pyml.datasets import gaussian
 from pyml.preprocessing import train_test_split
 
 
-class MathsTest(unittest.TestCase):
+class KMeansTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

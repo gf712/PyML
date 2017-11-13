@@ -26,11 +26,17 @@ def dot_product(u, v):
     [[0.0, -10.0], [-3.0, -1.0]]
 
     """
-    if isinstance(u[0], list) and isinstance(v[0], list):
-        return matrix_product(u, v)
-    elif len(u) == len(v) and isinstance(u[0], (float, int)) and isinstance(v[0], (float, int)):
-        return Clinear_algebra.dot_product([u], v)
-    elif len(u[0]) == len(v):
+    if isinstance(u[0], list):
+        if isinstance(v[0], list):
+            # matrix matrix multiplication
+            return matrix_product(u, v)
+        elif isinstance(v[0], (float, int)):
+            # matrix vector product
+            return Clinear_algebra.dot_product(u, v)
+        else:
+            raise NotImplementedError("This is not the code you are looking for.")
+    elif isinstance(u[0], (float, int)) and isinstance(v[0], (float, int)):
+        # vector vector product
         return Clinear_algebra.dot_product(u, v)
     else:
         raise NotImplementedError("This is not the code you are looking for.")
