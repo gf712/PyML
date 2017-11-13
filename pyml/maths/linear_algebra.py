@@ -58,8 +58,14 @@ def subtract(u, v):
     return Clinear_algebra.subtract(u, v)
 
 
-def power(u, n):
-    return Clinear_algebra.power(u, n)
+def power(A, n):
+    """
+    Calculates elementwise power of each element in a list (vector) or list of lists (matrix)
+    :param A: either a list or a list of lists
+    :param n: int to calculate the power
+    :return: same format as A (list or list of lists)
+    """
+    return Clinear_algebra.power(A, n)
 
 
 def divide(u, n):

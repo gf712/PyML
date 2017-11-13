@@ -61,7 +61,7 @@ class LinearAlgebraTest(unittest.TestCase):
         self.assertAlmostEqual(subtract(self.A[0], transpose(self.B)[0])[3], 0.6442101271237023)
 
     def test_power(self):
-        self.assertAlmostEqual(power(self.A[0], 2)[5], 0.9336806492618525)
+        self.assertAlmostEqual(power(self.A, 2)[0][5], 0.9336806492618525)
 
     def test_divide(self):
         self.assertAlmostEqual(divide(self.A[0], 0.5)[0], 0.2792398429743861)

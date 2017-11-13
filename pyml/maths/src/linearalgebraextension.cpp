@@ -10,7 +10,7 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
 
     // variable instantiation
     // A is a list of lists (matrix)
-    // u is a list (vector)
+    // V is a list (vector)
     auto A = new flatArray;
     auto V = new flatArray;
     auto result = new flatArray;
@@ -57,46 +57,36 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
 static PyObject* power(PyObject* self, PyObject *args) {
 
     // variable declaration
-    int sizeOfA;
-    PyObject *pAArray;
-    double* A;
-    int pPower;
-    double *result;
-    PyObject *result_py_list;
+    auto A = new flatArray;
+    int p;
+
+    // pointers to python lists
+    PyObject * pAArray;
 
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pAArray, &pPower)) {
+    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pAArray, &p)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list and an integer!");
         return nullptr;
     }
 
-    // use PyList_Size to get size of vector
-    sizeOfA = static_cast<int>(PyList_Size(pAArray));
-
-    // memory allocation
-    result = new double[sizeOfA];
-    A = new double[sizeOfA];
-
-    // Python list to C++ array
-    convertPy_1DArray(pAArray, A, sizeOfA);
+    // read in python list
+    A->readFromPythonList(pAArray);
 
     // calculate the power elementwise
-    vectorPower(A, pPower, sizeOfA, result);
+    flatMatrixPower(A, p);
 
     // convert vector to python list
-    result_py_list = Convert_1DArray(result, sizeOfA);
+    PyObject* result_py_list = ConvertFlat2DArray_2DPy(A);
 
     // build python object
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
 
     // deallocate memory
-    delete [] result;
-    delete [] A;
+    delete A;
 
     Py_DECREF(result_py_list);
 
-//    PyObject *FinalResult = Py_BuildValue("i", 0);
     return FinalResult;
 }
 

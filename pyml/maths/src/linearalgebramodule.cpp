@@ -55,22 +55,11 @@ void matrixMatrixProduct(double** A, double** B, int rows, int cols, double** re
 
 }
 
-//double * matrix_matrix_dot_product(PyObject *A, PyObject *B, int ASize, int BSize) {
-//
-//
-//
-//}
 
-void vectorPower(double* A, int pPower, int size, double* result) {
-
-    int i;
-
-    for (i = 0; i < size; ++i) {
-
-        result[i] = pow(A[i], pPower);
-
+void flatMatrixPower(flatArray *A, int p) {
+    for (int n = 0; n < A->getSize(); ++n) {
+        A->setNElement(pow(A->getNElement(n), p), n);
     }
-
 }
 
 
@@ -113,18 +102,6 @@ void matrixTranspose(double** X, double** result, int rows, int cols, int block_
         }
     }
 }
-
-void flatMatrixTranspose(flatArray* X, flatArray* result) {
-
-//    PyErr_SetString(PyExc_ValueError, std::to_string(X->getElement(0, 0)).c_str());
-    //    #pragma omp parallel for
-    for (int i = 0; i < X->getCols(); i++) {
-        for (int j = 0; j < X->getRows(); ++j) {
-            result->setElement(X->getElement(j, i), i, j);
-        }
-    }
-}
-
 
 void maximumSearch(double* vector, int size, int i, double* result) {
     // store result in result array

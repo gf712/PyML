@@ -17,7 +17,6 @@ void flatArray::readFromPythonList(PyObject *pyList) {
     // memory allocation of array
     startEmptyArray(rows, cols);
 
-
     convertPy_flatArray(pyList, this);
 }
 
