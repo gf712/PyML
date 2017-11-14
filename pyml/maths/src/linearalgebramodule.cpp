@@ -1,6 +1,6 @@
 #include <Python.h>
 #include "linearalgebramodule.h"
-#include <iostream>
+#include <omp.h>
 
 // Handle errors
 // static PyObject *algebraError;
@@ -55,31 +55,32 @@ void matrixMatrixProduct(double** A, double** B, int rows, int cols, double** re
 
 }
 
-
 void flatMatrixMatrixProduct(flatArray *A, flatArray *B, flatArray *result) {
 
-    int n = 0;
     int rRows = result->getRows();
     int rCols = result->getCols();
     int N = A->getCols();
     int M = B->getCols();
+    int n, i, j, k, posA, posB;
+    double eResult;
 
-    for (int i = 0; i < rRows; ++i) {
-        for (int j = 0; j < rCols; ++j) {
+    {
+    #pragma omp parallel for default(shared) private (i, j, k, n, posA, posB, eResult) schedule(static) collapse(2)
+        for (i = 0; i < rRows; ++i) {
+            for (j = 0; j < rCols; ++j) {
+                posA = i * N;
+                posB = j;
+                eResult = 0;
+                n = i * M + j;
+                for (k = 0; k < N; ++k) {
+                    eResult += A->getNElement(posA) * B->getNElement(posB);
 
-            int posA = i * N;
-            int posB = j;
-            double eResult = 0;
+                    posA++;
+                    posB += M;
+                }
 
-            for (int k = 0; k < N; ++k) {
-                eResult += A->getNElement(posA) * B->getNElement(posB);
-
-                posA++;
-                posB += M;
+                result->setNElement(eResult, n);
             }
-
-            result->setNElement(eResult, n);
-            n++;
         }
     }
 }

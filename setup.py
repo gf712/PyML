@@ -1,5 +1,4 @@
-from setuptools import setup
-from setuptools import Extension
+from setuptools import setup, Extension
 import distutils.sysconfig
 
 # Workaround setuptools -Wstrict-prototypes warnings
@@ -18,8 +17,8 @@ linear_algebra_module = Extension('pyml.maths.Clinear_algebra',
                                            'pyml/maths/src/linearalgebraextension.cpp',
                                            'pyml/maths/src/pythonconverters.cpp',
                                            'pyml/maths/src/flatArrays.cpp'],
-                                  extra_compile_args=['-std=c++11'],
-                                  # extra_link_args=['-lgomp'],
+                                  extra_compile_args=['-std=c++11', '-fopenmp'],
+                                  extra_link_args=['-lgomp'],
                                   include_dirs=['pyml/maths/include'],
                                   language='c++')
 
@@ -28,8 +27,8 @@ gradient_descent_module = Extension('pyml.maths.gradient_descent',
                                              'pyml/maths/src/linearalgebramodule.cpp',
                                              'pyml/maths/src/pythonconverters.cpp',
                                              'pyml/maths/src/flatArrays.cpp'],
-                                    extra_compile_args=['-std=c++11'],
-                                    # extra_link_args=['-lgomp'],
+                                    extra_compile_args=['-std=c++11', '-fopenmp'],
+                                    extra_link_args=['-lgomp'],
                                     include_dirs=['pyml/maths/include'],
                                     language='c++')
 

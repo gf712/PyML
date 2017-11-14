@@ -20,7 +20,6 @@ void flatArray::readFromPythonList(PyObject *pyList) {
     convertPy_flatArray(pyList, this);
 }
 
-
 int flatArray::getRows() {
     return flatArray::rows;
 }
@@ -62,7 +61,6 @@ flatArray* flatArray::transpose() {
 
     result->startEmptyArray(cols, rows);
 
-//    #pragma omp parallel for
     for (int n = 0; n < rows * cols; ++n) {
         int column = n / rows;
         int row = n % rows * cols;
