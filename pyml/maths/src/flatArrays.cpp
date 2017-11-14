@@ -115,3 +115,74 @@ void flatArray::setRow(double *row, int i) {
         n++;
     }
 }
+
+flatArray *flatArray::dot(flatArray *other) {
+
+    if (other->getRows() > 1) {
+        // matrix matrix multiplication
+        if (cols != other->getRows()) {
+            PyErr_SetString(PyExc_ValueError, "Number of columns in A must be the same as the number of rows in B");
+            return nullptr;
+        }
+
+        auto result = new flatArray;
+        result->startEmptyArray(rows, other->getCols());
+
+        int rRows = result->getRows();
+        int rCols = result->getCols();
+        int N = getCols();
+        int M = other->getCols();
+        int n, i, j, k, posA, posB;
+        double eResult;
+        double *otherArray = other->getArray();
+
+        for (i = 0; i < rRows; ++i) {
+            for (j = 0; j < rCols; ++j) {
+                posA = i * N;
+                posB = j;
+                eResult = 0;
+                n = i * M + j;
+                for (k = 0; k < N; ++k) {
+                    eResult += array[posA] * otherArray[posB];
+
+                    posA++;
+                    posB += M;
+                }
+
+                result->setNElement(eResult, n);
+            }
+        }
+
+        return result;
+    }
+
+    else if (other->getRows() == 1) {
+        // matrix vector multiplication
+        if (cols != other->getCols()){
+            PyErr_SetString(PyExc_ValueError, "A and v must have the same size");
+            return nullptr;
+        }
+
+        auto result = new flatArray;
+        result->startEmptyArray(1, rows);
+        double *v = other->getArray();
+
+        int n = 0;
+        for (int i = 0; i < rows; ++i) {
+            double row_result  = 0;
+            for (int j = 0; j < cols; ++j) {
+                row_result += array[n] * v[j];
+                n++;
+            }
+            result->setNElement(row_result, i);
+        }
+
+        return result;
+
+    }
+
+    else {
+        // ERROR
+        return nullptr;
+    }
+}

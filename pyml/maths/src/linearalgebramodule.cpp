@@ -1,7 +1,6 @@
 #include <flatArrays.h>
 #include <Python.h>
 #include "linearalgebramodule.h"
-#include <omp.h>
 #include <iostream>
 
 // Handle errors
@@ -28,76 +27,6 @@ void matrixVectorDotProduct(double** A, double* v, int ASize, int VSize, double*
 
     }
 
-}
-
-
-void matrixMatrixProduct(double** A, double** B, int rows, int cols, double** result) {
-
-    // it's easier to just transpose B
-    double** other = nullptr;
-
-    other = new double *[rows];
-    for (int i = 0; i < rows; ++i) {
-        other[i] = new double [cols];
-    }
-
-    matrixTranspose(B, other, cols, rows, 16);
-
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < rows; ++j) {
-            result[i][j] = dotProduct(A[i], other[j], cols);
-        }
-    }
-
-    for (int i = 0; i < rows; ++i) {
-        delete other[i];
-    }
-
-    delete [] other;
-
-}
-
-void flatMatrixMatrixProduct(flatArray *A, flatArray *B, flatArray *result) {
-
-    int rRows = result->getRows();
-    int rCols = result->getCols();
-    int N = A->getCols();
-    int M = B->getCols();
-    int n, i, j, k, posA, posB;
-    double eResult;
-
-    {
-    #pragma omp parallel for default(shared) private (i, j, k, n, posA, posB, eResult) schedule(static) collapse(2)
-        for (i = 0; i < rRows; ++i) {
-            for (j = 0; j < rCols; ++j) {
-                posA = i * N;
-                posB = j;
-                eResult = 0;
-                n = i * M + j;
-                for (k = 0; k < N; ++k) {
-                    eResult += A->getNElement(posA) * B->getNElement(posB);
-
-                    posA++;
-                    posB += M;
-                }
-
-                result->setNElement(eResult, n);
-            }
-        }
-    }
-}
-
-
-void flatMatrixVectorDotProduct(flatArray *X, flatArray *V, flatArray *result) {
-    int n = 0;
-    for (int i = 0; i < X->getRows(); ++i) {
-        double row_result  = 0;
-        for (int j = 0; j < X->getCols(); ++j) {
-            row_result += X->getNElement(n) * V->getNElement(j);
-            n++;
-        }
-        result->setNElement(row_result, i);
-    }
 }
 
 
@@ -253,17 +182,13 @@ void gaussianElimination(flatArray *A, double *result) {
 void leastSquares(flatArray *X, flatArray *y, double *theta) {
 
     // variable declaration
-    auto XTX = new flatArray;
     auto A = new flatArray;
-    auto right = new flatArray;
     int m = X->getCols();
     int n;
     int XTXn=0;
 
     // memory allocation
-    XTX->startEmptyArray(m, m);
     A->startEmptyArray(m, m+1);
-    right->startEmptyArray(m, 1);
 
     // start algorithm
 
@@ -273,12 +198,12 @@ void leastSquares(flatArray *X, flatArray *y, double *theta) {
     // XT is a m by n matrix
     // an m by n matrix multiplied by a n by m matrix results in a m by m matrix
     // so XTX is a m by m matrix
-    flatMatrixMatrixProduct(XT, X, XTX);
+    flatArray *XTX = XT->dot(X);
 
     // XT is a m by n matrix
     // y is a n dimensional vector
     // the result is a m dimensional vector called right (since it fits to the right of the A matrix)
-    flatMatrixVectorDotProduct(XT, y, right);
+    flatArray *right = XT->dot(y);
 
     // fill in A which is a m by m + 1 matrix
     n = 0;

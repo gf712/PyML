@@ -43,6 +43,7 @@ public:
     double* getRow(int i);
     double* getCol(int j);
     void setRow(double *row, int i);
+    flatArray *dot(flatArray *other);
 };
 
 #ifdef __cplusplus

@@ -13,7 +13,6 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
     // V is a list (vector)
     auto A = new flatArray;
     auto V = new flatArray;
-    auto result = new flatArray;
 
     // pointers to python lists
     PyObject * pAArray;
@@ -27,16 +26,10 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
 
     A->readFromPythonList(pAArray);
     V->readFromPythonList(pVVector);
-    result->startEmptyArray(1, A->getRows());
-
-    if (A->getCols() != V->getCols()){
-        PyErr_SetString(PyExc_ValueError, "A and v must have the same size");
-        return nullptr;
-    }
 
 
     // calculate dot product
-    flatMatrixVectorDotProduct(A, V, result);
+    flatArray *result = A->dot(V);
 
     // convert result to python list
     PyObject* result_py_list = ConvertFlatArray_PyList(result);
@@ -215,16 +208,11 @@ static PyObject* matrix_product(PyObject* self, PyObject *args) {
     A->readFromPythonList(pAArray);
     B->readFromPythonList(pBArray);
 
-
-    if (A->getCols() != B->getRows()){
-        PyErr_SetString(PyExc_ValueError, "Number of columns in A must be the same as the number of rows in B");
-        return nullptr;
-    }
-
     // memory allocation
-    result->startEmptyArray(A->getRows(), B->getCols());
+//    result->startEmptyArray(A->getRows(), B->getCols());
 
-    flatMatrixMatrixProduct(A, B, result);
+//    flatMatrixMatrixProduct(A, B, result);
+    result = A->dot(B);
 
     // convert to python list
     result_py_list = ConvertFlatArray_PyList(result);
@@ -391,7 +379,7 @@ static PyObject* mean(PyObject* self, PyObject *args) {
 
 
 static PyObject* version(PyObject* self) {
-    return Py_BuildValue("s", "Version 0.3");
+    return Py_BuildValue("s", "Version 0.2");
 }
 
 
