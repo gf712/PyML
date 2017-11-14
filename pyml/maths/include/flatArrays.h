@@ -1,6 +1,8 @@
 //
 // Created by gil on 10/11/17.
 //
+#include <Python.h>
+
 
 #ifndef PYML_DEV_FLATARRAYS_H
 #define PYML_DEV_FLATARRAYS_H
@@ -29,9 +31,7 @@ public:
     void readFromPythonList(PyObject *pyList);
     void startEmptyArray(int rows_, int cols_);
     int getRows();
-    void setRows(int rows);
     int getCols();
-    void setCols(int cols);
     double* getArray();
     double getElement(int row, int col);
     void setElement(double value, int row, int col);
@@ -40,6 +40,9 @@ public:
     void setNElement(double value, int n);
     int getSize();
     double sum();
+    double* getRow(int i);
+    double* getCol(int j);
+    void setRow(double *row, int i);
 };
 
 #ifdef __cplusplus

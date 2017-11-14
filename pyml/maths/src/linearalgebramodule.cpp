@@ -1,6 +1,8 @@
+#include <flatArrays.h>
 #include <Python.h>
 #include "linearalgebramodule.h"
 #include <omp.h>
+#include <iostream>
 
 // Handle errors
 // static PyObject *algebraError;
@@ -151,6 +153,7 @@ void matrixTranspose(double** X, double** result, int rows, int cols, int block_
     }
 }
 
+
 void maximumSearch(double* vector, int size, int i, double* result) {
     // store result in result array
     // result[0] is the maximum value and result[1] is the position of the maximum value
@@ -170,145 +173,133 @@ void maximumSearch(double* vector, int size, int i, double* result) {
 }
 
 
-void swapRows(double** A, int row1, int row2, int size) {
+void swapRows(flatArray *A, int row1, int row2) {
 
-    for (int j = 0; j < size; ++j) {
+    double *aRow1 = A->getRow(row1);
+    double *aRow2 = A->getRow(row2);
 
-        double tmp = A[row1][j];
-        A[row1][j] = A[row2][j];
-        A[row2][j] = tmp;
-        
-    }
+    A->setRow(aRow2, row1);
+    A->setRow(aRow1, row2);
+
+    delete [] aRow1;
+    delete [] aRow2;
 
 }
 
 
-void gaussianElimination(double** A, int n, double* result) {
+void gaussianElimination(flatArray *A, double *result) {
 
     // based on https://martin-thoma.com/images/2013/05/Gaussian-elimination.png
 
-    double* maxResult = nullptr;
-    maxResult = new double [2];
+    int n = A->getRows();
+
+    double *maxResult = nullptr;
+    maxResult = new double[2];
     double c;
+    double *rowI = nullptr;
+    double *rowK = nullptr;
 
     for (int i = 0; i < n; ++i) {
         // Search for maximum in this column
-        maximumSearch(A[i], n, i, maxResult);
+        maximumSearch(A->getRow(i), n, i, maxResult);
 
         // Swap maximum row with current row (column by column)
-        swapRows(A, (int) maxResult[1], i, n+1);
+        swapRows(A, (int) maxResult[1], i);
 
+        rowI = A->getRow(i);
         // Make all rows below this one 0 in current column
-        for (int k=i+1; k<n; k++) {
+        for (int k = i + 1; k < n; k++) {
 
-            c = -A[k][i]/A[i][i];
+            rowK = A->getRow(k);
 
-            for (int j=i; j<n+1; j++) {
+            c = -rowK[i] / rowI[i];
 
-                if (i==j) {
+            for (int j = i; j < n + 1; j++) {
 
-                    A[k][j] = 0;
+                if (i == j) {
+
+                    rowK[j] = 0;
+
+                } else {
+
+                    rowK[j] += c * rowI[j];
+
                 }
 
-                else {
-
-                    A[k][j] += c * A[i][j];
-
-                }
+                A->setRow(rowK, k);
             }
+
+            A->setRow(rowI, i);
         }
     }
 
-    for (int i=n-1; i>=0; i--) {
+    // A is the U matrix
 
-        result[i] = A[i][n]/A[i][i];
+    for (int i = n - 1; i >= 0; i--) {
 
-        for (int k=i-1;k>=0; k--) {
+        result[i] = A->getElement(i,n) / A->getElement(i, i);
 
-            A[k][n] -= A[k][i] * result[i];
-
+        for (int j = i - 1; j >= 0; j--) {
+            A->setElement(A->getElement(j, n) - A->getElement(j, i) * result[i], j, n);
         }
     }
-
-    // now A is the U matrix
 
     delete [] maxResult;
+    delete [] rowI;
+    delete [] rowK;
 }
 
 
-void leastSquares(double** X, double* y, double* theta, int n, int m) {
+void leastSquares(flatArray *X, flatArray *y, double *theta) {
 
     // variable declaration
-    double** XTX = nullptr;
-    double** A = nullptr;
-    double** XT = nullptr;
-    double* right = nullptr;
+    auto XTX = new flatArray;
+    auto A = new flatArray;
+    auto right = new flatArray;
+    int m = X->getCols();
+    int n;
+    int XTXn=0;
 
     // memory allocation
-    XTX = new double *[m];
-    for (int i = 0; i < m; ++i) {
-        XTX[i] = new double [m];
-    }
-
-    A = new double *[m];
-    for (int i = 0; i < m; ++i) {
-        A[i] = new double [m+1];
-    }
-
-    XT = new double *[m];
-    for (int i = 0; i < m; ++i) {
-        XT[i] = new double [n];
-    }
-
-    right = new double [m];
+    XTX->startEmptyArray(m, m);
+    A->startEmptyArray(m, m+1);
+    right->startEmptyArray(m, 1);
 
     // start algorithm
 
     // first transpose X and get XT
-    matrixTranspose(X, XT, n, m, 16);
+    flatArray *XT = X->transpose();
 
     // XT is a m by n matrix
     // an m by n matrix multiplied by a n by m matrix results in a m by m matrix
     // so XTX is a m by m matrix
-    matrixMatrixProduct(XT, X, m, n, XTX);
+    flatMatrixMatrixProduct(XT, X, XTX);
 
     // XT is a m by n matrix
     // y is a n dimensional vector
     // the result is a m dimensional vector called right (since it fits to the right of the A matrix)
-    matrixVectorDotProduct(XT, y, m, n, right);
-
+    flatMatrixVectorDotProduct(XT, y, right);
 
     // fill in A which is a m by m + 1 matrix
+    n = 0;
     for (int i = 0; i < m; ++i) {
-        // fill in XTX into A
         for (int j = 0; j < m; ++j) {
-            A[i][j] = XTX[i][j];
+            A->setNElement(XTX->getNElement(XTXn),n);
+            n++;
+            XTXn++;
         }
-        A[i][m] = right[i];
+        A->setNElement(right->getNElement(i), n);
+        n++;
     }
-
 
     // now we can perform gaussian elimination to get an approximation of theta
-    gaussianElimination(A, m, theta);
+    gaussianElimination(A, theta);
 
     // and free up memory
-    for (int i = 0; i < m; ++i) {
-        delete [] A[i];
-    }
-    delete [] A;
-
-    for (int i = 0; i < m; ++i) {
-        delete [] XTX[i];
-    }
-    delete [] XTX;
-
-    for (int i = 0; i < m; ++i) {
-        delete [] XT[i];
-    }
-    delete [] XT;
-
-    delete [] right;
-
+    delete XTX;
+    delete XT;
+    delete right;
+    delete A;
 }
 
 

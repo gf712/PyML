@@ -15,8 +15,6 @@ void matrixVectorDotProduct(double** A, double* v, int ASize, int VSize, double*
 double vectorSum(const double* array, int rows);
 void matrixTranspose(double** X, double** result, int rows, int cols, int block_size);
 void vectorSubtract(const double* u, const double* v, int size, double* result);
-void matrixMatrixProduct(double** A, double** B, int ASize, int BSize, double** result);
-void leastSquares(double** X, double* y, double* theta, int n, int m);
 void vectorDivide(double* X, int n, int size);
 double vectorMean(const double* array, int size);
 void matrixMean(double **array, int cols, int rows, int axis, double* result);
@@ -24,6 +22,8 @@ void flatMatrixVectorDotProduct(flatArray *A, flatArray *V, flatArray *result);
 void flatMatrixPower(flatArray *A, int p);
 void flatArraySubtract(flatArray *A, flatArray *B, flatArray *result);
 void flatMatrixMatrixProduct(flatArray *A, flatArray *B, flatArray *result);
+void leastSquares(flatArray *X, flatArray *y, double *theta);
+
 
 #ifdef __cplusplus
 }

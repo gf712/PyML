@@ -6,6 +6,7 @@
 void flatArray::readFromPythonList(PyObject *pyList) {
 
     // read in array from Python list
+    // check if it's a matrix or a vector
     if (PyFloat_Check(PyList_GET_ITEM(pyList, 0)) || PyLong_Check(PyList_GET_ITEM(pyList, 0))) {
         cols = static_cast<int>(PyList_GET_SIZE(pyList));
         rows = 1;
@@ -26,14 +27,6 @@ int flatArray::getRows() {
 
 int flatArray::getCols() {
     return flatArray::cols;
-}
-
-void flatArray::setRows(int rows) {
-    flatArray::rows = rows;
-}
-
-void flatArray::setCols(int cols) {
-    flatArray::cols = cols;
 }
 
 double *flatArray::getArray() {
@@ -87,4 +80,38 @@ double flatArray::sum() {
     for (int n = 0; n < size; ++n) {
         result += array[n];
     };
+}
+
+double *flatArray::getRow(int i) {
+    auto *row = new double [cols];
+    int n = 0;
+
+    for (int j = i * cols; j < (i + 1) * cols; ++j) {
+        row[n] = array[j];
+        n++;
+    }
+
+    return row;
+}
+
+double *flatArray::getCol(int j) {
+    auto *column = new double [rows];
+    int n = 0;
+
+    for (int i = j; i < size; i+=cols) {
+        column[n] = array[i];
+        n++;
+    }
+
+    return column;
+}
+
+void flatArray::setRow(double *row, int i) {
+
+    int n = 0;
+
+    for (int j = i * cols; j < (i + 1) * cols; ++j) {
+        array[j] = row[n];
+        n++;
+    }
 }

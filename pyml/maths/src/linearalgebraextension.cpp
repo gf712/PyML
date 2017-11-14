@@ -246,12 +246,11 @@ static PyObject* matrix_product(PyObject* self, PyObject *args) {
 static PyObject* least_squares(PyObject* self, PyObject *args) {
 
     // variable declaration
-    int m, n, ySize;
+    auto X = new flatArray;
+    auto y = new flatArray;
+
     PyObject *pX;
     PyObject *py;
-    double** X = nullptr;
-    double* y = nullptr;
-    double* theta = nullptr;
     PyObject *result_py_list;
 
     // return error if we don't get all the arguments
@@ -260,47 +259,34 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    if (!PyList_Check(PyList_GetItem(pX, 0))) {
-        PyErr_SetString(PyExc_TypeError, "Expected A to be a list of lists!");
-        return nullptr;
-    }
 
-    // use PyList_Size to get size of vectors
-    n = static_cast<int>(PyList_Size(pX));
-    m = static_cast<int>(PyList_Size(PyList_GetItem(pX, 0)));
-    ySize = static_cast<int>(PyList_Size(py));
+    // read in python lists
+    X->readFromPythonList(pX);
+    y->readFromPythonList(py);
+
 
     // sanity check
-    if (n != ySize){
+    if (X->getRows() != y->getCols()){
         PyErr_SetString(PyExc_ValueError, "Number of rows of X must be the same as the number of training examples");
         return nullptr;
     }
 
-    // memory allocation
-    theta = new double [m];
+    // memory allocation of theta
+//    theta->startEmptyArray(1, X->getCols());
+    auto theta = new double [X->getCols()];
 
-    X = new double *[n];
-    for (int j = 0; j < n; ++j) {
-        X[j] = new double [m];
-    }
-    y = new double [n];
+    leastSquares(X, y, theta);
+//    flatArray *result = leastSquares(X, y, theta);
 
-    convertPy_2DArray(pX, X, n, m);
-    convertPy_1DArray(py, y, n);
-
-    leastSquares(X, y, theta, n, m);
-
-    result_py_list = Convert_1DArray(theta, m);
+    result_py_list = Convert_1DArray(theta, X->getCols());
+//    result_py_list = ConvertFlatArray_PyList(A);
 
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
 
     // memory deallocation
-    delete [] theta;
-    for (int j = 0; j < n; ++j) {
-        delete [] X[j];
-    }
-    delete [] X;
-    delete [] y;
+    delete theta;
+    delete X;
+    delete y;
 
     Py_DECREF(result_py_list);
 
