@@ -20,6 +20,8 @@ def gaussian(n=100, d=2, labels=3, sigma=1, seed=None, shuffle=True):
         data = list(zip(datapoints, data_labels))
         random.shuffle(data)
         datapoints, data_labels = zip(*data)
+        datapoints = list(datapoints)
+        data_labels = list(data_labels)
 
     return datapoints, data_labels
 

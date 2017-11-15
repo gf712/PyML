@@ -4,8 +4,8 @@
 #include <Python.h>
 #include "flatArrays.h"
 
-#ifndef SRC_LINEARALGEBRAMODULE_H
-#define SRC_LINEARALGEBRAMODULE_H
+#ifndef MATHS_LINEARALGEBRAMODULE_H
+#define MATHS_LINEARALGEBRAMODULE_H
 
 #ifdef __cplusplus
 extern "C" {

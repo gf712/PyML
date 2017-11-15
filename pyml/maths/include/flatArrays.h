@@ -3,8 +3,8 @@
 //
 #include <Python.h>
 
-#ifndef PYML_DEV_FLATARRAYS_H
-#define PYML_DEV_FLATARRAYS_H
+#ifndef PYML_FLATARRAYS_H
+#define PYML_FLATARRAYS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,4 +65,4 @@ public:
 }
 #endif
 
-#endif //PYML_DEV_FLATARRAYS_H
+#endif //PYML_FLATARRAYS_H
