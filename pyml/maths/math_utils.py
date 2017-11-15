@@ -3,23 +3,22 @@ from .CMaths import quick_sort
 from .Clinear_algebra import Cmean
 
 
-def sort(array):
+def sort(array, axis=0):
     """
     sort array elements in ascending order using the quicksort algorithm
     :param array:
     :return: sorted array in ascending order
     """
-    return quick_sort(array)[0]
+    return quick_sort(array, axis)[0]
 
 
-def argsort(array):
+def argsort(array, axis=0):
     """
     calculate order of elements in array
     :param array:
     :return: sorted indices in ascending order
     """
-
-    return quick_sort(array)[1]
+    return quick_sort(array, axis)[1]
 
 
 def max_occurence(array):

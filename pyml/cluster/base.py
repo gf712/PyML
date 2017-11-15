@@ -1,5 +1,5 @@
 from ..base import BaseLearner
-from ..maths import mean, transpose
+from ..maths import mean, transpose, argsort
 from ..metrics.distances import euclidean_distance
 import random
 
@@ -49,9 +49,10 @@ class ClusterBase(BaseLearner):
     def _assign_cluster(self, X):
         # calculate distance to each centroid
         distances = [euclidean_distance(X, self._centroids[i]) for i in range(self.k)]
-        distances_T = transpose(distances)
-        # return label of closest cluster to each data point
-        return [x.index(min(x)) for x in distances_T]
+        # distances_T = transpose(distances)
+        # # return label of closest cluster to each data point
+        # return [x.index(min(x)) for x in distances_T]
+        return [x[0] for x in argsort(distances, axis=0)]
 
     def _changes(self):
         change_n = 0

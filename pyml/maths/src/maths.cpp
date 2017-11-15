@@ -1,6 +1,7 @@
 //
 // Created by Gil Ferreira Hoben on 07/11/17.
 //
+#include <flatArrays.h>
 #include "maths.h"
 
 
@@ -46,7 +47,7 @@ void permutations(double* array, double** result, int size) {
 }
 
 
-int partition(double* array, long* order, int low, int high) {
+int partition(double* array, double* order, int low, int high) {
     double pivot = array[low];
     int i = low;
 
@@ -54,16 +55,16 @@ int partition(double* array, long* order, int low, int high) {
         if (array[j] <= pivot) {
             i++;
             swapDouble(&array[i], &array[j]);
-            swapLong(&order[i], &order[j]);
+            swapDouble(&order[i], &order[j]);
         }
     }
     swapDouble(&array[i], &array[low]);
-    swapLong(&order[i], &order[low]);
+    swapDouble(&order[i], &order[low]);
     return i;
 }
 
 
-void quicksort(double* array, long* order, int low, int high) {
+void quicksort(double* array, double* order, int low, int high) {
     if (low < high) {
         int p = partition(array, order, low, high);
         quicksort(array, order, low, p);

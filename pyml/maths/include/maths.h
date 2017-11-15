@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 void permutations(double* array, double** result, int size);
-void quicksort(double* array, long* order, int low, int high);
+void quicksort(double* array, double* order, int low, int high);
 
 #ifdef __cplusplus
 }
