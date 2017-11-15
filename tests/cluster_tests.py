@@ -41,6 +41,6 @@ class KMeansTest(unittest.TestCase):
         datapoints, labels = gaussian(n=100, d=2, labels=3, sigma=0.1, seed=1970)
         X_train, y_train, X_test, y_test = train_test_split(datapoints, labels,
                                                             train_split=0.95, seed=1970)
-        classifier = KMeans(k=3, seed=1970, norm=2)
+        classifier = KMeans(k=3, seed=1970, norm='l2')
         classifier.train(X=X_train)
         self.assertEqual(self.classifier.iterations, 7)
