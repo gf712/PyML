@@ -4,8 +4,28 @@
 #include "pythonconverters.h"
 
 
+void sigmoid(flatArray *scores) {
+    for (int i = 0; i < scores->getSize(); ++i) {
+        scores->setNElement(1 / (1 + exp(-scores->getNElement(i))), i);
+    }
+}
+
+
 flatArray *predict(flatArray *X, flatArray *w) {
+
     return X->dot(w);
+}
+
+
+double logLikelihood(flatArray *scores, flatArray *y) {
+
+    double result = 0;
+
+    for (int i = 0; i < y->getSize(); ++i) {
+        result += y->getNElement(i) * scores->getNElement(i) - log(1 + exp(scores->getNElement(i)));
+    }
+
+    return result;
 }
 
 
@@ -40,21 +60,34 @@ void updateWeights(flatArray *theta, flatArray *gradients, double learningRate, 
 }
 
 
-double calculateCost(flatArray *X, flatArray *theta, flatArray *y) {
+double calculateCost(flatArray *X, flatArray *theta, flatArray *y, char *predType) {
 
+    double result;
     flatArray *prediction = predict(X, theta);
-    // calculate initial cost and store result
-    flatArray *loss = prediction->subtract(y);
-    double result = cost(loss);
+
+    if (strcmp(predType, "logit") == 0) {
+
+        result = logLikelihood(prediction, y);
+
+    }
+
+    else {
+
+        // calculate initial cost and store result
+        flatArray *loss = prediction->subtract(y);
+        result = cost(loss);
+
+        delete loss;
+
+    }
 
     delete prediction;
-    delete loss;
 
     return result;
 }
 
 
-int gradientDescent(flatArray *X, flatArray *y, flatArray *theta, int maxIteration, double epsilon, double learningRate, flatArray* costArray) {
+int gradientDescent(flatArray *X, flatArray *y, flatArray *theta, int maxIteration, double epsilon, double learningRate, flatArray* costArray, char *predType) {
 
     // variable declaration
     double JOld;
@@ -69,7 +102,7 @@ int gradientDescent(flatArray *X, flatArray *y, flatArray *theta, int maxIterati
     // X is a n by m matrix
     XT = X->transpose();
 
-    JNew = calculateCost(X, theta, y);
+    JNew = calculateCost(X, theta, y, predType);
     costArray->setNElement(JNew, iteration);
 
     // gradient descent
@@ -80,21 +113,29 @@ int gradientDescent(flatArray *X, flatArray *y, flatArray *theta, int maxIterati
 
         // calculate gradient
         flatArray *h = predict(X, theta);
-        flatArray *loss = h->subtract(y);
-        flatArray *gradients = gradientCalculation(XT, loss);
+
+        if (strcmp(predType, "logit") == 0) {
+            sigmoid(h);
+        }
+
+        flatArray *error = h->subtract(y);
+
+        flatArray *gradients = gradientCalculation(XT, error);
 
         // update coefficients
         updateWeights(theta, gradients, learningRate, m);
 
         // calculate cost for new weights
-        JNew = calculateCost(X, theta, y);
-        e = JOld - JNew;
+        JNew = calculateCost(X, theta, y, predType);
+
+        e = fabs(JOld) - fabs(JNew);
+
         costArray->setNElement(JNew, iteration+1);
 
         iteration++;
 
         delete h;
-        delete loss;
+        delete error;
         delete gradients;
     }
 
@@ -115,6 +156,7 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     auto X = new flatArray;
     auto y = new flatArray;
     auto theta = new flatArray;
+    char *predType;
 
     PyObject* ptheta;
     PyObject* pX;
@@ -123,11 +165,10 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     PyObject* pyTheta;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!O!idd", &PyList_Type, &pX, &PyList_Type, &ptheta, &PyList_Type, &py, &maxIterations, &epsilon, &learningRate)) {
+    if(!PyArg_ParseTuple(args, "O!O!O!idds", &PyList_Type, &pX, &PyList_Type, &ptheta, &PyList_Type, &py, &maxIterations, &epsilon, &learningRate, &predType)) {
         PyErr_SetString(PyExc_TypeError, "Check arguments!");
         return nullptr;
     }
-
 
     // read python lists
     X->readFromPythonList(pX);
@@ -151,7 +192,7 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     costArray->startEmptyArray(1, maxIterations);
 
     // gradient descent
-    iterations = gradientDescent(X, y, theta, maxIterations, epsilon, learningRate, costArray);
+    iterations = gradientDescent(X, y, theta, maxIterations, epsilon, learningRate, costArray, predType);
 
     // costArray only needs #iterations columns
     costArray->setCols(iterations);
