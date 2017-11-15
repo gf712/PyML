@@ -4,7 +4,7 @@ from ..utils import set_seed
 
 class KMeans(ClusterBase):
     def __init__(self, k=3, initialisation='Forgy', max_iterations=100, min_change=1,
-                 seed=None):
+                 seed=None, norm='l1'):
 
         """
         KMeans implementation
@@ -15,6 +15,11 @@ class KMeans(ClusterBase):
         :param min_change: int minimum assignment changes after each iteration required to continue algorithm
         """
         ClusterBase.__init__(self)
+
+        if isinstance(norm, int) or norm in ['l1', 'l2']:
+            self._norm = norm
+        else:
+            raise ValueError("Unknown norm.")
 
         self._seed = set_seed(seed)
         self._k = k
@@ -30,6 +35,11 @@ class KMeans(ClusterBase):
         self._X = X
         self._y = y
         self._n = len(X)
+
+        if self.n < self.k:
+            raise ValueError("Number of clusters should be lower than the number of data points, "
+                             "instead got {} datapoints for {} clusters".format(self.n, self.k))
+
         self._initialise_centroids()
         self._dimensions = len(X[0])
         self._iterations = 0
@@ -84,3 +94,7 @@ class KMeans(ClusterBase):
     @property
     def centroids(self):
         return self._centroids
+
+    @property
+    def norm(self):
+        return self._norm

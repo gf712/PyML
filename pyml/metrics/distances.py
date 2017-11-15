@@ -3,6 +3,14 @@ from .CMetrics import norm
 
 def calculate_distance(u, v, p):
 
+    if isinstance(p, str):
+        if p == 'l1':
+            p = 1
+        elif p == 'l2':
+            p = 2
+        else:
+            raise ValueError("Unknown norm.")
+
     if isinstance(u, (float, int)):
         u = [u]
 
