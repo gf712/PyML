@@ -26,23 +26,12 @@ def dot_product(u, v):
     [[0.0, -10.0], [-3.0, -1.0]]
 
     """
-    if isinstance(u[0], list):
-        if isinstance(v[0], list):
-            # matrix matrix multiplication
-            return matrix_product(u, v)
-        elif isinstance(v[0], (float, int)):
-            # matrix vector product
-            return Clinear_algebra.dot_product(u, v)
-        else:
-            raise NotImplementedError("This is not the code you are looking for.")
-    elif isinstance(u[0], (float, int)) and isinstance(v[0], (float, int)):
-        # vector vector product
-        return Clinear_algebra.dot_product(u, v)
-    else:
-        raise NotImplementedError("This is not the code you are looking for.")
+    # TODO: write exceptions to help user with errors from the backend
+    return Clinear_algebra.dot_product(u, v)
 
 
 def transpose(m):
+    # TODO: write exceptions to help user with errors from the backend
     return Clinear_algebra.transpose(m)
 
 
@@ -57,6 +46,7 @@ def subtract(A, B):
     :param B: either a list or a list of lists
     :return: same format as A (list or list of lists)
     """
+    # TODO: write exceptions to help user with errors from the backend
     return Clinear_algebra.subtract(A, B)
 
 
@@ -67,6 +57,7 @@ def power(A, n):
     :param n: int to calculate the power
     :return: same format as A (list or list of lists)
     """
+    # TODO: write exceptions to help user with errors from the backend
     return Clinear_algebra.power(A, n)
 
 
@@ -74,9 +65,6 @@ def divide(u, n):
     return [x / n for x in u]
 
 
-def matrix_product(m, n):
-    return Clinear_algebra.matrix_product(m, n)
-
-
 def least_squares(X, y):
+    # TODO: write exceptions to help user with errors from the backend
     return Clinear_algebra.least_squares(X, y)
