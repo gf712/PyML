@@ -72,4 +72,4 @@ def sigmoid(array):
     :param array: list
     :return: list
     """
-    return [1 / (1 + exp(array_i)) for array_i in array]
+    return [1 / (1 + exp(-array_i)) for array_i in array]
