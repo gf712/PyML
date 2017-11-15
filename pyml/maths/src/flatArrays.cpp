@@ -44,7 +44,7 @@ void flatArray::setElement(double value, int row, int col) {
 void flatArray::startEmptyArray(int rows, int cols) {
     flatArray::rows = rows;
     flatArray::cols = cols;
-    flatArray::size = rows * cols;
+    size = rows * cols;
     array = new double [size];
 }
 
@@ -80,6 +80,8 @@ double flatArray::sum() {
     for (int n = 0; n < size; ++n) {
         result += array[n];
     };
+
+    return result;
 }
 
 double *flatArray::getRow(int i) {

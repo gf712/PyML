@@ -26,25 +26,37 @@ public:
         size = 0;
     };
     ~flatArray() {
-        delete array;
+        delete [] array;
+        array = nullptr;
     };
+
     void readFromPythonList(PyObject *pyList);
     void startEmptyArray(int rows_, int cols_);
+
     int getRows();
     int getCols();
+    void setRows(int r);
+    void setCols(int c);
+    int getSize();
+
     double* getArray();
+
     double getElement(int row, int col);
     void setElement(double value, int row, int col);
-    flatArray* transpose();
+
     double getNElement(int n);
     void setNElement(double value, int n);
-    int getSize();
-    double sum();
+
     double* getRow(int i);
     double* getCol(int j);
     void setRow(double *row, int i);
+
+    flatArray* transpose();
+    double sum();
     flatArray *dot(flatArray *other);
     flatArray *subtract(flatArray *other);
+    flatArray *power(int p);
+    flatArray *divide(double m);
 };
 
 #ifdef __cplusplus
