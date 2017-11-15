@@ -186,3 +186,62 @@ flatArray *flatArray::dot(flatArray *other) {
         return nullptr;
     }
 }
+
+flatArray *flatArray::subtract(flatArray *other) {
+
+    auto result = new flatArray;
+
+    if (rows != other->getRows()) {
+        PyErr_SetString(PyExc_ValueError, "Arrays must have matching number of rows.");
+        return nullptr;
+    }
+    if (cols != other->getCols()) {
+        PyErr_SetString(PyExc_ValueError, "Arrays must have matching number of columns.");
+        return nullptr;
+    }
+
+    result->startEmptyArray(rows, cols);
+
+    double *B = other->getArray();
+
+    for (int n = 0; n < size; ++n) {
+        result->setNElement(array[n] - B[n], n);
+    }
+
+    return result;
+
+}
+
+flatArray *flatArray::power(int p) {
+
+    auto result = new flatArray;
+
+    result->startEmptyArray(rows, cols);
+
+    for (int n = 0; n < size; ++n) {
+        result->setNElement(pow(array[n], p), n);
+    }
+
+    return result;
+}
+
+flatArray *flatArray::divide(double m) {
+
+    auto result = new flatArray;
+
+    result->startEmptyArray(rows, cols);
+
+    for (int n = 0; n < size; ++n) {
+        result->setNElement(array[n] / m, n);
+    }
+
+    return result;
+}
+
+void flatArray::setRows(int r) {
+    rows = r;
+}
+
+void flatArray::setCols(int c) {
+    cols = c;
+}

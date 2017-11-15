@@ -44,6 +44,7 @@ public:
     double* getCol(int j);
     void setRow(double *row, int i);
     flatArray *dot(flatArray *other);
+    flatArray *subtract(flatArray *other);
 };
 
 #ifdef __cplusplus

@@ -93,7 +93,6 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
     // variable instantiation
     auto A = new flatArray;
     auto B = new flatArray;
-    auto result = new flatArray;
 
     PyObject *pA;
     PyObject *pB;
@@ -109,11 +108,8 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
     A->readFromPythonList(pA);
     B->readFromPythonList(pB);
 
-    // memory allocation
-    result->startEmptyArray(A->getRows(), A->getCols());
-
-    // calculation
-    flatArraySubtract(A, B, result);
+    // subtraction
+    flatArray *result = A->subtract(B);
 
     result_py_list = ConvertFlatArray_PyList(result);
 
