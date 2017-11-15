@@ -189,52 +189,6 @@ static PyObject* pyTranspose(PyObject* self, PyObject *args) {
 }
 
 
-static PyObject* matrix_product(PyObject* self, PyObject *args) {
-
-    // variable declaration
-    auto A = new flatArray;
-    auto B = new flatArray;
-    auto result = new flatArray;
-
-    // python list pointers
-    PyObject *pAArray;
-    PyObject *pBArray;
-    PyObject *result_py_list;
-
-    // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pAArray, &PyList_Type, &pBArray)) {
-        PyErr_SetString(PyExc_TypeError, "Expected two lists!");
-        return nullptr;
-    }
-
-
-    // read in matrices
-    A->readFromPythonList(pAArray);
-    B->readFromPythonList(pBArray);
-
-    // memory allocation
-//    result->startEmptyArray(A->getRows(), B->getCols());
-
-//    flatMatrixMatrixProduct(A, B, result);
-    result = A->dot(B);
-
-    // convert to python list
-    result_py_list = ConvertFlatArray_PyList(result);
-
-    PyObject* FinalResult = Py_BuildValue("O", result_py_list);
-
-    // memory deallocation
-    delete A;
-    delete B;
-    delete result;
-
-
-    Py_DECREF(result_py_list);
-
-    return FinalResult;
-}
-
-
 static PyObject* least_squares(PyObject* self, PyObject *args) {
 
     // variable declaration
@@ -390,7 +344,6 @@ static PyObject* version(PyObject* self) {
 static PyMethodDef linearAlgebraMethods[] = {
         // Python name    C function              argument representation  description
         {"dot_product",   dot_product,            METH_VARARGS,            "Calculate the dot product of two vectors"},
-        {"matrix_product",matrix_product,         METH_VARARGS,            "Calculate the product of two matrices"},
         {"power",         power,                  METH_VARARGS,            "Calculate element wise power"},
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
         {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
