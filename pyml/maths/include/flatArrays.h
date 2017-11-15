@@ -50,6 +50,7 @@ public:
     double* getRow(int i);
     double* getCol(int j);
     void setRow(double *row, int i);
+    void setCol(double *row, int j);
 
     flatArray* transpose();
     double sum();

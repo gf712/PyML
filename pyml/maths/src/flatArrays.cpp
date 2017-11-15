@@ -76,6 +76,7 @@ int flatArray::getSize() {
 }
 
 double flatArray::sum() {
+
     double result = 0;
     for (int n = 0; n < size; ++n) {
         result += array[n];
@@ -85,6 +86,7 @@ double flatArray::sum() {
 }
 
 double *flatArray::getRow(int i) {
+
     auto *row = new double [cols];
     int n = 0;
 
@@ -97,6 +99,7 @@ double *flatArray::getRow(int i) {
 }
 
 double *flatArray::getCol(int j) {
+
     auto *column = new double [rows];
     int n = 0;
 
@@ -114,6 +117,15 @@ void flatArray::setRow(double *row, int i) {
 
     for (int j = i * cols; j < (i + 1) * cols; ++j) {
         array[j] = row[n];
+        n++;
+    }
+}
+
+void flatArray::setCol(double *column, int j) {
+
+    int n = 0;
+    for (int k = j; k < size; k+=cols) {
+        array[k] = column[n];
         n++;
     }
 }
@@ -247,3 +259,4 @@ void flatArray::setRows(int r) {
 void flatArray::setCols(int c) {
     cols = c;
 }
+
