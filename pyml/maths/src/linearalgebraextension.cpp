@@ -1,6 +1,10 @@
 //
 // Created by Gil Ferreira Hoben on 07/11/17.
 //
+// This file provides the Python API for
+// the linear algebra code written in C++
+
+
 #include <Python.h>
 #include <linearalgebramodule.h>
 #include "pythonconverters.h"
