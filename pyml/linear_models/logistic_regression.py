@@ -1,10 +1,11 @@
 from .base import LinearBase
+from ..base import Classifier
 from ..maths import dot_product, gradient_descent, sigmoid
 from pyml.metrics.scores import accuracy
 from ..utils import set_seed
 
 
-class LogisticRegression(LinearBase):
+class LogisticRegression(LinearBase, Classifier):
     def __init__(self, seed=None, bias=True, learning_rate=0.01, epsilon=0.01, max_iterations=10000):
         """
 
@@ -17,6 +18,7 @@ class LogisticRegression(LinearBase):
         """
 
         LinearBase.__init__(self)
+        Classifier.__init__(self)
 
         self._seed = set_seed(seed)
         self.bias = bias
