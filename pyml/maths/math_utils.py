@@ -57,13 +57,13 @@ def mean(array, axis=None):
             return Cmean(array, 0)
 
         else:
-            raise ValueError("Expected a list of lists or a list of int/floats")
+            raise TypeError("Expected a list of lists or a list of int/floats")
 
     elif isinstance(array, list):
         raise ValueError("Empty list")
 
     else:
-        raise ValueError("Expected a list")
+        raise TypeError("Expected a list")
 
 
 def sigmoid(array):

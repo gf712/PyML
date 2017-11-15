@@ -64,6 +64,8 @@ class LogisticRegression(LinearBase, Classifier):
     def _score(self, X, y_true, scorer='accuracy'):
         if scorer == 'accuracy':
             return accuracy(self.predict(X), y_true)
+        else:
+            raise ValueError("Unknown scorer")
 
     @property
     def seed(self):
