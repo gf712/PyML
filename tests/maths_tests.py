@@ -37,6 +37,15 @@ class MathsTest(unittest.TestCase):
     def test_mean_1_shape(self):
         self.assertEqual(len(mean(self.A, 1)), 10)
 
+    def test_mean_TypeError(self):
+        self.assertRaises(TypeError, mean, (1, 2, 3))
+
+    def test_mean_TypeError_2(self):
+        self.assertRaises(TypeError, mean, [(1, 2, 3), (1, 2, 3)])
+
+    def test_mean_EmptyList_ValueError(self):
+        self.assertRaises(ValueError, mean, [])
+
 
 class LinearAlgebraTest(unittest.TestCase):
 

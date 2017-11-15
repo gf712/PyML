@@ -31,6 +31,9 @@ class LinearRegressionGradientDescentTest(unittest.TestCase):
     def test_mse(self):
         self.assertAlmostEqual(self.regressor.score(self.X_test, self.y_test), 1.3280324597827904, delta=0.001)
 
+    def test_seed(self):
+        self.assertEqual(self.regressor.seed, 1970)
+
 
 class LinearRegressionOLSTest(unittest.TestCase):
 
@@ -83,3 +86,6 @@ class LogisticRegressionTest(unittest.TestCase):
 
     def test_log_accuracy(self):
         self.assertAlmostEqual(self.classifier.score(self.X_test, self.y_test), 0.975, delta=0.001)
+
+    def test_log_seed(self):
+        self.assertEqual(self.classifier.seed, 1970)
