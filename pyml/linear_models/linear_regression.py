@@ -1,8 +1,7 @@
 from .base import LinearBase
-from ..maths import dot_product, least_squares
+from ..maths import dot_product, least_squares, gradient_descent
 from pyml.metrics.scores import mean_squared_error, mean_absolute_error
 from ..utils import set_seed
-from pyml.maths import gradient_descent
 
 
 class LinearRegression(LinearBase):
@@ -41,7 +40,8 @@ class LinearRegression(LinearBase):
                                                                                                  self.y,
                                                                                                  self.max_iterations,
                                                                                                  self.epsilon,
-                                                                                                 self._learning_rate)
+                                                                                                 self._learning_rate,
+                                                                                                 'rgrs')
         else:
             if self.bias:
                 self.X = [[1] + row for row in self.X]
