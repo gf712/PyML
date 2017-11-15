@@ -3,7 +3,6 @@
 //
 #include <Python.h>
 
-
 #ifndef PYML_DEV_FLATARRAYS_H
 #define PYML_DEV_FLATARRAYS_H
 
@@ -58,6 +57,8 @@ public:
     flatArray *subtract(flatArray *other);
     flatArray *power(int p);
     flatArray *divide(double m);
+    flatArray *multiply(flatArray *other);
+    flatArray *nlog(double base);
 };
 
 #ifdef __cplusplus

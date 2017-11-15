@@ -260,3 +260,27 @@ void flatArray::setCols(int c) {
     cols = c;
 }
 
+flatArray *flatArray::multiply(flatArray *other) {
+    auto result = new flatArray;
+
+    result->startEmptyArray(rows, cols);
+
+    for (int n = 0; n < size; ++n) {
+        result->setNElement(array[n] * other->getNElement(n), n);
+    }
+
+    return result;
+}
+
+flatArray *flatArray::nlog(double base) {
+    auto result = new flatArray;
+
+
+    result->startEmptyArray(rows, cols);
+
+    for (int n = 0; n < size; ++n) {
+        result->setNElement(log(array[n]) / log(base), n);
+    }
+
+    return result;
+}
