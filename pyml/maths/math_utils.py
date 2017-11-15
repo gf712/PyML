@@ -1,6 +1,7 @@
 from collections import Counter
 from .CMaths import quick_sort
 from .Clinear_algebra import Cmean
+from math import exp
 
 
 def sort(array, axis=0):
@@ -63,3 +64,12 @@ def mean(array, axis=None):
 
     else:
         raise ValueError("Expected a list")
+
+
+def sigmoid(array):
+    """
+    Python implementation of element wise sigmoid
+    :param array: list
+    :return: list
+    """
+    return [1 / (1 + exp(array_i)) for array_i in array]
