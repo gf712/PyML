@@ -157,8 +157,8 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     costArray->setCols(iterations);
 
     // convert cost array and theta to lists
-    pyCostArray = ConvertFlatArray_PyList(costArray);
-    pyTheta = ConvertFlatArray_PyList(theta);
+    pyCostArray = ConvertFlatArray_PyList(costArray, "float");
+    pyTheta = ConvertFlatArray_PyList(theta, "float");
 
     PyObject* FinalResult = Py_BuildValue("OOi", pyTheta, pyCostArray, iterations);
 

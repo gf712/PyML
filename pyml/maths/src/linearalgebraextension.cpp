@@ -36,7 +36,7 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
     flatArray *result = A->dot(V);
 
     // convert result to python list
-    PyObject* result_py_list = ConvertFlatArray_PyList(result);
+    PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
 
     // build python object
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
@@ -74,7 +74,7 @@ static PyObject* power(PyObject* self, PyObject *args) {
     flatMatrixPower(A, p);
 
     // convert vector to python list
-    PyObject* result_py_list = ConvertFlatArray_PyList(A);
+    PyObject* result_py_list = ConvertFlatArray_PyList(A, "float");
 
     // build python object
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
@@ -111,7 +111,7 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
     // subtraction
     flatArray *result = A->subtract(B);
 
-    result_py_list = ConvertFlatArray_PyList(result);
+    result_py_list = ConvertFlatArray_PyList(result, "float");
 
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
 
@@ -172,7 +172,7 @@ static PyObject* pyTranspose(PyObject* self, PyObject *args) {
 
     flatArray *result = A->transpose();
 
-    pyResult = ConvertFlatArray_PyList(result);
+    pyResult = ConvertFlatArray_PyList(result, "float");
 
     PyObject* FinalResult = Py_BuildValue("O", pyResult);
 

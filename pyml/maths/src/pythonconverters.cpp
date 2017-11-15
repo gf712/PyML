@@ -86,7 +86,7 @@ PyObject* Convert_2DArray(double** array, int rows, int cols) {
 }
 
 
-PyObject* ConvertFlatArray_PyList(flatArray *array) {
+PyObject* ConvertFlatArray_PyList(flatArray *array, const char pyType[5]) {
 
     // converts a 1D C++ array representation of a 2D array to a python list of lists
 
@@ -107,22 +107,53 @@ PyObject* ConvertFlatArray_PyList(flatArray *array) {
     }
 
     if (result != nullptr) {
+        if (array->getRows() > 1) {
 
-        for (int j = 0; j < array->getRows(); ++j) {
+            if (pyType == "int") {
 
-            if (array->getRows() > 1) {
-                // if it's a matrix (instead of a vector) return a list of lists
-                row = PyList_New(array->getCols());
+                for (int j = 0; j < array->getRows(); ++j) {
 
-                if (row != nullptr) {
+                    // if it's a matrix (instead of a vector) return a list of lists
+                    row = PyList_New(array->getCols());
 
-                    for (int k = 0; k < array->getCols(); ++k) {
-                        item = PyFloat_FromDouble(array->getNElement(n));
-                        PyList_SET_ITEM(row, k, item);
-                        n++;
+                    if (row != nullptr) {
+
+                        for (int k = 0; k < array->getCols(); ++k) {
+                            item = PyLong_FromDouble(array->getNElement(n));
+                            PyList_SET_ITEM(row, k, item);
+                            n++;
+                        }
+
+                        PyList_SET_ITEM(result, j, row);
                     }
+                }
+            }
 
-                    PyList_SET_ITEM(result, j, row);
+            else {
+                for (int j = 0; j < array->getRows(); ++j) {
+                    // if it's a matrix (instead of a vector) return a list of lists
+                    row = PyList_New(array->getCols());
+
+                    if (row != nullptr) {
+
+                        for (int k = 0; k < array->getCols(); ++k) {
+                            item = PyFloat_FromDouble(array->getNElement(n));
+                            PyList_SET_ITEM(row, k, item);
+                            n++;
+                        }
+
+                        PyList_SET_ITEM(result, j, row);
+                    }
+                }
+            }
+        }
+
+        else {
+
+            if (pyType == "int") {
+                for (int k = 0; k < array->getCols(); ++k) {
+                    item = PyLong_FromDouble(array->getNElement(k));
+                    PyList_SET_ITEM(result, k, item);
                 }
             }
 
@@ -133,7 +164,6 @@ PyObject* ConvertFlatArray_PyList(flatArray *array) {
                 }
             }
         }
-
     }
 
     return result;
