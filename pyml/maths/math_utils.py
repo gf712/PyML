@@ -1,6 +1,6 @@
 from collections import Counter
 from .CMaths import quick_sort
-from .Clinear_algebra import Cmean, Cstd
+from .Clinear_algebra import Cmean, Cstd, Cvariance
 from math import exp
 
 
@@ -63,7 +63,7 @@ def mean(array, axis=None):
         raise TypeError("Expected a list")
 
 
-def std(array, axis = None):
+def std(array, axis=None):
 
     """
     numpy style standard deviation of array
@@ -84,6 +84,37 @@ def std(array, axis = None):
             elif isinstance(array[0], (int, float)):
                 # in this case we have a vector
                 return Cstd(array, 0)
+
+            else:
+                raise TypeError("Expected a list of lists or a list of int/floats")
+
+        else:
+            raise ValueError("Empty list")
+    else:
+        raise TypeError("Expected a list")
+
+
+def variance(array, axis=None):
+
+    """
+    numpy style standard deviation of array
+    :param array:
+    :param axis:
+    :return:
+    """
+    if isinstance(array, list):
+
+        if len(array) > 0:
+            if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
+                # in this case we have a 2D matrix
+                if axis == 1 or axis == 0:
+                    return Cvariance(array, axis)
+                else:
+                    raise NotImplementedError("This is not the code you are looking for.")
+
+            elif isinstance(array[0], (int, float)):
+                # in this case we have a vector
+                return Cvariance(array, 0)
 
             else:
                 raise TypeError("Expected a list of lists or a list of int/floats")
