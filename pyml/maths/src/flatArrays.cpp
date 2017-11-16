@@ -365,6 +365,53 @@ flatArray *flatArray::std(int axis) {
 
     auto result = new flatArray;
 
+    flatArray *arrayVar = var(axis);
+
+    if (rows == 1) {
+        // vector
+        result->startEmptyArray(1, 1);
+
+        double arrayMean_i = arrayVar->getNElement(0);
+
+        result->setNElement(pow(arrayMean_i, 0.5), 0);
+    }
+
+    else if (rows > 1) {
+        // matrix
+        if (axis == 0) {
+            // std of each column
+            result->startEmptyArray(1, cols);
+
+            for (int i = 0; i < cols; ++i) {
+
+                result->setNElement(pow(arrayVar->getNElement(i), 0.5), i);
+            }
+
+        }
+
+        else {
+            // std of each row
+            result->startEmptyArray(1, rows);
+
+            for (int i = 0; i < rows; ++i) {
+
+                result->setNElement(pow(arrayVar->getNElement(i), 0.5), i);
+
+            }
+
+        }
+    }
+
+    delete arrayVar;
+
+    return result;
+}
+
+
+flatArray *flatArray::var(int axis) {
+
+    auto result = new flatArray;
+
     flatArray *arrayMean = mean(axis);
 
     if (rows == 1) {
@@ -381,7 +428,7 @@ flatArray *flatArray::std(int axis) {
 
         rowResult /= (double) (size);
 
-        result->setNElement(pow(rowResult, 0.5), 0);
+        result->setNElement(rowResult, 0);
     }
 
     else if (rows > 1) {
@@ -405,13 +452,15 @@ flatArray *flatArray::std(int axis) {
 
                 colResult /= (double) (rows);
 
-                result->setNElement(pow(colResult, 0.5), i);
+                result->setNElement(colResult, i);
 
             }
 
             delete colArray;
 
-        } else {
+        }
+
+        else {
             // std of each row
             double rowResult;
             double *rowArray = nullptr;
@@ -430,12 +479,11 @@ flatArray *flatArray::std(int axis) {
 
                 rowResult /= (double) (cols);
 
-                result->setNElement(pow(rowResult, 0.5), i);
+                result->setNElement(rowResult, i);
 
             }
 
             delete rowArray;
-
         }
     }
 

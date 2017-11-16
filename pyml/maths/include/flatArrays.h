@@ -61,6 +61,7 @@ public:
     flatArray *nlog(double base);
     flatArray *mean(int axis);
     flatArray *std(int axis);
+    flatArray *var(int axis);
 };
 
 #ifdef __cplusplus

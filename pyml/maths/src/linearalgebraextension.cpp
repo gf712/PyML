@@ -317,6 +317,46 @@ static PyObject* standardDeviation(PyObject* self, PyObject *args) {
 }
 
 
+static PyObject* variance(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    int axis;
+    PyObject *pX;
+    auto X = new flatArray;
+    PyObject *FinalResult = nullptr;
+
+    // return error if we don't get all the arguments
+    if (!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pX, &axis)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and one integer!");
+        return nullptr;
+    }
+
+    X->readFromPythonList(pX);
+
+    flatArray *result = X->var(axis);
+
+    if (X->getRows() == 1) {
+
+        FinalResult = Py_BuildValue("d", result->getNElement(0));
+
+    }
+
+    else {
+
+        PyObject *result_py_list = ConvertFlatArray_PyList(result, "float");
+
+        FinalResult = Py_BuildValue("O", result_py_list);
+
+        Py_DECREF(result_py_list);
+    }
+
+    delete X;
+    delete result;
+
+    return FinalResult;
+}
+
+
 static PyObject* version(PyObject* self) {
     return Py_BuildValue("s", "Version 0.2");
 }
@@ -332,6 +372,7 @@ static PyMethodDef linearAlgebraMethods[] = {
         {"least_squares", least_squares,          METH_VARARGS,            "Perform least squares"},
         {"Cmean",         mean,                   METH_VARARGS,            "Numpy style array mean"},
         {"Cstd",          standardDeviation,      METH_VARARGS,            "Numpy style array standard deviation"},
+        {"Cvariance",     variance,               METH_VARARGS,            "Numpy style array variance"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {nullptr, nullptr, 0, nullptr}
 };
