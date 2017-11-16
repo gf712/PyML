@@ -1,6 +1,6 @@
 from collections import Counter
 from .CMaths import quick_sort
-from .Clinear_algebra import Cmean
+from .Clinear_algebra import Cmean, Cstd
 from math import exp
 
 
@@ -39,29 +39,57 @@ def mean(array, axis=None):
     :param axis:
     :return:
     """
-    if isinstance(array, list) and len(array) > 0:
-        # in this case we have a 2D matrix
-        if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
-            dim = len(array[0])
-            if axis == 1:
-                # return [mean([array[x][d] for d in range(dim)]) for x in range(len(array))]
-                return Cmean(array, 1)
-            elif axis == 0:
-                # return [mean([array[x][d] for x in range(len(array))]) for d in range(dim)]
-                return Cmean(array, 0)
-            else:
-                # return mean([mean([array[x][d] for d in range(dim)]) for x in range(len(array))])
-                return Cmean(Cmean(array, 0), 0)
+    if isinstance(array, list):
 
-        elif isinstance(array[0], (int, float)):
-            return Cmean(array, 0)
+        if len(array) > 0:
+            if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
+                # in this case we have a 2D matrix
+                if axis == 1 or axis == 0:
+                    return Cmean(array, axis)
+                else:
+                    # return mean([mean([array[x][d] for d in range(dim)]) for x in range(len(array))])
+                    return Cmean(Cmean(array, 0), 0)
+
+            elif isinstance(array[0], (int, float)):
+                # in this case we have a vector
+                return Cmean(array, 0)
+
+            else:
+                raise TypeError("Expected a list of lists or a list of int/floats")
 
         else:
-            raise TypeError("Expected a list of lists or a list of int/floats")
+            raise ValueError("Empty list")
+    else:
+        raise TypeError("Expected a list")
 
-    elif isinstance(array, list):
-        raise ValueError("Empty list")
 
+def std(array, axis = None):
+
+    """
+    numpy style standard deviation of array
+    :param array:
+    :param axis:
+    :return:
+    """
+    if isinstance(array, list):
+
+        if len(array) > 0:
+            if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
+                # in this case we have a 2D matrix
+                if axis == 1 or axis == 0:
+                    return Cstd(array, axis)
+                else:
+                    raise NotImplementedError("This is not the code you are looking for.")
+
+            elif isinstance(array[0], (int, float)):
+                # in this case we have a vector
+                return Cstd(array, 0)
+
+            else:
+                raise TypeError("Expected a list of lists or a list of int/floats")
+
+        else:
+            raise ValueError("Empty list")
     else:
         raise TypeError("Expected a list")
 
