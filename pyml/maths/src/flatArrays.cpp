@@ -284,3 +284,82 @@ flatArray *flatArray::nlog(double base) {
 
     return result;
 }
+
+flatArray *flatArray::mean(int axis) {
+    int rows, cols;
+    auto result = new flatArray;
+
+    rows = getRows();
+    cols = getCols();
+
+    if (rows == 1) {
+        // vector
+        double rowResult = 0;
+
+        result->startEmptyArray(1, 1);
+
+        for (int i = 0; i < cols; ++i) {
+            rowResult += array[i];
+        }
+
+        rowResult /= (double) cols;
+
+        result->setNElement(rowResult, 0);
+    }
+
+    else if (rows > 1) {
+        // matrix
+        if (axis == 0) {
+            // mean of each column
+            double colResult;
+            double *colArray = nullptr;
+
+            result->startEmptyArray(1 , cols);
+
+            for (int i = 0; i < cols; ++i) {
+
+                colResult = 0;
+                colArray = getCol(i);
+
+                for (int j = 0; j < rows; ++j) {
+                    colResult += colArray[j];
+                }
+
+                colResult /= (double) rows;
+
+                result->setNElement(colResult, i);
+
+            }
+
+            delete [] colArray;
+
+        }
+
+        else {
+            // mean of each row
+            double rowResult;
+            double *rowArray = nullptr;
+
+            result->startEmptyArray(1, rows);
+
+            for (int i = 0; i < rows; ++i) {
+
+                rowResult = 0;
+                rowArray = getRow(i);
+
+                for (int j = 0; j < cols; ++j) {
+                    rowResult += rowArray[j];
+                }
+
+                rowResult /= (double) cols;
+
+                result->setNElement(rowResult, i);
+
+            }
+
+            delete [] rowArray;
+        }
+    }
+
+    return result;
+}

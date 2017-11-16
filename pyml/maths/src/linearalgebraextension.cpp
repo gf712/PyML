@@ -55,6 +55,7 @@ static PyObject* power(PyObject* self, PyObject *args) {
 
     // variable declaration
     auto A = new flatArray;
+    auto result = new flatArray;
     int p;
 
     // pointers to python lists
@@ -71,10 +72,10 @@ static PyObject* power(PyObject* self, PyObject *args) {
     A->readFromPythonList(pAArray);
 
     // calculate the power elementwise
-    flatMatrixPower(A, p);
+    result = A->power(p);
 
     // convert vector to python list
-    PyObject* result_py_list = ConvertFlatArray_PyList(A, "float");
+    PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
 
     // build python object
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
@@ -241,94 +242,38 @@ static PyObject* mean(PyObject* self, PyObject *args) {
     // variable declaration
     int axis;
     PyObject *pX;
+    auto X = new flatArray;
+    PyObject *FinalResult = nullptr;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pX, &axis)) {
+    if (!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pX, &axis)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list and one integer!");
         return nullptr;
     }
 
-    if (PyFloat_Check(PyList_GetItem(pX, 0))) {
-        // if the first element is a float we assume this is a 1D array/vector
+    X->readFromPythonList(pX);
 
-        // variable declaration
-        double result = 0;
-        double* X = nullptr;
-        int cols;
+    flatArray *result = X->mean(axis);
 
-        // get size of array
-        cols = static_cast<int> PyList_GET_SIZE(pX);
+    if (X->getRows() == 1) {
 
-        // memory allocation
-        X = new double[cols];
+        FinalResult = Py_BuildValue("d", result->getNElement(0));
 
-        convertPy_1DArray(pX, X, cols);
-
-        result = vectorMean(X, cols);
-
-        PyObject *FinalResult = Py_BuildValue("d", result);
-
-        // memory deallocation
-        delete [] X;
-
-        return FinalResult;
     }
-    else if (PyList_Check(PyList_GET_ITEM(pX, 0))){
-        // if it is a list we assume this is a 2D array/matrix
 
-        // variable declaration
-        int rows, cols;
-        double* result = nullptr;
-        double **X = nullptr;
-        PyObject *result_py_list;
+    else {
 
-        // get size of array
-        rows = static_cast<int> PyList_GET_SIZE(pX);
-        cols = static_cast<int> PyList_GET_SIZE(PyList_GET_ITEM(pX, 0));
+        PyObject *result_py_list = ConvertFlatArray_PyList(result, "float");
 
-        // memory allocation
-        X = new double *[rows];
-        for (int i = 0; i < rows; ++i) {
-            X[i] = new double [cols];
-        }
-
-        if (axis == 0) {
-            result = new double[cols];
-        }
-        else {
-            result = new double[rows];
-        }
-
-        convertPy_2DArray(pX, X, rows, cols);
-
-        matrixMean(X, cols, rows, axis, result);
-
-        if (axis == 0) {
-            result_py_list = Convert_1DArray(result, cols);
-        }
-        else {
-            result_py_list = Convert_1DArray(result, rows);
-        }
-
-        PyObject *FinalResult = Py_BuildValue("O", result_py_list);
-
-        // memory deallocation
-        for (int j = 0; j < rows; ++j) {
-            delete [] X[j];
-        }
-        delete [] X;
-
-        delete [] result;
+        FinalResult = Py_BuildValue("O", result_py_list);
 
         Py_DECREF(result_py_list);
-
-        return FinalResult;
-
     }
-    else {
-        PyErr_SetString(PyExc_TypeError, "Can only handle 2D float arrays at the moment!");
-        return nullptr;
-    }
+
+    delete X;
+    delete result;
+
+    return FinalResult;
 }
 
 

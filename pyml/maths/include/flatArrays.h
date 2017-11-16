@@ -59,6 +59,7 @@ public:
     flatArray *divide(double m);
     flatArray *multiply(flatArray *other);
     flatArray *nlog(double base);
+    flatArray *mean(int axis);
 };
 
 #ifdef __cplusplus
