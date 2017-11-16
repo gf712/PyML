@@ -286,11 +286,8 @@ flatArray *flatArray::nlog(double base) {
 }
 
 flatArray *flatArray::mean(int axis) {
-    int rows, cols;
-    auto result = new flatArray;
 
-    rows = getRows();
-    cols = getCols();
+    auto result = new flatArray;
 
     if (rows == 1) {
         // vector
@@ -360,6 +357,89 @@ flatArray *flatArray::mean(int axis) {
             delete [] rowArray;
         }
     }
+
+    return result;
+}
+
+flatArray *flatArray::std(int axis) {
+
+    auto result = new flatArray;
+
+    flatArray *arrayMean = mean(axis);
+
+    if (rows == 1) {
+        // vector
+        double rowResult = 0;
+
+        result->startEmptyArray(1, 1);
+
+        double arrayMean_i = arrayMean->getNElement(0);
+
+        for (int i = 0; i < size; ++i) {
+            rowResult += pow(array[i] - arrayMean_i, 2);
+        }
+
+        rowResult /= (double) (size);
+
+        result->setNElement(pow(rowResult, 0.5), 0);
+    }
+
+    else if (rows > 1) {
+        // matrix
+        if (axis == 0) {
+            // std of each column
+            double colResult;
+            double *colArray = nullptr;
+
+            result->startEmptyArray(1, cols);
+
+            for (int i = 0; i < cols; ++i) {
+
+                colResult = 0;
+                double colMean = arrayMean->getNElement(i);
+                colArray = getCol(i);
+
+                for (int j = 0; j < rows; ++j) {
+                    colResult += pow(colArray[j] - colMean, 2);
+                }
+
+                colResult /= (double) (rows);
+
+                result->setNElement(pow(colResult, 0.5), i);
+
+            }
+
+            delete colArray;
+
+        } else {
+            // std of each row
+            double rowResult;
+            double *rowArray = nullptr;
+
+            result->startEmptyArray(1, rows);
+
+            for (int i = 0; i < rows; ++i) {
+
+                rowResult = 0;
+                double rowMean = arrayMean->getNElement(i);
+                rowArray = getRow(i);
+
+                for (int j = 0; j < cols; ++j) {
+                    rowResult += pow(rowArray[j] - rowMean, 2);
+                }
+
+                rowResult /= (double) (cols);
+
+                result->setNElement(pow(rowResult, 0.5), i);
+
+            }
+
+            delete rowArray;
+
+        }
+    }
+
+    delete arrayMean;
 
     return result;
 }
