@@ -78,6 +78,13 @@ class MathsTest(unittest.TestCase):
     def test_var_EmptyList_ValueError(self):
         self.assertRaises(ValueError, variance, [])
 
+    def test_cov_matrix(self):
+        self.assertAlmostEqual(covariance(self.A)[1][7], 0.015228530607877794)
+
+    def test_cov_matrix_shape(self):
+        self.assertEqual(len(covariance(self.A)), len(self.A[1]))
+        self.assertEqual(len(covariance(self.A)[0]), len(self.A[1]))
+
 
 class LinearAlgebraTest(unittest.TestCase):
 

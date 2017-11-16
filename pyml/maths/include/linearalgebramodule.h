@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 void leastSquares(flatArray *X, flatArray *y, double *theta);
+flatArray *covariance(flatArray *X);
 
 #ifdef __cplusplus
 }

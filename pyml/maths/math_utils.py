@@ -1,6 +1,6 @@
 from collections import Counter
 from .CMaths import quick_sort
-from .Clinear_algebra import Cmean, Cstd, Cvariance
+from .Clinear_algebra import Cmean, Cstd, Cvariance, Ccovariance
 from math import exp
 
 
@@ -123,6 +123,17 @@ def variance(array, degrees_of_freedom=0, axis=None):
             raise ValueError("Empty list")
     else:
         raise TypeError("Expected a list")
+
+
+def covariance(array):
+
+    """
+
+    :param array: list of lists
+    :return:
+    """
+
+    return Ccovariance(array)
 
 
 def sigmoid(array):

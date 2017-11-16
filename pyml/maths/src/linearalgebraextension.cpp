@@ -357,6 +357,36 @@ static PyObject* variance(PyObject* self, PyObject *args) {
 }
 
 
+static PyObject* cov(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    PyObject *pX;
+    auto X = new flatArray;
+    PyObject *FinalResult = nullptr;
+
+    // return error if we don't get all the arguments
+    if (!PyArg_ParseTuple(args, "O!", &PyList_Type, &pX)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and two integers!");
+        return nullptr;
+    }
+
+    X->readFromPythonList(pX);
+
+    flatArray *result = covariance(X);
+
+    PyObject *result_py_list = ConvertFlatArray_PyList(result, "float");
+
+    FinalResult = Py_BuildValue("O", result_py_list);
+
+    Py_DECREF(result_py_list);
+
+    delete X;
+    delete result;
+
+    return FinalResult;
+}
+
+
 static PyObject* version(PyObject* self) {
     return Py_BuildValue("s", "Version 0.2");
 }
@@ -373,6 +403,7 @@ static PyMethodDef linearAlgebraMethods[] = {
         {"Cmean",         mean,                   METH_VARARGS,            "Numpy style array mean"},
         {"Cstd",          standardDeviation,      METH_VARARGS,            "Numpy style array standard deviation"},
         {"Cvariance",     variance,               METH_VARARGS,            "Numpy style array variance"},
+        {"Ccovariance",   cov,                    METH_VARARGS,            "Calculate covariance matrix"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {nullptr, nullptr, 0, nullptr}
 };

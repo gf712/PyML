@@ -155,3 +155,67 @@ void leastSquares(flatArray *X, flatArray *y, double *theta) {
     delete right;
     delete A;
 }
+
+
+flatArray *covariance(flatArray *X) {
+
+    // variable declaration
+    auto covMatrix = new flatArray;
+    int cols, rows;
+    flatArray *XVar = nullptr;
+    double *XVecMean = nullptr;
+    double *Vec1 = nullptr;
+    double *Vec2 = nullptr;
+    auto vecProd = new flatArray;
+
+    // get number of cols and rows (quicker than calling getter all the time)
+    cols = X->getCols();
+    rows = X->getRows();
+
+    // initialise covariance matrix
+    // if X is a n by m matrix
+    // the covariance matrix is m by m
+    covMatrix->startEmptyArray(cols, cols);
+
+    // get mean and variance of each column
+    XVecMean = X->mean(0)->getArray();
+    XVar = X->var(0, 0);
+
+    vecProd->startEmptyArray(1, rows);
+
+    for (int i = 0; i < cols; ++i) {
+        // the diagonal of the covariance matrix is the column wise variance of X
+        covMatrix->setNElement(XVar->getNElement(i), i + i * cols);
+
+        // get ith vector
+        Vec1 = X->getCol(i);
+
+        // only need to calculate the upper triangle
+        for (int j = cols - 1; j > i; --j) {
+
+            // get jth vector
+            Vec2 = X->getCol(j);
+
+            for (int k = 0; k < rows; ++k) {
+                vecProd->setNElement(Vec1[k] * Vec2[k], k);
+            }
+
+            // cov(X, Y) = E(X*Y) - E(X)*E(Y)
+            // where X is the ith vector and Y the jth vector
+            double result = vecProd->mean(0)->getNElement(0) - XVecMean[i] * XVecMean[j];
+
+            // set S(i, j) = S(j, i) = cov(i, j)
+            covMatrix->setNElement(result, i * cols + j);
+            covMatrix->setNElement(result, j * cols + i);
+        }
+    }
+
+    // memory dellocation
+    delete XVecMean;
+    delete Vec1;
+    delete Vec2;
+    delete XVar;
+    delete vecProd;
+
+    return covMatrix;
+}
