@@ -11,3 +11,11 @@ class BaseLearner:
 
     def score(self, X, y_true):
         return self._score(X, y_true)
+
+
+class Classifier:
+    def __init__(self):
+        pass
+
+    def predict_proba(self, X):
+        return self._predict_proba(X)

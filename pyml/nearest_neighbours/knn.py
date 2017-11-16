@@ -1,5 +1,6 @@
 from .base import KNNBase
-from ..maths import max_occurence, mean, mean_squared_error, mean_absolute_error
+from ..maths import max_occurence, mean
+from pyml.metrics.scores import mean_squared_error, mean_absolute_error
 
 
 class KNNClassifier(KNNBase):

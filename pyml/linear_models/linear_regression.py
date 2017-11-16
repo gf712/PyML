@@ -1,12 +1,21 @@
 from .base import LinearBase
-from ..maths import dot_product, mean_squared_error, mean_absolute_error, least_squares
+from ..maths import dot_product, least_squares, gradient_descent
+from pyml.metrics.scores import mean_squared_error, mean_absolute_error
 from ..utils import set_seed
-from pyml.maths import gradient_descent
 
 
 class LinearRegression(LinearBase):
     def __init__(self, seed=None, bias=True, solver='OLS', learning_rate=0.01,
                  epsilon=0.01, max_iterations=10000):
+        """
+
+        :param seed:
+        :param bias:
+        :param solver:
+        :param learning_rate:
+        :param epsilon:
+        :param max_iterations:
+        """
 
         LinearBase.__init__(self)
 
@@ -23,16 +32,19 @@ class LinearRegression(LinearBase):
         self.y = y
 
         self._n_features = len(X[0])
-        self._initiate_weights(bias=self.bias)
 
         if self._solver == 'gradient_descent':
+            self._initiate_weights(bias=self.bias)
             self._coefficients, self._cost, self._iterations = gradient_descent.gradient_descent(self.X,
                                                                                                  self.coefficients,
                                                                                                  self.y,
                                                                                                  self.max_iterations,
                                                                                                  self.epsilon,
-                                                                                                 self._learning_rate)
+                                                                                                 self._learning_rate,
+                                                                                                 'rgrs')
         else:
+            if self.bias:
+                self.X = [[1] + row for row in self.X]
             self._cost = 'NaN'
             self._iterations = 'NaN'
             self._coefficients = least_squares(self.X, self.y)

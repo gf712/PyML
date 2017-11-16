@@ -1,53 +1,49 @@
 //
 // Created by Gil Ferreira Hoben on 07/11/17.
 //
+// This file provides the Python API for
+// the linear algebra code written in C++
+
+
 #include <Python.h>
 #include <linearalgebramodule.h>
 #include "pythonconverters.h"
+#include <iostream>
 
 static PyObject* dot_product(PyObject* self, PyObject *args) {
 
-    // prepare to handle python objects (two lists U and V), and U and V items and then n
-    int sizeOfA;
-    int sizeOfV;
+    // variable instantiation
+    // A is a list of lists (matrix)
+    // V is a list (vector)
+    auto A = new flatArray;
+    auto V = new flatArray;
 
     // pointers to python lists
-    PyObject *pAArray;
-    PyObject *pVVector;
+    PyObject * pAArray;
+    PyObject * pVVector;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pAArray, &PyList_Type, &pVVector)) {
+    if (!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pAArray, &PyList_Type, &pVVector)) {
         PyErr_SetString(PyExc_TypeError, "Expected two lists!");
         return nullptr;
     }
 
-    // use PyList_Size to get size of vectors
-    sizeOfA = PyList_Size(pAArray);
-    sizeOfV = PyList_Size(pVVector);
-
-    if (sizeOfA == 0){
-        PyErr_SetString(PyExc_ValueError, "Argument U is empty");
-        return nullptr;
-    }
-
-    if (sizeOfV == 0){
-        PyErr_SetString(PyExc_ValueError, "Argument V is empty");
-        return nullptr;
-    }
-
-    double *result = nullptr;
-    result = new double[sizeOfA];
-
-    PyObject *result_py_list;
+    A->readFromPythonList(pAArray);
+    V->readFromPythonList(pVVector);
 
 
-    pypyMatrixVectorDotProduct(pAArray, pVVector, sizeOfA, sizeOfV, result);
+    // calculate dot product
+    flatArray *result = A->dot(V);
 
-    result_py_list = Convert_1DArray(result, sizeOfA);
+    // convert result to python list
+    PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
 
-    free(result);
-
+    // build python object
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    delete result;
+    delete A;
+    delete V;
 
     Py_DECREF(result_py_list);
 
@@ -57,44 +53,34 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
 
 static PyObject* power(PyObject* self, PyObject *args) {
 
-    // prepare to handle python objects (two lists U and V), and U and V items and then n
-    int sizeOfA;
+    // variable declaration
+    auto A = new flatArray;
+    int p;
 
     // pointers to python lists
-    PyObject *pAArray;
-    int pPower;
+    PyObject * pAArray;
+
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pAArray, &pPower)) {
+    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pAArray, &p)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list and an integer!");
         return nullptr;
     }
 
-    // use PyList_Size to get size of vector
-    sizeOfA = PyList_Size(pAArray);
+    // read in python list
+    A->readFromPythonList(pAArray);
 
-    if (sizeOfA == 0){
-        PyErr_SetString(PyExc_ValueError, "Argument U is empty");
-        return nullptr;
-    }
+    // calculate the power elementwise
+    flatMatrixPower(A, p);
 
+    // convert vector to python list
+    PyObject* result_py_list = ConvertFlatArray_PyList(A, "float");
 
-    if (pPower < 0) {
-        PyErr_SetString(PyExc_ValueError, "Power must be greater than 0.");
-        return nullptr;
-    }
-
-    double *result;
-    result = new double[sizeOfA];
-    PyObject *result_py_list;
-
-    vector_power(pAArray, pPower, sizeOfA, result);
-
-    result_py_list = Convert_1DArray(result, sizeOfA);
-
-    delete [] result;
-
+    // build python object
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    // deallocate memory
+    delete A;
 
     Py_DECREF(result_py_list);
 
@@ -104,51 +90,35 @@ static PyObject* power(PyObject* self, PyObject *args) {
 
 static PyObject* subtract(PyObject* self, PyObject *args) {
 
-    // prepare to handle python objects (two lists U and V), and U and V items and then n
-    int sizeOfU;
-    int sizeOfV;
+    // variable instantiation
+    auto A = new flatArray;
+    auto B = new flatArray;
 
-    // pointers to python lists
-    PyObject *pUVector;
-    PyObject *pVVector;
+    PyObject *pA;
+    PyObject *pB;
+    PyObject *result_py_list;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pUVector, &PyList_Type, &pVVector)) {
+    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pA, &PyList_Type, &pB)) {
         PyErr_SetString(PyExc_TypeError, "Expected two lists!");
         return nullptr;
     }
 
-    // use PyList_Size to get size of vectors
-    sizeOfU = PyList_Size(pUVector);
-    sizeOfV = PyList_Size(pVVector);
+    // get python lists
+    A->readFromPythonList(pA);
+    B->readFromPythonList(pB);
 
-    if (sizeOfU == 0){
-        PyErr_SetString(PyExc_ValueError, "Argument U is empty");
-        return nullptr;
-    }
+    // subtraction
+    flatArray *result = A->subtract(B);
 
-    if (sizeOfV == 0){
-        PyErr_SetString(PyExc_ValueError, "Argument V is empty");
-        return nullptr;
-    }
-
-    double* result = nullptr;
-    result = new double[sizeOfU];
-
-    PyObject *result_py_list;
-
-    if (sizeOfU != sizeOfV) {
-        PyErr_SetString(PyExc_ValueError, "Expected two lists of the same size.");
-        return nullptr;
-    }
-
-    pyCVectorSubtract(pUVector, pVVector, sizeOfU, result);
-
-    result_py_list = Convert_1DArray(result, sizeOfU);
-
-    delete [] result;
+    result_py_list = ConvertFlatArray_PyList(result, "float");
 
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    // memory deallocation
+    delete result;
+    delete A;
+    delete B;
 
     Py_DECREF(result_py_list);
 
@@ -158,44 +128,34 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
 
 static PyObject* sum(PyObject* self, PyObject *args) {
 
-    // prepare to handle python objects (two lists U and V), and U and V items and then n
-    int sizeOfA;
+    // sum of all elements in a matrix/vector
 
-    // pointers to python lists
+    // variable declaration
+    auto A = new flatArray;
     PyObject *pAArray;
 
     // return error if we don't get all the arguments
     if(!PyArg_ParseTuple(args, "O!", &PyList_Type, &pAArray)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list and an integer!");
-        return NULL;
-    }
-
-    // use PyList_Size to get size of vector
-    sizeOfA = PyList_Size(pAArray);
-
-    if (sizeOfA == 0){
-        PyErr_SetString(PyExc_ValueError, "Argument U is empty");
         return nullptr;
     }
 
-    double result;
+    // use PyList_Size to get size of vector
+    A->readFromPythonList(pAArray);
 
-    result = pyVectorSum(pAArray, sizeOfA);
+    double result = A->sum();
 
     PyObject *FinalResult = Py_BuildValue("d", result);
 
     return FinalResult;
 }
 
-static PyObject* transpose(PyObject* self, PyObject *args) {
+static PyObject* pyTranspose(PyObject* self, PyObject *args) {
 
     // declarations
-    double** result;
-    int cols, rows;
+    auto A = new flatArray;
+//    int block_size;
     PyObject* pyResult;
-
-
-    // pointers to python lists
     PyObject* pArray;
 
     // return error if we don't get all the arguments
@@ -204,32 +164,20 @@ static PyObject* transpose(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    // use PyList_Size to get dimensions of array
-    rows = PyList_Size(pArray);
-    cols = PyList_Size(PyList_GetItem(pArray, 0));
+//    if (block_size <= 0) {
+//        block_size = 1;
+//    }
 
+    A->readFromPythonList(pArray);
 
-    if (cols == 0){
-        PyErr_SetString(PyExc_ValueError, "Argument U is empty");
-        return nullptr;
-    }
+    flatArray *result = A->transpose();
 
-    // allocate memory for result
-    result = new double *[cols];
-    for (int i = 0; i < cols; ++i) {
-        result[i] = new double[rows];
-    }
-
-    pyTranspose(pArray, result, rows, cols);
-
-    pyResult = Convert_2DArray(result, cols, rows);
+    pyResult = ConvertFlatArray_PyList(result, "float");
 
     PyObject* FinalResult = Py_BuildValue("O", pyResult);
 
-    for (int i = 0; i < cols; ++i) {
-        delete [] result[i];
-    }
-    delete [] result;
+    delete result;
+    delete A;
 
     Py_DECREF(pyResult);
 
@@ -237,119 +185,50 @@ static PyObject* transpose(PyObject* self, PyObject *args) {
 }
 
 
-static PyObject* matrix_product(PyObject* self, PyObject *args) {
-
-    int rowsA, rowsB, colsA, colsB;
-
-    // pointers to python lists
-    PyObject *pAArray;
-    PyObject *pBArray;
-
-    // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pAArray, &PyList_Type, &pBArray)) {
-        PyErr_SetString(PyExc_TypeError, "Expected two lists!");
-        return nullptr;
-    }
-
-    if (!PyList_Check(PyList_GetItem(pAArray, 0))) {
-        PyErr_SetString(PyExc_TypeError, "Expected A to be a list of lists!");
-        return nullptr;
-    }
-
-    if (!PyList_Check(PyList_GetItem(pBArray, 0))) {
-        PyErr_SetString(PyExc_TypeError, "Expected B to be a list of lists!");
-        return nullptr;
-    }
-
-    // use PyList_Size to get size of vectors
-    rowsA = PyList_Size(pAArray);
-    colsA = PyList_Size(PyList_GetItem(pAArray, 0));
-    rowsB = PyList_Size(pBArray);
-    colsB = PyList_Size(PyList_GetItem(pBArray, 0));
-
-    if (rowsA != colsB){
-        PyErr_SetString(PyExc_ValueError, "Number of rows in A must be the same as the number of columns in B");
-        return nullptr;
-    }
-
-    if (colsA != rowsB){
-        PyErr_SetString(PyExc_ValueError, "Number of columns in A must be the same as the number of rows in B");
-        return nullptr;
-    }
-
-    double** result = nullptr;
-
-    result = new double *[rowsA];
-
-    for (int i = 0; i < rowsA; ++i) {
-        result[i] = new double [rowsA];
-    }
-
-    PyObject *result_py_list;
-
-    pypyMatrixMatrixProduct(pAArray, pBArray, rowsA, colsA, result);
-
-    result_py_list = Convert_2DArray(result, rowsA, colsB);
-
-    for (int i = 0; i < rowsA; ++i) {
-        delete [] result[i];
-    }
-    delete [] result;
-
-    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
-
-    Py_DECREF(result_py_list);
-
-    return FinalResult;
-
-}
-
-
 static PyObject* least_squares(PyObject* self, PyObject *args) {
 
-    int m, n, ySize;
+    // variable declaration
+    auto X = new flatArray;
+    auto y = new flatArray;
 
-    // pointers to python lists
-    PyObject *X;
-    PyObject *y;
+    PyObject *pX;
+    PyObject *py;
+    PyObject *result_py_list;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &X, &PyList_Type, &y)) {
+    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pX, &PyList_Type, &py)) {
         PyErr_SetString(PyExc_TypeError, "Expected two lists!");
         return nullptr;
     }
 
-    if (!PyList_Check(PyList_GetItem(X, 0))) {
-        PyErr_SetString(PyExc_TypeError, "Expected A to be a list of lists!");
-        return nullptr;
-    }
 
-    // use PyList_Size to get size of vectors
-    n = PyList_Size(X);
-    m = PyList_Size(PyList_GetItem(X, 0));
-    ySize = PyList_Size(y);
+    // read in python lists
+    X->readFromPythonList(pX);
+    y->readFromPythonList(py);
+
 
     // sanity check
-    if (n != ySize){
+    if (X->getRows() != y->getCols()){
         PyErr_SetString(PyExc_ValueError, "Number of rows of X must be the same as the number of training examples");
         return nullptr;
     }
 
-    double* theta = nullptr;
+    // memory allocation of theta
+//    theta->startEmptyArray(1, X->getCols());
+    auto theta = new double [X->getCols()];
 
-    theta = new double [m];
+    leastSquares(X, y, theta);
+//    flatArray *result = leastSquares(X, y, theta);
 
-    PyObject *result_py_list;
-
-    pyLeastSquares(X, y, theta, n, m);
-
-
-
-    result_py_list = Convert_1DArray(theta, m);
-
-    delete [] theta;
+    result_py_list = Convert_1DArray(theta, X->getCols());
+//    result_py_list = ConvertFlatArray_PyList(A);
 
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    // memory deallocation
+    delete theta;
+    delete X;
+    delete y;
 
     Py_DECREF(result_py_list);
 
@@ -357,20 +236,116 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
 }
 
 
+static PyObject* mean(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    int axis;
+    PyObject *pX;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pX, &axis)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and one integer!");
+        return nullptr;
+    }
+
+    if (PyFloat_Check(PyList_GetItem(pX, 0))) {
+        // if the first element is a float we assume this is a 1D array/vector
+
+        // variable declaration
+        double result = 0;
+        double* X = nullptr;
+        int cols;
+
+        // get size of array
+        cols = static_cast<int> PyList_GET_SIZE(pX);
+
+        // memory allocation
+        X = new double[cols];
+
+        convertPy_1DArray(pX, X, cols);
+
+        result = vectorMean(X, cols);
+
+        PyObject *FinalResult = Py_BuildValue("d", result);
+
+        // memory deallocation
+        delete [] X;
+
+        return FinalResult;
+    }
+    else if (PyList_Check(PyList_GET_ITEM(pX, 0))){
+        // if it is a list we assume this is a 2D array/matrix
+
+        // variable declaration
+        int rows, cols;
+        double* result = nullptr;
+        double **X = nullptr;
+        PyObject *result_py_list;
+
+        // get size of array
+        rows = static_cast<int> PyList_GET_SIZE(pX);
+        cols = static_cast<int> PyList_GET_SIZE(PyList_GET_ITEM(pX, 0));
+
+        // memory allocation
+        X = new double *[rows];
+        for (int i = 0; i < rows; ++i) {
+            X[i] = new double [cols];
+        }
+
+        if (axis == 0) {
+            result = new double[cols];
+        }
+        else {
+            result = new double[rows];
+        }
+
+        convertPy_2DArray(pX, X, rows, cols);
+
+        matrixMean(X, cols, rows, axis, result);
+
+        if (axis == 0) {
+            result_py_list = Convert_1DArray(result, cols);
+        }
+        else {
+            result_py_list = Convert_1DArray(result, rows);
+        }
+
+        PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+        // memory deallocation
+        for (int j = 0; j < rows; ++j) {
+            delete [] X[j];
+        }
+        delete [] X;
+
+        delete [] result;
+
+        Py_DECREF(result_py_list);
+
+        return FinalResult;
+
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Can only handle 2D float arrays at the moment!");
+        return nullptr;
+    }
+}
+
+
 static PyObject* version(PyObject* self) {
-    return Py_BuildValue("s", "Version 0.3");
+    return Py_BuildValue("s", "Version 0.2");
 }
 
 
 static PyMethodDef linearAlgebraMethods[] = {
         // Python name    C function              argument representation  description
         {"dot_product",   dot_product,            METH_VARARGS,            "Calculate the dot product of two vectors"},
-        {"matrix_product",matrix_product,         METH_VARARGS,            "Calculate the product of two matrices"},
         {"power",         power,                  METH_VARARGS,            "Calculate element wise power"},
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
         {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
-        {"transpose",     transpose,              METH_VARARGS,            "Transpose a 2D matrix"},
-        {"least_squares", least_squares,           METH_VARARGS,            "Perform least squares"},
+        {"transpose",     pyTranspose,            METH_VARARGS,            "Transpose a 2D matrix"},
+        {"least_squares", least_squares,          METH_VARARGS,            "Perform least squares"},
+        {"Cmean",         mean,                   METH_VARARGS,            "Numpy style array mean"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {nullptr, nullptr, 0, nullptr}
 };

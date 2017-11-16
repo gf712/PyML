@@ -27,31 +27,13 @@ class KNNBase(BaseLearner):
 
         # for each data point find n closest points in training set
         for x_i in X:
-            distances_i = [self._distance(x, x_i, self.norm) for x in self.X]
+            distances_i = calculate_distance(self.X, x_i, self.norm)
 
             # get order of distances
             sorted_distances = argsort(distances_i)
 
             # get k points
-            k_nearest_neighbours = [self.y[sorted_distances.index(i)] for i in range(self.n)]
+            k_nearest_neighbours = [self.y[sorted_distances[i]] for i in range(self.n)]
 
             # majority vote
             self._neighbours.append(k_nearest_neighbours)
-
-    @staticmethod
-    def _distance(u, v, norm):
-        """
-
-        :param u:
-        :param v:
-        :param norm:
-        :return:
-        """
-        if norm == 'l1':
-            p = 1
-        elif norm == 'l2':
-            p = 2
-        else:
-            p = norm
-
-        return calculate_distance(u, v, p)

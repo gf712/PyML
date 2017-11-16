@@ -1,5 +1,4 @@
-from setuptools import setup
-from setuptools import Extension
+from setuptools import setup, Extension
 import distutils.sysconfig
 
 # Workaround setuptools -Wstrict-prototypes warnings
@@ -16,18 +15,41 @@ with open('./pyml/__about__.py', 'r') as f:
 linear_algebra_module = Extension('pyml.maths.Clinear_algebra',
                                   sources=['pyml/maths/src/linearalgebramodule.cpp',
                                            'pyml/maths/src/linearalgebraextension.cpp',
-                                           'pyml/maths/src/pythonconverters.cpp'],
+                                           'pyml/maths/src/pythonconverters.cpp',
+                                           'pyml/maths/src/flatArrays.cpp'],
                                   extra_compile_args=['-std=c++11'],
+                                  # extra_link_args=['-lgomp'],
                                   include_dirs=['pyml/maths/include'],
                                   language='c++')
 
 gradient_descent_module = Extension('pyml.maths.gradient_descent',
                                     sources=['pyml/maths/src/gradientdescentmodule.cpp',
                                              'pyml/maths/src/linearalgebramodule.cpp',
-                                             'pyml/maths/src/pythonconverters.cpp'],
+                                             'pyml/maths/src/pythonconverters.cpp',
+                                             'pyml/maths/src/flatArrays.cpp'],
                                     extra_compile_args=['-std=c++11'],
+                                    # extra_link_args=['-lgomp'],
                                     include_dirs=['pyml/maths/include'],
                                     language='c++')
+
+distances = Extension('pyml.metrics.CMetrics',
+                      sources=['pyml/metrics/src/metricspythonextension.cpp',
+                               'pyml/metrics/src/distances.cpp',
+                               'pyml/maths/src/pythonconverters.cpp',
+                               'pyml/maths/src/flatArrays.cpp'],
+                      extra_compile_args=['-std=c++11'],
+                      include_dirs=['pyml/metrics/include',
+                                    'pyml/maths/include'],
+                      language='c++')
+
+maths = Extension('pyml.maths.CMaths',
+                  sources=['pyml/maths/src/maths.cpp',
+                           'pyml/maths/src/mathsextension.cpp',
+                           'pyml/maths/src/pythonconverters.cpp',
+                           'pyml/maths/src/flatArrays.cpp'],
+                  extra_compile_args=['-std=c++11'],
+                  include_dirs=['pyml/maths/include'],
+                  language='c++')
 
 setup(
     name='PyML',
@@ -50,12 +72,13 @@ setup(
               'pyml.datasets',
               'pyml.preprocessing',
               'pyml.linear_models',
-              'pyml.utils'],
+              'pyml.utils',
+              'pyml.cluster'],
     url='https://github.com/gf712/PyML',
     license=about['__license__'],
     author=about['__author__'],
     author_email=about['__author_email__'],
     description='Machine learning with Python and C/C++',
     test_suite="tests",
-    ext_modules=[linear_algebra_module, gradient_descent_module],
+    ext_modules=[linear_algebra_module, gradient_descent_module, distances, maths],
 )

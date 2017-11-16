@@ -1,3 +1,12 @@
+PyML
+====
+.. image:: https://coveralls.io/repos/github/gf712/PyML/badge.svg?branch=master
+    :target: https://coveralls.io/github/gf712/PyML?branch=master
+.. image:: https://travis-ci.org/gf712/PyML.svg?branch=master
+    :target: https://travis-ci.org/gf712/PyML
+
+PyML is a Python package with machine learning algorithms written in Python and C/C++.
+
 Installation
 ============
 `git clone git@github.com:gf712/PyML.git`
@@ -14,7 +23,7 @@ Usage
 =====
 >>> from pyml.linear_models import LinearRegression
 >>> from pyml.datasets import regression
->>> X, y = regression()
+>>> X, y = regression(seed=1970)
 >>> lr = LinearRegression(solver='OLS', bias=True)
 >>> lr.train(X, y)
 >>> lr.coefficients
@@ -23,7 +32,19 @@ Usage
 
 Changelog
 =========
+Version 0.2:
+------------
+ - Major:
+    - KMeans implementation
+
+ - Minor:
+    - Clean up C++ code
+    - Norm is calculated with pure C++ (Python only used to provide `euclidean_distance` and `manhattan_distance` interface
+    - Faster implementation of quick sort algorithm (with C++)
+
+
 Version 0.1:
+------------
  - Major:
     - Linear regression (with gradient descent and ordinary least square)
     - KNN, both regressor and classifier

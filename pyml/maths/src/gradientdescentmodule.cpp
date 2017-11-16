@@ -4,83 +4,106 @@
 #include "pythonconverters.h"
 
 
-void predict(PyObject* X, PyObject* w, double* prediction, int rows, int cols) {
-    pypyMatrixVectorDotProduct(X, w, rows, cols, prediction);
-}
-
-
-void power(const double* array, int n, int rows, double* result) {
-
-    for (int i = 0; i < rows; ++i) {
-        result[i] = pow(array[i], n);
+void sigmoid(flatArray *scores) {
+    for (int i = 0; i < scores->getSize(); ++i) {
+        scores->setNElement(1 / (1 + exp(-scores->getNElement(i))), i);
     }
 }
 
 
-double cost(double* loss, int rows){
-    double result[rows];
-    power(loss, 2, rows, result);
-    return cVectorSum(result, rows) / (2 * rows);
+flatArray *predict(flatArray *X, flatArray *w) {
+
+    return X->dot(w);
+}
+
+
+double logLikelihood(flatArray *scores, flatArray *y) {
+
+    double result = 0;
+
+    for (int i = 0; i < y->getSize(); ++i) {
+        result += y->getNElement(i) * scores->getNElement(i) - log(1 + exp(scores->getNElement(i)));
+    }
+
+    return result;
+}
+
+
+double cost(flatArray* loss){
+    flatArray *result = loss->power(2);
+    double costResult = result->sum() / (2 * result->getCols());
+
+    delete result;
+
+    return costResult;
 }
 
 
 
-void gradientCalculation(double** X, double* loss, double* gradients, int rows, int cols) {
+flatArray *gradientCalculation(flatArray *X, flatArray *loss) {
 
-    ccMatrixVectorDotProduct(X, loss, gradients, rows, cols);
-    cVectorDivide(gradients, cols, rows);
+    flatArray *gradients = X->dot(loss);
 
+    flatArray* result = gradients->divide(X->getCols());
+
+    delete gradients;
+
+    return result;
 }
 
 
-void updateWeights(PyObject* theta, const double* gradients, double learningRate, int size) {
+void updateWeights(flatArray *theta, flatArray *gradients, double learningRate, int size) {
 
     for (int i = 0; i < size; ++i) {
-        double theta_i = PyFloat_AsDouble(PyList_GetItem(theta, i));
-        theta_i -= gradients[i] * learningRate;
-        PyList_SetItem(theta, i, PyFloat_FromDouble(theta_i));
+        theta->setNElement(theta->getNElement(i) - gradients->getNElement(i) * learningRate,i);
     }
 }
 
 
-double calculateCost(PyObject* X, PyObject* theta, double* prediction, PyObject* y, double* loss, int n, int m) {
-    // first prediction
-    predict(X, theta, prediction, n, m);
+double calculateCost(flatArray *X, flatArray *theta, flatArray *y, char *predType) {
 
-    // calculate initial cost and store result
-    cPyVectorSubtract(prediction, y, loss, n);
-    return cost(loss, n);
+    double result;
+    flatArray *prediction = predict(X, theta);
+
+    if (strcmp(predType, "logit") == 0) {
+
+        result = logLikelihood(prediction, y);
+
+    }
+
+    else {
+
+        // calculate initial cost and store result
+        flatArray *loss = prediction->subtract(y);
+        result = cost(loss);
+
+        delete loss;
+
+    }
+
+    delete prediction;
+
+    return result;
 }
 
 
-int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration, double epsilon, double learningRate, int n, int m, double* costArray) {
+int gradientDescent(flatArray *X, flatArray *y, flatArray *theta, int maxIteration, double epsilon, double learningRate, flatArray* costArray, char *predType) {
 
-    // variable initialisation
+    // variable declaration
     double JOld;
     double JNew;
-    double** X_pyTranspose;
     int iteration = 0;
     double e = 1000;
-    double* prediction = nullptr;
-    double* loss = nullptr;
-    double* gradients = nullptr;
+    int m = X->getCols();
+    flatArray *XT;
 
-    // memory allocation
-    X_pyTranspose = new double *[m];
-    for (int i = 0; i < m; ++i) {
-        X_pyTranspose[i] = new double [n];
-    }
-
-    prediction = new double[n];
-    loss = new double[n];
-    gradients = new double[m];
 
     // X pyTranspose (m by n matrix)
     // X is a n by m matrix
-    pyTranspose(X, X_pyTranspose, n, m);
+    XT = X->transpose();
 
-    JNew = calculateCost(X, theta, prediction, y, loss, n, m);
-    costArray[iteration] = JNew;
+    JNew = calculateCost(X, theta, y, predType);
+    costArray->setNElement(JNew, iteration);
 
     // gradient descent
     while (fabs(e) >= epsilon and iteration < maxIteration) {
@@ -89,29 +112,35 @@ int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration,
         JOld = JNew;
 
         // calculate gradient
-        gradientCalculation(X_pyTranspose, loss, gradients, m, n);
+        flatArray *h = predict(X, theta);
+
+        if (strcmp(predType, "logit") == 0) {
+            sigmoid(h);
+        }
+
+        flatArray *error = h->subtract(y);
+
+        flatArray *gradients = gradientCalculation(XT, error);
 
         // update coefficients
         updateWeights(theta, gradients, learningRate, m);
 
         // calculate cost for new weights
-        JNew = calculateCost(X, theta, prediction, y, loss, n, m);
-        e = JOld - JNew;
-        costArray[iteration+1] = JNew;
+        JNew = calculateCost(X, theta, y, predType);
 
-        iteration += 1;
+        e = fabs(JOld) - fabs(JNew);
+
+        costArray->setNElement(JNew, iteration+1);
+
+        iteration++;
+
+        delete h;
+        delete error;
+        delete gradients;
     }
 
     // free up memory
-    for (int i = 0; i < m; ++i) {
-        delete [] X_pyTranspose[i];
-    }
-
-    delete [] prediction;
-    delete [] X_pyTranspose;
-    delete [] loss;
-    delete [] gradients;
-
+    delete XT;
 
     // return number of iterations needed to reach convergence
     return iteration;
@@ -121,27 +150,35 @@ int gradientDescent(PyObject* X, PyObject* y, PyObject* theta, int maxIteration,
 static PyObject *gradient_descent(PyObject *self, PyObject *args) {
 
     // variable declaration
-    int m;
-    int n;
-    PyObject* theta;
-    PyObject* X;
-    PyObject* y;
-    int maxIterations;
-    double epsilon;
-    double learningRate;
-    int iterations;
-    double* costArray = nullptr;
+    int m, n, maxIterations, iterations;
+    double epsilon, learningRate;
+    auto costArray = new flatArray;
+    auto X = new flatArray;
+    auto y = new flatArray;
+    auto theta = new flatArray;
+    char *predType;
+
+    PyObject* ptheta;
+    PyObject* pX;
+    PyObject* py;
+    PyObject* pyCostArray;
+    PyObject* pyTheta;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!O!idd", &PyList_Type, &X, &PyList_Type, &theta, &PyList_Type, &y, &maxIterations, &epsilon, &learningRate)) {
+    if(!PyArg_ParseTuple(args, "O!O!O!idds", &PyList_Type, &pX, &PyList_Type, &ptheta, &PyList_Type, &py, &maxIterations, &epsilon, &learningRate, &predType)) {
         PyErr_SetString(PyExc_TypeError, "Check arguments!");
         return nullptr;
     }
 
-    n = (int) PyList_Size(X);
-    m = (int) PyList_Size(PyList_GetItem(X, 0));
+    // read python lists
+    X->readFromPythonList(pX);
+    y->readFromPythonList(py);
+    theta->readFromPythonList(ptheta);
 
-    if (PyList_Size(theta) != m) {
+    n = X->getRows();
+    m = X->getCols();
+
+    if (PyList_Size(ptheta) != m) {
         PyErr_SetString(PyExc_ValueError, "Theta should be the same size as the number of features.");
         return nullptr;
     }
@@ -151,18 +188,29 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
         return nullptr;
     }
 
-    costArray = new double[maxIterations];
-    PyObject* pyCostArray;
+    // memory allocation
+    costArray->startEmptyArray(1, maxIterations);
 
-    iterations = gradientDescent(X, y, theta, maxIterations, epsilon, learningRate, n, m, costArray);
+    // gradient descent
+    iterations = gradientDescent(X, y, theta, maxIterations, epsilon, learningRate, costArray, predType);
 
-    pyCostArray = Convert_1DArray(costArray, iterations);
+    // costArray only needs #iterations columns
+    costArray->setCols(iterations);
 
-    delete [] costArray;
+    // convert cost array and theta to lists
+    pyCostArray = ConvertFlatArray_PyList(costArray, "float");
+    pyTheta = ConvertFlatArray_PyList(theta, "float");
 
-    PyObject* FinalResult = Py_BuildValue("OOi", theta, pyCostArray, iterations);
+    PyObject* FinalResult = Py_BuildValue("OOi", pyTheta, pyCostArray, iterations);
+
+    // memory deallocation
+    delete costArray;
+    delete theta;
+    delete y;
+    delete X;
 
     Py_DECREF(pyCostArray);
+    Py_DECREF(pyTheta);
 
     return FinalResult;
 }
@@ -175,7 +223,7 @@ static PyMethodDef gradientDescentMethods[] = {
         // Python name       C function              argument representation  description
         {"gradient_descent", gradient_descent,       METH_VARARGS,            "Gradient Descent"},
         {"version",          (PyCFunction)version,   METH_NOARGS,             "Returns version."},
-        {nullptr, nullptr, 0, nullptr}
+        {nullptr,            nullptr,                0,                       nullptr}
 };
 
 
