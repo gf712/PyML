@@ -63,6 +63,21 @@ class MathsTest(unittest.TestCase):
     def test_std_EmptyList_ValueError(self):
         self.assertRaises(ValueError, std, [])
 
+    def test_var_0(self):
+        self.assertAlmostEqual(variance(self.A, 0)[0], 0.09331773638462285)
+
+    def test_var_1(self):
+        self.assertAlmostEqual(variance(self.A, 1)[2], 0.06527551169388744)
+
+    def test_var_TypeError(self):
+        self.assertRaises(TypeError, variance, (1, 2, 3))
+
+    def test_var_TypeError_2(self):
+        self.assertRaises(TypeError, variance, [(1, 2, 3), (1, 2, 3)])
+
+    def test_var_EmptyList_ValueError(self):
+        self.assertRaises(ValueError, variance, [])
+
 
 class LinearAlgebraTest(unittest.TestCase):
 
