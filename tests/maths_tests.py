@@ -13,7 +13,6 @@ class MathsTest(unittest.TestCase):
         set_seed(1970)
 
         cls.A = [[random.random() for e in range(8)] for x in range(10)]
-        cls.B = [[random.random() for e in range(10)] for x in range(8)]
 
     def test_sort(self):
         array = [-5, 3, 10, 2, 1, -1]
@@ -24,6 +23,9 @@ class MathsTest(unittest.TestCase):
         array = [-5, 3, 10, 2, 1, -1]
         argsorted_array = argsort(array)
         self.assertEqual(argsorted_array, [0, 5, 4, 3, 1, 2])
+
+    def test_mean(self):
+        self.assertAlmostEqual(mean(self.A), 0.44745262883077663)
 
     def test_mean_0(self):
         self.assertAlmostEqual(mean(self.A, 0)[0], 0.44000517100025094)
@@ -45,6 +47,21 @@ class MathsTest(unittest.TestCase):
 
     def test_mean_EmptyList_ValueError(self):
         self.assertRaises(ValueError, mean, [])
+
+    def test_std_0(self):
+        self.assertAlmostEqual(std(self.A, 0)[0], 0.3054795187645529)
+
+    def test_std_1(self):
+        self.assertAlmostEqual(std(self.A, 1)[2], 0.2554907272170312)
+
+    def test_std_TypeError(self):
+        self.assertRaises(TypeError, std, (1, 2, 3))
+
+    def test_std_TypeError_2(self):
+        self.assertRaises(TypeError, std, [(1, 2, 3), (1, 2, 3)])
+
+    def test_std_EmptyList_ValueError(self):
+        self.assertRaises(ValueError, std, [])
 
 
 class LinearAlgebraTest(unittest.TestCase):
