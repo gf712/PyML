@@ -280,20 +280,20 @@ static PyObject* mean(PyObject* self, PyObject *args) {
 static PyObject* standardDeviation(PyObject* self, PyObject *args) {
 
     // variable declaration
-    int axis;
+    int axis, degreesOfFreedom;
     PyObject *pX;
     auto X = new flatArray;
     PyObject *FinalResult = nullptr;
 
     // return error if we don't get all the arguments
-    if (!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pX, &axis)) {
+    if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &degreesOfFreedom, &axis)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list and one integer!");
         return nullptr;
     }
 
     X->readFromPythonList(pX);
 
-    flatArray *result = X->std(axis);
+    flatArray *result = X->std(degreesOfFreedom, axis);
 
     if (X->getRows() == 1) {
 
@@ -320,20 +320,20 @@ static PyObject* standardDeviation(PyObject* self, PyObject *args) {
 static PyObject* variance(PyObject* self, PyObject *args) {
 
     // variable declaration
-    int axis;
+    int axis, degreesOfFreedom;
     PyObject *pX;
     auto X = new flatArray;
     PyObject *FinalResult = nullptr;
 
     // return error if we don't get all the arguments
-    if (!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pX, &axis)) {
-        PyErr_SetString(PyExc_TypeError, "Expected a list and one integer!");
+    if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &degreesOfFreedom, &axis)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and two integers!");
         return nullptr;
     }
 
     X->readFromPythonList(pX);
 
-    flatArray *result = X->var(axis);
+    flatArray *result = X->var(degreesOfFreedom, axis);
 
     if (X->getRows() == 1) {
 

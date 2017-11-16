@@ -63,7 +63,7 @@ def mean(array, axis=None):
         raise TypeError("Expected a list")
 
 
-def std(array, axis=None):
+def std(array, degrees_of_freedom=0, axis=None):
 
     """
     numpy style standard deviation of array
@@ -77,13 +77,13 @@ def std(array, axis=None):
             if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
                 # in this case we have a 2D matrix
                 if axis == 1 or axis == 0:
-                    return Cstd(array, axis)
+                    return Cstd(array, degrees_of_freedom, axis)
                 else:
                     raise NotImplementedError("This is not the code you are looking for.")
 
             elif isinstance(array[0], (int, float)):
                 # in this case we have a vector
-                return Cstd(array, 0)
+                return Cstd(array, degrees_of_freedom, 0)
 
             else:
                 raise TypeError("Expected a list of lists or a list of int/floats")
@@ -94,7 +94,7 @@ def std(array, axis=None):
         raise TypeError("Expected a list")
 
 
-def variance(array, axis=None):
+def variance(array, degrees_of_freedom=0, axis=None):
 
     """
     numpy style standard deviation of array
@@ -108,13 +108,13 @@ def variance(array, axis=None):
             if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
                 # in this case we have a 2D matrix
                 if axis == 1 or axis == 0:
-                    return Cvariance(array, axis)
+                    return Cvariance(array, degrees_of_freedom, axis)
                 else:
                     raise NotImplementedError("This is not the code you are looking for.")
 
             elif isinstance(array[0], (int, float)):
                 # in this case we have a vector
-                return Cvariance(array, 0)
+                return Cvariance(array, degrees_of_freedom, 0)
 
             else:
                 raise TypeError("Expected a list of lists or a list of int/floats")

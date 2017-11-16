@@ -361,11 +361,11 @@ flatArray *flatArray::mean(int axis) {
     return result;
 }
 
-flatArray *flatArray::std(int axis) {
+flatArray *flatArray::std(int degreesOfFreedom, int axis) {
 
     auto result = new flatArray;
 
-    flatArray *arrayVar = var(axis);
+    flatArray *arrayVar = var(degreesOfFreedom, axis);
 
     if (rows == 1) {
         // vector
@@ -408,7 +408,7 @@ flatArray *flatArray::std(int axis) {
 }
 
 
-flatArray *flatArray::var(int axis) {
+flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
     auto result = new flatArray;
 
@@ -426,7 +426,7 @@ flatArray *flatArray::var(int axis) {
             rowResult += pow(array[i] - arrayMean_i, 2);
         }
 
-        rowResult /= (double) (size);
+        rowResult /= (double) (size - degreesOfFreedom);
 
         result->setNElement(rowResult, 0);
     }
@@ -450,7 +450,7 @@ flatArray *flatArray::var(int axis) {
                     colResult += pow(colArray[j] - colMean, 2);
                 }
 
-                colResult /= (double) (rows);
+                colResult /= (double) (rows - degreesOfFreedom);
 
                 result->setNElement(colResult, i);
 
@@ -477,7 +477,7 @@ flatArray *flatArray::var(int axis) {
                     rowResult += pow(rowArray[j] - rowMean, 2);
                 }
 
-                rowResult /= (double) (cols);
+                rowResult /= (double) (cols - degreesOfFreedom);
 
                 result->setNElement(rowResult, i);
 

@@ -60,8 +60,8 @@ public:
     flatArray *multiply(flatArray *other);
     flatArray *nlog(double base);
     flatArray *mean(int axis);
-    flatArray *std(int axis);
-    flatArray *var(int axis);
+    flatArray *std(int degreesOfFreedom, int axis);
+    flatArray *var(int degreesOfFreedom, int axis);
 };
 
 #ifdef __cplusplus

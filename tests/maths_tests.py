@@ -28,16 +28,16 @@ class MathsTest(unittest.TestCase):
         self.assertAlmostEqual(mean(self.A), 0.44745262883077663)
 
     def test_mean_0(self):
-        self.assertAlmostEqual(mean(self.A, 0)[0], 0.44000517100025094)
+        self.assertAlmostEqual(mean(self.A, axis=0)[0], 0.44000517100025094)
 
     def test_mean_0_shape(self):
         self.assertEqual(len(mean(self.A, 0)), 8)
 
     def test_mean_1(self):
-        self.assertAlmostEqual(mean(self.A, 1)[5], 0.5668557306974099)
+        self.assertAlmostEqual(mean(self.A, axis=1)[5], 0.5668557306974099)
 
     def test_mean_1_shape(self):
-        self.assertEqual(len(mean(self.A, 1)), 10)
+        self.assertEqual(len(mean(self.A, axis=1)), 10)
 
     def test_mean_TypeError(self):
         self.assertRaises(TypeError, mean, (1, 2, 3))
@@ -49,10 +49,10 @@ class MathsTest(unittest.TestCase):
         self.assertRaises(ValueError, mean, [])
 
     def test_std_0(self):
-        self.assertAlmostEqual(std(self.A, 0)[0], 0.3054795187645529)
+        self.assertAlmostEqual(std(self.A, axis=0)[0], 0.3054795187645529)
 
     def test_std_1(self):
-        self.assertAlmostEqual(std(self.A, 1)[2], 0.2554907272170312)
+        self.assertAlmostEqual(std(self.A, axis=1)[2], 0.2554907272170312)
 
     def test_std_TypeError(self):
         self.assertRaises(TypeError, std, (1, 2, 3))
@@ -64,10 +64,10 @@ class MathsTest(unittest.TestCase):
         self.assertRaises(ValueError, std, [])
 
     def test_var_0(self):
-        self.assertAlmostEqual(variance(self.A, 0)[0], 0.09331773638462285)
+        self.assertAlmostEqual(variance(self.A, axis=0)[0], 0.09331773638462285)
 
     def test_var_1(self):
-        self.assertAlmostEqual(variance(self.A, 1)[2], 0.06527551169388744)
+        self.assertAlmostEqual(variance(self.A, axis=1)[2], 0.06527551169388744)
 
     def test_var_TypeError(self):
         self.assertRaises(TypeError, variance, (1, 2, 3))
