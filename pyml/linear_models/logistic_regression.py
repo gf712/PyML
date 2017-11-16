@@ -1,6 +1,7 @@
 from .base import LinearBase
 from ..base import Classifier
-from ..maths import dot_product, gradient_descent, sigmoid
+from ..maths import dot_product, sigmoid
+from ..maths.optimisers import gradient_descent
 from pyml.metrics.scores import accuracy
 from ..utils import set_seed
 
@@ -33,13 +34,9 @@ class LogisticRegression(LinearBase, Classifier):
         self._n_features = len(X[0])
 
         self._initiate_weights(bias=self.bias)
-        self._coefficients, self._cost, self._iterations = gradient_descent.gradient_descent(self.X,
-                                                                                             self.coefficients,
-                                                                                             self.y,
-                                                                                             self.max_iterations,
-                                                                                             self.epsilon,
-                                                                                             self._learning_rate,
-                                                                                             'logit')
+        self._coefficients, self._cost, self._iterations = gradient_descent(self.X, self.coefficients, self.y,
+                                                                            self.max_iterations, self.epsilon,
+                                                                            self._learning_rate, 'logit')
 
     def _predict(self, X):
         if self.bias and len(X[0]) == self._n_features + 1:

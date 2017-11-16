@@ -18,10 +18,6 @@ static PyObject* quick_sort(PyObject* self, PyObject *args) {
     PyObject* pA;
 
     // return error if we don't get all the arguments
-//    if (!PyArg_ParseTuple(args, "O!", &PyList_Type, &pA)) {
-//        PyErr_SetString(PyExc_TypeError, "Expected one lists and an integer!");
-//        return nullptr;
-//    }
     if (!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pA, &axis)) {
         PyErr_SetString(PyExc_TypeError, "Expected one lists and an integer!");
         return nullptr;

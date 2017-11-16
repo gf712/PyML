@@ -1,5 +1,6 @@
 from .base import LinearBase
-from ..maths import dot_product, least_squares, gradient_descent
+from ..maths import dot_product, least_squares
+from ..maths.optimisers import gradient_descent
 from pyml.metrics.scores import mean_squared_error, mean_absolute_error
 from ..utils import set_seed
 
@@ -35,13 +36,9 @@ class LinearRegression(LinearBase):
 
         if self._solver == 'gradient_descent':
             self._initiate_weights(bias=self.bias)
-            self._coefficients, self._cost, self._iterations = gradient_descent.gradient_descent(self.X,
-                                                                                                 self.coefficients,
-                                                                                                 self.y,
-                                                                                                 self.max_iterations,
-                                                                                                 self.epsilon,
-                                                                                                 self._learning_rate,
-                                                                                                 'rgrs')
+            self._coefficients, self._cost, self._iterations = gradient_descent(self.X, self.coefficients, self.y,
+                                                                                self.max_iterations, self.epsilon,
+                                                                                self._learning_rate, 'rgrs')
         else:
             if self.bias:
                 self.X = [[1] + row for row in self.X]
