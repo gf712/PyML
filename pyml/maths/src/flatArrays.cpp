@@ -491,6 +491,46 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
     return result;
 }
+
+double *flatArray::getRowSlice(int i, int start, int end) {
+    double *row = getRow(i);
+    double *result = nullptr;
+
+    result = new double [end - start];
+
+    int n = 0;
+    for (int j = start; j < end; ++j) {
+
+        result[n] = row[j];
+
+        n++;
+    }
+
+    delete row;
+
+    return result;
+}
+
+double *flatArray::getColSlice(int j, int start, int end) {
+    double *col = getCol(j);
+    double *result = nullptr;
+
+    result = new double[end - start];
+
+
+    int n = 0;
+    for (int i = start; i < end; ++i) {
+
+        result[n] = col[i];
+
+        n++;
+    }
+
+    delete col;
+
+    return result;
+}
+
 double *flatArray::diagonal() {
     double *result = nullptr;
 
