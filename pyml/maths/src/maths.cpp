@@ -71,3 +71,32 @@ void quicksort(double* array, double* order, int low, int high) {
         quicksort(array, order, p + 1, high);
     }
 }
+
+int argmax(const double *array, int size) {
+
+    int result = 0;
+    double max = array[result];
+
+    for (int i = 1; i < size; ++i) {
+        if (array[i] > max) {
+            result = i;
+        }
+    }
+
+    return result;
+}
+
+
+int argmin(const double *array, int size) {
+
+    int result = 0;
+    double min = array[result];
+
+    for (int i = 1; i < size; ++i) {
+        if (array[i] < min) {
+            result = i;
+        }
+    }
+
+    return result;
+}

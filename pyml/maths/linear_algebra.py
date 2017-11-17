@@ -1,4 +1,5 @@
 from pyml.maths import Clinear_algebra
+from pyml.maths.math_utils import argsort
 
 
 def dot_product(u, v):
@@ -68,3 +69,22 @@ def divide(u, n):
 def least_squares(X, y):
     # TODO: write exceptions to help user with errors from the backend
     return Clinear_algebra.least_squares(X, y)
+
+
+def eigen(array, tolerance=1.0e-9, max_iterations=0, normalise=True):
+    # TODO: write exceptions to help user with errors from the backend
+
+    if normalise:
+        E, v = Clinear_algebra.eigen_solve(array, tolerance, max_iterations)
+
+        # sort eigenvalues and eigenvectors
+        idx = argsort(E)
+        E = [E[i] for i in idx]
+        v = [[x[i] for i in idx] for x in v]
+
+        v = [[x[i] / v[0][i] for i in range(len(x))] for x in v]
+
+        return E, v
+
+    else:
+        return Clinear_algebra.eigen_solve(array, tolerance, max_iterations)

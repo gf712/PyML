@@ -55,6 +55,7 @@ static PyObject* power(PyObject* self, PyObject *args) {
 
     // variable declaration
     auto A = new flatArray;
+    auto result = new flatArray;
     int p;
 
     // pointers to python lists
@@ -71,10 +72,10 @@ static PyObject* power(PyObject* self, PyObject *args) {
     A->readFromPythonList(pAArray);
 
     // calculate the power elementwise
-    flatMatrixPower(A, p);
+    result = A->power(p);
 
     // convert vector to python list
-    PyObject* result_py_list = ConvertFlatArray_PyList(A, "float");
+    PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
 
     // build python object
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
@@ -241,94 +242,190 @@ static PyObject* mean(PyObject* self, PyObject *args) {
     // variable declaration
     int axis;
     PyObject *pX;
+    auto X = new flatArray;
+    PyObject *FinalResult = nullptr;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pX, &axis)) {
+    if (!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pX, &axis)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list and one integer!");
         return nullptr;
     }
 
-    if (PyFloat_Check(PyList_GetItem(pX, 0))) {
-        // if the first element is a float we assume this is a 1D array/vector
+    X->readFromPythonList(pX);
 
-        // variable declaration
-        double result = 0;
-        double* X = nullptr;
-        int cols;
+    flatArray *result = X->mean(axis);
 
-        // get size of array
-        cols = static_cast<int> PyList_GET_SIZE(pX);
+    if (X->getRows() == 1) {
 
-        // memory allocation
-        X = new double[cols];
+        FinalResult = Py_BuildValue("d", result->getNElement(0));
 
-        convertPy_1DArray(pX, X, cols);
-
-        result = vectorMean(X, cols);
-
-        PyObject *FinalResult = Py_BuildValue("d", result);
-
-        // memory deallocation
-        delete [] X;
-
-        return FinalResult;
     }
-    else if (PyList_Check(PyList_GET_ITEM(pX, 0))){
-        // if it is a list we assume this is a 2D array/matrix
 
-        // variable declaration
-        int rows, cols;
-        double* result = nullptr;
-        double **X = nullptr;
-        PyObject *result_py_list;
+    else {
 
-        // get size of array
-        rows = static_cast<int> PyList_GET_SIZE(pX);
-        cols = static_cast<int> PyList_GET_SIZE(PyList_GET_ITEM(pX, 0));
+        PyObject *result_py_list = ConvertFlatArray_PyList(result, "float");
 
-        // memory allocation
-        X = new double *[rows];
-        for (int i = 0; i < rows; ++i) {
-            X[i] = new double [cols];
-        }
-
-        if (axis == 0) {
-            result = new double[cols];
-        }
-        else {
-            result = new double[rows];
-        }
-
-        convertPy_2DArray(pX, X, rows, cols);
-
-        matrixMean(X, cols, rows, axis, result);
-
-        if (axis == 0) {
-            result_py_list = Convert_1DArray(result, cols);
-        }
-        else {
-            result_py_list = Convert_1DArray(result, rows);
-        }
-
-        PyObject *FinalResult = Py_BuildValue("O", result_py_list);
-
-        // memory deallocation
-        for (int j = 0; j < rows; ++j) {
-            delete [] X[j];
-        }
-        delete [] X;
-
-        delete [] result;
+        FinalResult = Py_BuildValue("O", result_py_list);
 
         Py_DECREF(result_py_list);
-
-        return FinalResult;
-
     }
-    else {
-        PyErr_SetString(PyExc_TypeError, "Can only handle 2D float arrays at the moment!");
+
+    delete X;
+    delete result;
+
+    return FinalResult;
+}
+
+
+static PyObject* standardDeviation(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    int axis, degreesOfFreedom;
+    PyObject *pX;
+    auto X = new flatArray;
+    PyObject *FinalResult = nullptr;
+
+    // return error if we don't get all the arguments
+    if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &degreesOfFreedom, &axis)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and one integer!");
         return nullptr;
     }
+
+    X->readFromPythonList(pX);
+
+    flatArray *result = X->std(degreesOfFreedom, axis);
+
+    if (X->getRows() == 1) {
+
+        FinalResult = Py_BuildValue("d", result->getNElement(0));
+
+    }
+
+    else {
+
+        PyObject *result_py_list = ConvertFlatArray_PyList(result, "float");
+
+        FinalResult = Py_BuildValue("O", result_py_list);
+
+        Py_DECREF(result_py_list);
+    }
+
+    delete X;
+    delete result;
+
+    return FinalResult;
+}
+
+
+static PyObject* variance(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    int axis, degreesOfFreedom;
+    PyObject *pX;
+    auto X = new flatArray;
+    PyObject *FinalResult = nullptr;
+
+    // return error if we don't get all the arguments
+    if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &degreesOfFreedom, &axis)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and two integers!");
+        return nullptr;
+    }
+
+    X->readFromPythonList(pX);
+
+    flatArray *result = X->var(degreesOfFreedom, axis);
+
+    if (X->getRows() == 1) {
+
+        FinalResult = Py_BuildValue("d", result->getNElement(0));
+
+    }
+
+    else {
+
+        PyObject *result_py_list = ConvertFlatArray_PyList(result, "float");
+
+        FinalResult = Py_BuildValue("O", result_py_list);
+
+        Py_DECREF(result_py_list);
+    }
+
+    delete X;
+    delete result;
+
+    return FinalResult;
+}
+
+
+static PyObject* cov(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    PyObject *pX;
+    auto X = new flatArray;
+    PyObject *FinalResult = nullptr;
+
+    // return error if we don't get all the arguments
+    if (!PyArg_ParseTuple(args, "O!", &PyList_Type, &pX)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list!");
+        return nullptr;
+    }
+
+    X->readFromPythonList(pX);
+
+    flatArray *result = covariance(X);
+
+    PyObject *result_py_list = ConvertFlatArray_PyList(result, "float");
+
+    FinalResult = Py_BuildValue("O", result_py_list);
+
+    Py_DECREF(result_py_list);
+
+    delete X;
+    delete result;
+
+    return FinalResult;
+}
+
+
+static PyObject* eigenSolve(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    int maxIterations;
+    double tolerance;
+    auto X = new flatArray;
+    auto eigFArray = new flatArray;
+
+    PyObject *pX;
+    PyObject *FinalResult = nullptr;
+
+    // return error if we don't get all the arguments
+    if (!PyArg_ParseTuple(args, "O!di", &PyList_Type, &pX, &tolerance, &maxIterations)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list, a float and an integer!");
+        return nullptr;
+    }
+
+    X->readFromPythonList(pX);
+
+    flatArray *result = jacobiEigenDecomposition(X, tolerance, maxIterations);
+
+    PyObject *eigV = Convert_1DArray(result->getRow(0), result->getCols());
+
+    eigFArray->startEmptyArray(result->getCols(), result->getCols());
+    for (int i = 1; i < result->getRows(); ++i) {
+        eigFArray->setRow(result->getRow(i), i - 1);
+    }
+
+    PyObject *eigE = ConvertFlatArray_PyList(eigFArray, "float");
+
+    FinalResult = Py_BuildValue("OO", eigV, eigE);
+
+    Py_DECREF(eigE);
+
+    delete X;
+    delete result;
+    delete eigFArray;
+
+    return FinalResult;
 }
 
 
@@ -346,6 +443,10 @@ static PyMethodDef linearAlgebraMethods[] = {
         {"transpose",     pyTranspose,            METH_VARARGS,            "Transpose a 2D matrix"},
         {"least_squares", least_squares,          METH_VARARGS,            "Perform least squares"},
         {"Cmean",         mean,                   METH_VARARGS,            "Numpy style array mean"},
+        {"Cstd",          standardDeviation,      METH_VARARGS,            "Numpy style array standard deviation"},
+        {"Cvariance",     variance,               METH_VARARGS,            "Numpy style array variance"},
+        {"Ccovariance",   cov,                    METH_VARARGS,            "Calculate covariance matrix"},
+        {"eigen_solve",   eigenSolve,             METH_VARARGS,            "Eigendecomposition of symmetric matrix"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {nullptr, nullptr, 0, nullptr}
 };

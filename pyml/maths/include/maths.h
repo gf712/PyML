@@ -11,6 +11,8 @@ extern "C" {
 
 void permutations(double* array, double** result, int size);
 void quicksort(double* array, double* order, int low, int high);
+int argmax(const double *array, int size);
+int argmin(const double *array, int size);
 
 #ifdef __cplusplus
 }

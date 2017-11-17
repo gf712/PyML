@@ -2,90 +2,14 @@
 // Created by Gil Ferreira Hoben on 07/11/17.
 //
 
-
 #include <flatArrays.h>
-#include <Python.h>
 #include "linearalgebramodule.h"
+#include "maths.h"
 #include <iostream>
+#include <Python.h>
 
 // Handle errors
 // static PyObject *algebraError;
-
-double dotProduct(const double* u, const double* v, int size) {
-
-    double result = 0;
-
-    for (int i = 0; i < size; ++i) {
-
-        result += v[i] * u[i];
-    }
-
-    return result;
-}
-
-
-void matrixVectorDotProduct(double** A, double* v, int ASize, int VSize, double* result) {
-
-    for (int i = 0; i < ASize ; ++i) {
-
-        result[i] = dotProduct(A[i], v, VSize);
-
-    }
-
-}
-
-
-void flatMatrixPower(flatArray *A, int p) {
-    for (int n = 0; n < A->getSize(); ++n) {
-        A->setNElement(pow(A->getNElement(n), p), n);
-    }
-}
-
-
-void vectorSubtract(const double* u, const double* v, int size, double* result) {
-
-    for (int i = 0; i < size; ++i) {
-
-        result[i] = u[i] - v[i];
-
-    }
-}
-
-void flatArraySubtract(flatArray *A, flatArray *B, flatArray *result) {
-
-    for (int n = 0; n < A->getSize(); ++n) {
-        result->setNElement(A->getNElement(n) - B->getNElement(n), n);
-    }
-}
-
-double vectorSum(const double* array, int rows) {
-
-    double result=0;
-
-    for (int i = 0; i < rows; ++i) {
-        result += array[i];
-    }
-
-    return result;
-}
-
-
-void vectorDivide(double* X, int n, int size) {
-    for (int i = 0; i < size; ++i) {
-        X[i] /= (double)n;
-    }
-}
-
-
-void matrixTranspose(double** X, double** result, int rows, int cols, int block_size) {
-
-//    #pragma omp parallel for
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            result[j][i] = X[i][j];
-        }
-    }
-}
 
 
 void maximumSearch(double* vector, int size, int i, double* result) {
@@ -233,37 +157,224 @@ void leastSquares(flatArray *X, flatArray *y, double *theta) {
 }
 
 
-double vectorMean(const double* array, int size) {
+flatArray *covariance(flatArray *X) {
 
-    double result = 0;
+    // variable declaration
+    auto covMatrix = new flatArray;
+    int cols, rows;
+    flatArray *XVar = nullptr;
+    double *XVecMean = nullptr;
+    double *Vec1 = nullptr;
+    double *Vec2 = nullptr;
+    auto vecProd = new flatArray;
 
-    for (int i = 0; i < size; ++i) {
-        result += array[i];
+    // get number of cols and rows (quicker than calling getter all the time)
+    cols = X->getCols();
+    rows = X->getRows();
+
+    // initialise covariance matrix
+    // if X is a n by m matrix
+    // the covariance matrix is m by m
+    covMatrix->startEmptyArray(cols, cols);
+
+    // get mean and variance of each column
+    XVecMean = X->mean(0)->getArray();
+    XVar = X->var(0, 0);
+
+    vecProd->startEmptyArray(1, rows);
+
+    for (int i = 0; i < cols; ++i) {
+        // the diagonal of the covariance matrix is the column wise variance of X
+        covMatrix->setNElement(XVar->getNElement(i), i + i * cols);
+
+        // get ith vector
+        Vec1 = X->getCol(i);
+
+        // only need to calculate the upper triangle
+        for (int j = cols - 1; j > i; --j) {
+
+            // get jth vector
+            Vec2 = X->getCol(j);
+
+            for (int k = 0; k < rows; ++k) {
+                vecProd->setNElement(Vec1[k] * Vec2[k], k);
+            }
+
+            // cov(X, Y) = E(X*Y) - E(X)*E(Y)
+            // where X is the ith vector and Y the jth vector
+            double result = vecProd->mean(0)->getNElement(0) - XVecMean[i] * XVecMean[j];
+
+            // set S(i, j) = S(j, i) = cov(i, j)
+            covMatrix->setNElement(result, i * cols + j);
+            covMatrix->setNElement(result, j * cols + i);
+        }
     }
 
-    return result / static_cast<double>(size);
+    // memory dellocation
+    delete XVecMean;
+    delete Vec1;
+    delete Vec2;
+    delete XVar;
+    delete vecProd;
 
+    return covMatrix;
+}
+
+double *maxElementOffDiag(flatArray *S) {
+
+    double *result = nullptr;
+    double *row = nullptr;
+    int n = S->getCols();
+
+    result = new double[3];
+
+    for (int k = 0; k < n; ++k) {
+
+        row = S->getRowSlice(k, k + 1, n);
+
+        int j = 0;
+        for (int i = k + 1; i < n; ++i) {
+
+            if (fabs(row[j]) >= result[0]) {
+                result[0] = fabs(row[j]);
+                result[1] = k;
+                result[2] = i;
+            }
+            j++;
+        }
+    }
+
+    return result;
 }
 
 
-void matrixMean(double** array, int cols, int rows, int axis, double* result) {
+flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxIterations) {
 
-    if (axis == 0) {
-        // mean of each column
+    // Implementation of the Jacobi rotation algorithm
+    // https://en.wikipedia.org/wiki/Jacobi_eigenvalue_algorithm
+    // http://www.southampton.ac.uk/~feeg6002/lecturenotes/feeg6002_numerical_methods08.pdf
+    //
+    // if S is a n by n matrix, then:
+    // return a flatMatrix (n + 1 by n) with the first row corresponding to the eigenvalues (n-dimensional vector)
+    // and below are the eigenvector (n by n matrix)
 
-        for (int i = 0; i < cols; ++i) {
-            result[i] = 0;
-            for (int j = 0; j < rows; ++j) {
-                result[i] += array[j][i];
+    int l, k;
+    double s, c, t, y, temp, diff, phi;
+
+    auto E = new flatArray;
+    auto result = new flatArray;
+    double *maxValues = nullptr;
+
+    // number of rows
+    int n = S->getRows();
+
+    // set max iterations to 5 * n ** 2 if this value is not set
+    if (maxIterations == 0) {
+        maxIterations = 5 * pow(n, 2);
+    }
+
+    // initialise e, E, ind and changed
+    // memory allocation
+    E->startEmptyArray(n, n);
+    result->startEmptyArray(n + 1, n);
+
+
+    // initialise values
+    for (int i = 0; i < n; ++i) {
+        E->setNElement(1, i * n + i);
+    }
+
+    int iteration = 0;
+
+    while (iteration < maxIterations) {
+
+        //  get max values off the diagonal
+        maxValues = maxElementOffDiag(S);
+        k = (int) maxValues[1];
+        l = (int) maxValues[2];
+
+        if (maxValues[0] < tolerance) {
+            // found convergence
+            break;
+        }
+
+        // Jacobi rotation
+        diff = S->getNElement(l * n + l) - S->getNElement(k * n + k);
+
+        if (fabs(S->getNElement(k * n + l)) < fabs(diff) * 1.0e-40) {
+            y = S->getNElement(k * n + l) / diff;
+        }
+        else {
+            phi = diff / (2 * S->getNElement(k * n + l));
+            y = 1.0 / (fabs(phi) + sqrt(pow(phi, 2) + 1.0));
+            if (phi < 0) {
+                y = -y;
             }
-            result[i] /= rows;
         }
+
+
+        c = 1.0 / sqrt(pow(y, 2) + 1);
+        s = y * c;
+        t = s / (1 + c);
+
+        temp = S->getNElement(k * n + l);
+
+        S->setNElement(0, k * n + l);
+        S->setNElement(S->getNElement(k * n + k) - y * temp, k * n + k);
+        S->setNElement(S->getNElement(l * n + l) + y * temp, l * n + l);
+
+
+        for (int i = 0; i < k; ++i) {
+            // temp = a[i,k]
+            // a[i,k] = temp - s*(a[i,l] + tau*temp)
+            // a[i,l] = a[i,l] + s*(temp - tau*a[i,l])
+            temp = S->getNElement(i * n + k);
+            S->setNElement(temp - s*(S->getNElement(i * n + l) + t * temp), i * n + k);
+            S->setNElement(S->getNElement(i * n + l) + s * (temp - t * S->getNElement(i * n + l)), i * n + l);
+        }
+
+        for (int i = k + 1; i < l; ++i) {
+            //  temp = a[k,i]
+            // a[k,i] = temp - s*(a[i,l] + tau*a[k,i])
+            // a[i,l] = a[i,l] + s*(temp - tau*a[i,l])
+            temp = S->getNElement(k * n + i);
+            S->setNElement(temp - s * (S->getNElement(i * n + l) + t * S->getNElement(k * n + i)), k * n + i);
+            S->setNElement(S->getNElement(i * n + l) + s * (temp - t * S->getNElement(i * n + l)), i * n + l);
+
+        }
+
+        for (int i = l + 1; i < n; ++i) {
+            // temp = a[k,i]
+            // a[k,i] = temp - s*(a[l,i] + tau*temp)
+            // a[l,i] = a[l,i] + s*(temp - tau*a[l,i])
+            temp = S->getNElement(k * n + i);
+            S->setNElement(temp - s * (S->getNElement(n * l + i) + t * temp), k * n + i);
+            S->setNElement(S->getNElement(l * n + i) + s * (temp - t * S->getNElement(l * n + i)), l * n + i);
+        }
+
+        for (int i = 0; i < n; ++i) {
+            // temp = p[i,k]
+            // p[i,k] = temp - s*(p[i,l] + tau*p[i,k])
+            // p[i,l] = p[i,l] + s*(temp - tau*p[i,l])
+            temp = E->getNElement(i * n + k);
+            E->setNElement(temp - s * (E->getNElement(i * n + l) + t * E->getNElement(i * n + k)), i * n + k);
+            E->setNElement(E->getNElement(i * n + l) + s * (temp - t * E->getNElement(i * n + l)), i * n + l);
+        }
+
+        iteration++;
     }
 
-    else {
-        // mean of each row
-        for (int i = 0; i < rows; ++i) {
-            result[i] = vectorMean(array[i], cols);
-        }
+    // the diagonal of S has the eigenvalues
+    result->setRow(S->diagonal(), 0);
+
+    for (int j = 1; j < n + 1; ++j) {
+        result->setRow(E->getRow(j -1), j );
     }
+
+    // memory deallocation
+    delete [] maxValues;
+    delete E;
+
+
+    return result;
 }

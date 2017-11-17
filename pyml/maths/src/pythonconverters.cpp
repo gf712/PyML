@@ -109,7 +109,7 @@ PyObject* ConvertFlatArray_PyList(flatArray *array, const char pyType[5]) {
     if (result != nullptr) {
         if (array->getRows() > 1) {
 
-            if (pyType == "int") {
+            if (strcmp(pyType, "int") == 0) {
 
                 for (int j = 0; j < array->getRows(); ++j) {
 
@@ -150,7 +150,7 @@ PyObject* ConvertFlatArray_PyList(flatArray *array, const char pyType[5]) {
 
         else {
 
-            if (pyType == "int") {
+            if (strcmp(pyType, "int") == 0) {
                 for (int k = 0; k < array->getCols(); ++k) {
                     item = PyLong_FromDouble(array->getNElement(k));
                     PyList_SET_ITEM(result, k, item);

@@ -51,6 +51,9 @@ public:
     void setRow(double *row, int i);
     void setCol(double *row, int j);
 
+    double *getRowSlice(int i, int start, int end);
+    double *getColSlice(int j, int start, int end);
+
     flatArray* transpose();
     double sum();
     flatArray *dot(flatArray *other);
@@ -59,6 +62,11 @@ public:
     flatArray *divide(double m);
     flatArray *multiply(flatArray *other);
     flatArray *nlog(double base);
+    flatArray *mean(int axis);
+    flatArray *std(int degreesOfFreedom, int axis);
+    flatArray *var(int degreesOfFreedom, int axis);
+
+    double *diagonal();
 };
 
 #ifdef __cplusplus
