@@ -62,6 +62,8 @@ public:
     flatArray *mean(int axis);
     flatArray *std(int degreesOfFreedom, int axis);
     flatArray *var(int degreesOfFreedom, int axis);
+
+    double *diagonal();
 };
 
 #ifdef __cplusplus

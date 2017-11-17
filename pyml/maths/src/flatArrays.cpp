@@ -491,3 +491,14 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
     return result;
 }
+double *flatArray::diagonal() {
+    double *result = nullptr;
+
+    result = new double [rows];
+
+    for (int i = 0; i < rows; ++i) {
+        result[i] = array[i + i * rows];
+    }
+
+    return result;
+}
