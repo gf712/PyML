@@ -55,7 +55,6 @@ static PyObject* power(PyObject* self, PyObject *args) {
 
     // variable declaration
     auto A = new flatArray;
-    auto result = new flatArray;
     int p;
 
     // pointers to python lists
@@ -72,7 +71,7 @@ static PyObject* power(PyObject* self, PyObject *args) {
     A->readFromPythonList(pAArray);
 
     // calculate the power elementwise
-    result = A->power(p);
+    flatArray *result = A->power(p);
 
     // convert vector to python list
     PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
@@ -215,14 +214,12 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
     }
 
     // memory allocation of theta
-//    theta->startEmptyArray(1, X->getCols());
     auto theta = new double [X->getCols()];
 
+    // get theta estimate using least squares
     leastSquares(X, y, theta);
-//    flatArray *result = leastSquares(X, y, theta);
 
     result_py_list = Convert_1DArray(theta, X->getCols());
-//    result_py_list = ConvertFlatArray_PyList(A);
 
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
 
@@ -420,6 +417,7 @@ static PyObject* eigenSolve(PyObject* self, PyObject *args) {
     FinalResult = Py_BuildValue("OO", eigV, eigE);
 
     Py_DECREF(eigE);
+    Py_DECREF(eigV);
 
     delete X;
     delete result;
