@@ -220,17 +220,17 @@ flatArray *covariance(flatArray *X) {
     return covMatrix;
 }
 
-double *maxElementOffDiag(flatArray *S) {
+void *maxElementOffDiag(flatArray *S, double result[3]) {
 
-    double *result = nullptr;
-    double *row = nullptr;
     int n = S->getCols();
 
-    result = new double[3];
+    result[0] = 0;
+    result[1] = 0;
+    result[2] = 0;
 
     for (int k = 0; k < n; ++k) {
 
-        row = S->getRowSlice(k, k + 1, n);
+        double *row = S->getRowSlice(k, k + 1, n);
 
         int j = 0;
         for (int i = k + 1; i < n; ++i) {
@@ -242,13 +242,16 @@ double *maxElementOffDiag(flatArray *S) {
             }
             j++;
         }
+
+        delete [] row;
+
     }
 
     return result;
 }
 
 
-flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxIterations) {
+flatArray *jacobiEigendecomposition(flatArray *S, double tolerance, int maxIterations) {
 
     // Implementation of the Jacobi rotation algorithm
     // https://en.wikipedia.org/wiki/Jacobi_eigenvalue_algorithm
@@ -260,10 +263,11 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
 
     int l, k;
     double s, c, t, y, temp, diff, phi;
+    double *maxValues = nullptr;
 
+    maxValues = new double[3];
     auto E = new flatArray;
     auto result = new flatArray;
-    double *maxValues = nullptr;
 
     // number of rows
     int n = S->getRows();
@@ -289,7 +293,7 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
     while (iteration < maxIterations) {
 
         //  get max values off the diagonal
-        maxValues = maxElementOffDiag(S);
+        maxElementOffDiag(S, maxValues);
         k = (int) maxValues[1];
         l = (int) maxValues[2];
 
@@ -365,16 +369,19 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
     }
 
     // the diagonal of S has the eigenvalues
-    result->setRow(S->diagonal(), 0);
+    double* diag = S->diagonal();
+    result->setRow(diag, 0);
 
     for (int j = 1; j < n + 1; ++j) {
-        result->setRow(E->getRow(j -1), j );
+        double *row = E->getRow(j -1);
+        result->setRow(row, j );
+        delete [] row;
     }
 
     // memory deallocation
-    delete [] maxValues;
     delete E;
-
+    delete [] diag;
+    delete [] maxValues;
 
     return result;
 }

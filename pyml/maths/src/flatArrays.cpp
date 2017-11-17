@@ -506,7 +506,7 @@ double *flatArray::getRowSlice(int i, int start, int end) {
         n++;
     }
 
-    delete row;
+    delete [] row;
 
     return result;
 }
@@ -526,7 +526,7 @@ double *flatArray::getColSlice(int j, int start, int end) {
         n++;
     }
 
-    delete col;
+    delete [] col;
 
     return result;
 }
