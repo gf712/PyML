@@ -2,11 +2,11 @@
 // Created by Gil Ferreira Hoben on 07/11/17.
 //
 
-
 #include <flatArrays.h>
-#include <Python.h>
 #include "linearalgebramodule.h"
+#include "maths.h"
 #include <iostream>
+#include <Python.h>
 
 // Handle errors
 // static PyObject *algebraError;
@@ -218,4 +218,163 @@ flatArray *covariance(flatArray *X) {
     delete vecProd;
 
     return covMatrix;
+}
+
+double *maxElementOffDiag(flatArray *S) {
+
+    double *result = nullptr;
+    double *row = nullptr;
+    int n = S->getCols();
+
+    result = new double[3];
+
+    for (int k = 0; k < n; ++k) {
+
+        row = S->getRowSlice(k, k + 1, n);
+
+        int j = 0;
+        for (int i = k + 1; i < n; ++i) {
+
+            if (fabs(row[j]) >= result[0]) {
+                result[0] = fabs(row[j]);
+                result[1] = k;
+                result[2] = i;
+            }
+            j++;
+        }
+    }
+
+    return result;
+}
+
+
+flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxIterations) {
+
+    // Implementation of the Jacobi rotation algorithm
+    // https://en.wikipedia.org/wiki/Jacobi_eigenvalue_algorithm
+    // http://www.southampton.ac.uk/~feeg6002/lecturenotes/feeg6002_numerical_methods08.pdf
+    //
+    // if S is a n by n matrix, then:
+    // return a flatMatrix (n + 1 by n) with the first row corresponding to the eigenvalues (n-dimensional vector)
+    // and below are the eigenvector (n by n matrix)
+
+    int l, k;
+    double s, c, t, y, temp, diff, phi;
+
+    auto E = new flatArray;
+    auto result = new flatArray;
+    double *maxValues = nullptr;
+
+    // number of rows
+    int n = S->getRows();
+
+    // set max iterations to 5 * n ** 2 if this value is not set
+    if (maxIterations == 0) {
+        maxIterations = 5 * pow(n, 2);
+    }
+
+    // initialise e, E, ind and changed
+    // memory allocation
+    E->startEmptyArray(n, n);
+    result->startEmptyArray(n + 1, n);
+
+
+    // initialise values
+    for (int i = 0; i < n; ++i) {
+        E->setNElement(1, i * n + i);
+    }
+
+    int iteration = 0;
+
+    while (iteration < maxIterations) {
+
+        //  get max values off the diagonal
+        maxValues = maxElementOffDiag(S);
+        k = (int) maxValues[1];
+        l = (int) maxValues[2];
+
+        if (maxValues[0] < tolerance) {
+            // found convergence
+            break;
+        }
+
+        // Jacobi rotation
+        diff = S->getNElement(l * n + l) - S->getNElement(k * n + k);
+
+        if (fabs(S->getNElement(k * n + l)) < fabs(diff) * 1.0e-40) {
+            y = S->getNElement(k * n + l) / diff;
+        }
+        else {
+            phi = diff / (2 * S->getNElement(k * n + l));
+            y = 1.0 / (fabs(phi) + sqrt(pow(phi, 2) + 1.0));
+            if (phi < 0) {
+                y = -y;
+            }
+        }
+
+
+        c = 1.0 / sqrt(pow(y, 2) + 1);
+        s = y * c;
+        t = s / (1 + c);
+
+        temp = S->getNElement(k * n + l);
+
+        S->setNElement(0, k * n + l);
+        S->setNElement(S->getNElement(k * n + k) - y * temp, k * n + k);
+        S->setNElement(S->getNElement(l * n + l) + y * temp, l * n + l);
+
+
+        for (int i = 0; i < k; ++i) {
+            // temp = a[i,k]
+            // a[i,k] = temp - s*(a[i,l] + tau*temp)
+            // a[i,l] = a[i,l] + s*(temp - tau*a[i,l])
+            temp = S->getNElement(i * n + k);
+            S->setNElement(temp - s*(S->getNElement(i * n + l) + t * temp), i * n + k);
+            S->setNElement(S->getNElement(i * n + l) + s * (temp - t * S->getNElement(i * n + l)), i * n + l);
+        }
+
+        for (int i = k + 1; i < l; ++i) {
+            //  temp = a[k,i]
+            // a[k,i] = temp - s*(a[i,l] + tau*a[k,i])
+            // a[i,l] = a[i,l] + s*(temp - tau*a[i,l])
+            temp = S->getNElement(k * n + i);
+            S->setNElement(temp - s * (S->getNElement(i * n + l) + t * S->getNElement(k * n + i)), k * n + i);
+            S->setNElement(S->getNElement(i * n + l) + s * (temp - t * S->getNElement(i * n + l)), i * n + l);
+
+        }
+
+        for (int i = l + 1; i < n; ++i) {
+            // temp = a[k,i]
+            // a[k,i] = temp - s*(a[l,i] + tau*temp)
+            // a[l,i] = a[l,i] + s*(temp - tau*a[l,i])
+            temp = S->getNElement(k * n + i);
+            S->setNElement(temp - s * (S->getNElement(n * l + i) + t * temp), k * n + i);
+            S->setNElement(S->getNElement(l * n + i) + s * (temp - t * S->getNElement(l * n + i)), l * n + i);
+        }
+
+        for (int i = 0; i < n; ++i) {
+            // temp = p[i,k]
+            // p[i,k] = temp - s*(p[i,l] + tau*p[i,k])
+            // p[i,l] = p[i,l] + s*(temp - tau*p[i,l])
+            temp = E->getNElement(i * n + k);
+            E->setNElement(temp - s * (E->getNElement(i * n + l) + t * E->getNElement(i * n + k)), i * n + k);
+            E->setNElement(E->getNElement(i * n + l) + s * (temp - t * E->getNElement(i * n + l)), i * n + l);
+        }
+
+        iteration++;
+    }
+
+    // the diagonal of S has the eigenvalues
+    result->setRow(S->diagonal(), 0);
+
+    for (int j = 1; j < n + 1; ++j) {
+        result->setRow(E->getRow(j -1), j );
+    }
+
+    // memory deallocation
+    delete [] maxValues;
+    delete E;
+
+
+    return result;
 }

@@ -366,7 +366,7 @@ static PyObject* cov(PyObject* self, PyObject *args) {
 
     // return error if we don't get all the arguments
     if (!PyArg_ParseTuple(args, "O!", &PyList_Type, &pX)) {
-        PyErr_SetString(PyExc_TypeError, "Expected a list and two integers!");
+        PyErr_SetString(PyExc_TypeError, "Expected a list!");
         return nullptr;
     }
 
@@ -382,6 +382,48 @@ static PyObject* cov(PyObject* self, PyObject *args) {
 
     delete X;
     delete result;
+
+    return FinalResult;
+}
+
+
+static PyObject* eigenSolve(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    int maxIterations;
+    double tolerance;
+    auto X = new flatArray;
+    auto eigFArray = new flatArray;
+
+    PyObject *pX;
+    PyObject *FinalResult = nullptr;
+
+    // return error if we don't get all the arguments
+    if (!PyArg_ParseTuple(args, "O!di", &PyList_Type, &pX, &tolerance, &maxIterations)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list, a float and an integer!");
+        return nullptr;
+    }
+
+    X->readFromPythonList(pX);
+
+    flatArray *result = jacobiEigenDecomposition(X, tolerance, maxIterations);
+
+    PyObject *eigV = Convert_1DArray(result->getRow(0), result->getCols());
+
+    eigFArray->startEmptyArray(result->getCols(), result->getCols());
+    for (int i = 1; i < result->getRows(); ++i) {
+        eigFArray->setRow(result->getRow(i), i - 1);
+    }
+
+    PyObject *eigE = ConvertFlatArray_PyList(eigFArray, "float");
+
+    FinalResult = Py_BuildValue("OO", eigV, eigE);
+
+    Py_DECREF(eigE);
+
+    delete X;
+    delete result;
+    delete eigFArray;
 
     return FinalResult;
 }
@@ -404,6 +446,7 @@ static PyMethodDef linearAlgebraMethods[] = {
         {"Cstd",          standardDeviation,      METH_VARARGS,            "Numpy style array standard deviation"},
         {"Cvariance",     variance,               METH_VARARGS,            "Numpy style array variance"},
         {"Ccovariance",   cov,                    METH_VARARGS,            "Calculate covariance matrix"},
+        {"eigen_solve",   eigenSolve,             METH_VARARGS,            "Eigendecomposition of symmetric matrix"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {nullptr, nullptr, 0, nullptr}
 };
