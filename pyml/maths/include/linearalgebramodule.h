@@ -13,6 +13,7 @@ extern "C" {
 
 void leastSquares(flatArray *X, flatArray *y, double *theta);
 flatArray *covariance(flatArray *X);
+flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxIterations);
 
 #ifdef __cplusplus
 }

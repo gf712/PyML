@@ -78,13 +78,6 @@ class MathsTest(unittest.TestCase):
     def test_var_EmptyList_ValueError(self):
         self.assertRaises(ValueError, variance, [])
 
-    def test_cov_matrix(self):
-        self.assertAlmostEqual(covariance(self.A)[1][7], 0.015228530607877794)
-
-    def test_cov_matrix_shape(self):
-        self.assertEqual(len(covariance(self.A)), len(self.A[1]))
-        self.assertEqual(len(covariance(self.A)[0]), len(self.A[1]))
-
 
 class LinearAlgebraTest(unittest.TestCase):
 
@@ -113,3 +106,20 @@ class LinearAlgebraTest(unittest.TestCase):
 
     def test_divide(self):
         self.assertAlmostEqual(divide(self.A[0], 0.5)[0], 0.2792398429743861)
+
+    def test_cov_matrix(self):
+        self.assertAlmostEqual(covariance(self.A)[1][7], 0.015228530607877794)
+
+    def test_cov_matrix_shape(self):
+        self.assertEqual(len(covariance(self.A)), len(self.A[1]))
+        self.assertEqual(len(covariance(self.A)[0]), len(self.A[1]))
+
+    def test_eigen_normalised(self):
+        S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]
+        self.assertAlmostEqual(eigen(S, normalise=False)[0][0], 3)
+        self.assertAlmostEqual(eigen(S, normalise=False)[1][0][0], 0.7071067811865476)
+
+    def test_eigen_unnormalised(self):
+        S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]
+        self.assertAlmostEqual(eigen(S, normalise=True)[0][0], 1)
+        self.assertAlmostEqual(eigen(S, normalise=True)[1][0][0], 1)
