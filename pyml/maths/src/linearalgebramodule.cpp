@@ -251,7 +251,7 @@ void *maxElementOffDiag(flatArray *S, double result[3]) {
 }
 
 
-flatArray *jacobiEigendecomposition(flatArray *S, double tolerance, int maxIterations) {
+flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxIterations) {
 
     // Implementation of the Jacobi rotation algorithm
     // https://en.wikipedia.org/wiki/Jacobi_eigenvalue_algorithm
