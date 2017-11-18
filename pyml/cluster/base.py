@@ -1,5 +1,5 @@
 from ..base import BaseLearner
-from ..maths import mean, transpose, argsort
+from ..maths import mean, argsort, argmin
 from ..metrics.distances import calculate_distance
 import random
 
@@ -52,7 +52,8 @@ class ClusterBase(BaseLearner):
         # distances_T = transpose(distances)
         # # return label of closest cluster to each data point
         # return [x.index(min(x)) for x in distances_T]
-        return [x[0] for x in argsort(distances, axis=0)]
+        # print(distances)
+        return argmin(distances, axis=0)
 
     def _changes(self):
         change_n = 0

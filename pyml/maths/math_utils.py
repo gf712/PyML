@@ -1,5 +1,5 @@
 from collections import Counter
-from .CMaths import quick_sort
+from .CMaths import quick_sort, Cargmax, Cargmin
 from .Clinear_algebra import Cmean, Cstd, Cvariance, Ccovariance
 from math import exp
 
@@ -20,6 +20,26 @@ def argsort(array, axis=0):
     :return: sorted indices in ascending order
     """
     return quick_sort(array, axis)[1]
+
+
+def argmin(array, axis=0):
+    """
+
+    :param array:
+    :param axis:
+    :return:
+    """
+    return Cargmin(array, axis)
+
+
+def argmax(array, axis=0):
+    """
+
+    :param array:
+    :param axis:
+    :return:
+    """
+    return Cargmin(array, axis)
 
 
 def max_occurence(array):
