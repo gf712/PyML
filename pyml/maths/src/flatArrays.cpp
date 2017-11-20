@@ -60,6 +60,7 @@ flatArray* flatArray::transpose() {
 
         result->setNElement(array[row + column], n);
         }
+
     return result;
 }
 
@@ -78,6 +79,7 @@ int flatArray::getSize() {
 double flatArray::sum() {
 
     double result = 0;
+
     for (int n = 0; n < size; ++n) {
         result += array[n];
     };
@@ -170,7 +172,7 @@ flatArray *flatArray::dot(flatArray *other) {
                 result->setNElement(eResult, n);
             }
         }
-
+        
         return result;
     }
 
@@ -196,7 +198,6 @@ flatArray *flatArray::dot(flatArray *other) {
         }
 
         return result;
-
     }
 
     else {
@@ -235,6 +236,7 @@ flatArray *flatArray::subtract(flatArray *other) {
 
             delete [] B;
         }
+
         else if (other->getCols() == cols){
             double *B = other->getRow(0);
 
@@ -252,6 +254,7 @@ flatArray *flatArray::subtract(flatArray *other) {
 
             delete [] B;
         }
+
         else {
             PyErr_SetString(PyExc_ValueError, "Matrix and vector must have matching number of rows or columns.");
             return nullptr;
@@ -276,6 +279,7 @@ flatArray *flatArray::subtract(flatArray *other) {
             result->setNElement(array[n] - B[n], n);
         }
     }
+
     return result;
 }
 
@@ -307,10 +311,14 @@ flatArray *flatArray::divide(double m) {
 
 void flatArray::setRows(int r) {
     rows = r;
+    // update size
+    size = rows * cols;
 }
 
 void flatArray::setCols(int c) {
     cols = c;
+    // update size
+    size = rows * cols;
 }
 
 flatArray *flatArray::multiply(flatArray *other) {
@@ -379,10 +387,7 @@ flatArray *flatArray::mean(int axis) {
                 result->setNElement(colResult, i);
 
                 delete [] colArray;
-
             }
-
-
         }
 
         else {
@@ -449,7 +454,6 @@ flatArray *flatArray::std(int degreesOfFreedom, int axis) {
                 result->setNElement(pow(arrayVar->getNElement(i), 0.5), i);
 
             }
-
         }
     }
 
@@ -540,6 +544,7 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
 
 double *flatArray::getRowSlice(int i, int start, int end) {
+
     double *row = getRow(i);
     double *result = nullptr;
 
@@ -559,11 +564,11 @@ double *flatArray::getRowSlice(int i, int start, int end) {
 }
 
 double *flatArray::getColSlice(int j, int start, int end) {
+
     double *col = getCol(j);
     double *result = nullptr;
 
     result = new double[end - start];
-
 
     int n = 0;
     for (int i = start; i < end; ++i) {
@@ -579,6 +584,7 @@ double *flatArray::getColSlice(int j, int start, int end) {
 }
 
 double *flatArray::diagonal() {
+
     double *result = nullptr;
 
     result = new double [rows];

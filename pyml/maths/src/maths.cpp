@@ -1,7 +1,6 @@
 //
 // Created by Gil Ferreira Hoben on 07/11/17.
 //
-#include <flatArrays.h>
 #include "maths.h"
 
 
@@ -12,12 +11,6 @@ void swapDouble(double* a, double* b)
     *b = t;
 }
 
-void swapLong(long* a, long* b)
-{
-    long t = *a;
-    *a = *b;
-    *b = t;
-}
 
 int factorial(int size) {
     int fact=1;
@@ -28,6 +21,7 @@ int factorial(int size) {
 
     return fact;
 }
+
 
 void permutations(double* array, double** result, int size) {
 

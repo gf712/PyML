@@ -92,7 +92,6 @@ def mean(array, axis=None):
                 if axis == 1 or axis == 0:
                     return Cmean(array, axis)
                 else:
-                    # return mean([mean([array[x][d] for d in range(dim)]) for x in range(len(array))])
                     return Cmean(Cmean(array, 0), 0)
 
             elif isinstance(array[0], (int, float)):
@@ -101,7 +100,6 @@ def mean(array, axis=None):
 
             else:
                 raise TypeError("Expected a list of lists or a list of int/floats")
-
         else:
             raise ValueError("Empty list")
     else:

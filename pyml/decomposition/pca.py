@@ -19,10 +19,8 @@ class PCA(BaseLearner, Transformer):
 
     def _train(self, X, y=None):
         """
+        Calculates the feature vector of X with PCA algorithm
 
-        :param X:
-        :param y:
-        :return:
         """
         self._X = X
         self._n = len(X)

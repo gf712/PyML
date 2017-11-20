@@ -1,3 +1,6 @@
+.. role:: bash(code)
+   :language: bash
+
 PyML
 ====
 .. image:: https://coveralls.io/repos/github/gf712/PyML/badge.svg?branch=master
@@ -32,6 +35,16 @@ Usage
 
 Changelog
 =========
+Version 0.2 (23/11/2017):
+-------------------------
+ - Major:
+    - PCA implementation
+
+ - Minor:
+    - Eigendecomposition of symmetric matrices with Jacobi rotations
+    - Fixed memory leaks
+
+
 Version 0.2 (16/11/2017):
 -------------------------
  - Major:

@@ -18,7 +18,7 @@ class PCATest(unittest.TestCase):
         self.assertCountEqual(self.decomposer.eigenvalues, [4.1966751631979795, 0.24062861448333198,
                                                             0.07800041537352681, 0.023525140278494793])
 
-    def test_PCA_eigenvectos(self):
+    def test_PCA_eigenvectors(self):
         self.assertAlmostEqual(self.decomposer.eigenvectors[0][2], 0.5809972798275975)
 
     def test_PCA_transform(self):

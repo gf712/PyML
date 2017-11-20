@@ -28,31 +28,42 @@ public:
         delete [] array;
     };
 
+    // initialisers
     void readFromPythonList(PyObject *pyList);
     void startEmptyArray(int rows_, int cols_);
 
+    // GETTERS/SETTERS
+    // column and row size
     int getRows();
     int getCols();
     void setRows(int r);
     void setCols(int c);
+
+    // matrix size
     int getSize();
 
+    // get array
     double* getArray();
 
+    // get array element by row and column
     double getElement(int row, int col);
     void setElement(double value, int row, int col);
 
+    // set array element by row and column
     double getNElement(int n);
     void setNElement(double value, int n);
 
+    // row and column
     double* getRow(int i);
     double* getCol(int j);
     void setRow(double *row, int i);
     void setCol(double *row, int j);
 
+    // row and column slices
     double *getRowSlice(int i, int start, int end);
     double *getColSlice(int j, int start, int end);
 
+    // MATRIX MANIPULATION/LINEAR ALGEBRA
     flatArray* transpose();
     double sum();
     flatArray *dot(flatArray *other);
@@ -64,7 +75,6 @@ public:
     flatArray *mean(int axis);
     flatArray *std(int degreesOfFreedom, int axis);
     flatArray *var(int degreesOfFreedom, int axis);
-
     double *diagonal();
 };
 

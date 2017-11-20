@@ -4,7 +4,7 @@ from pyml.maths.math_utils import argsort
 
 def dot_product(u, v):
     """
-    Dot product using C++ extension.
+    Matrix/matrix, matrix/vector and vector/vector dot product
 
     :param u:
     :param v:
@@ -135,6 +135,17 @@ def least_squares(X, y):
     :return: list with the same number of dimensions as the number of columns of X with the solution of the least squares problem
     """
     # TODO: write exceptions to help user with errors from the backend
+    """
+
+    :type X: list
+    :type y: list
+
+    :param X:
+    :param y:
+
+    :rtype: list
+    :return:
+    """
     return Clinear_algebra.least_squares(X, y)
 
 

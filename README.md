@@ -32,13 +32,21 @@ Usage
 
 Changelog
 =========
+## Version 0.2 (23/11/2017):
+ - Major:
+    - PCA implementation
+    
+ - Minor:
+    - Eigendecomposition of symmetric matrices with Jacobi rotations
+    - Improved docs
+    - Fixed memory leaks
+
 ## Version 0.2 (16/11/2017):
  - Major:
     - KMeans implementation
     - Logistic regression implementation
     - New C++ class to represent 2D arrays more efficiently
 
-    
  - Minor:
     - Cleaned up C++ code
     - Norm is calculated with pure C++ (Python only used to provide `euclidean_distance` and `manhattan_distance` interface)
