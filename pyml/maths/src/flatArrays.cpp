@@ -205,25 +205,74 @@ flatArray *flatArray::subtract(flatArray *other) {
 
     auto result = new flatArray;
 
-    if (rows != other->getRows()) {
-        PyErr_SetString(PyExc_ValueError, "Arrays must have matching number of rows.");
-        return nullptr;
-    }
-    if (cols != other->getCols()) {
-        PyErr_SetString(PyExc_ValueError, "Arrays must have matching number of columns.");
-        return nullptr;
-    }
-
     result->startEmptyArray(rows, cols);
 
-    double *B = other->getArray();
+    if (other->getRows() == 1 && rows > 1) {
+        // other is a vector and this is a matrix
 
-    for (int n = 0; n < size; ++n) {
-        result->setNElement(array[n] - B[n], n);
+        // if square matrix will prioritise column wise subtraction (consider transposing matrix
+        // if this is not what you want)
+        if (other->getCols() == rows) {
+            // number of rows match number of dimensions of vector
+
+            double *B = other->getRow(0);
+
+            int n = 0;
+            for (int i = 0; i < rows; ++i) {
+
+                for (int j = 0; j < cols; ++j) {
+
+                    // subtract each row by the ith element of other vector
+                    result->setNElement(array[n] - B[i], n);
+
+                    n++;
+                }
+            }
+
+            delete [] B;
+        }
+        else if (other->getCols() == cols){
+            double *B = other->getRow(0);
+
+            int n = 0;
+            for (int i = 0; i < rows; ++i) {
+
+                for (int j = 0; j < cols; ++j) {
+
+                    // subtract each column by the ith element of other vector
+                    result->setNElement(array[n] - B[j], n);
+
+                    n++;
+                }
+            }
+
+            delete [] B;
+        }
+        else {
+            PyErr_SetString(PyExc_ValueError, "Matrix and vector must have matching number of rows or columns.");
+            return nullptr;
+        }
     }
 
-    return result;
+    else {
+        // both are matrices or vectors
 
+        if (rows != other->getRows()) {
+            PyErr_SetString(PyExc_ValueError, "Arrays must have matching number of rows.");
+            return nullptr;
+        }
+        if (cols != other->getCols()) {
+            PyErr_SetString(PyExc_ValueError, "Arrays must have matching number of columns.");
+            return nullptr;
+        }
+
+        double *B = other->getArray();
+
+        for (int n = 0; n < size; ++n) {
+            result->setNElement(array[n] - B[n], n);
+        }
+    }
+    return result;
 }
 
 flatArray *flatArray::power(int p) {
