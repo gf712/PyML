@@ -21,6 +21,34 @@ void flatArray::readFromPythonList(PyObject *pyList) {
     convertPy_flatArray(pyList, this);
 }
 
+
+void flatArray::startEmptyArray(int rows, int cols) {
+    flatArray::rows = rows;
+    flatArray::cols = cols;
+    size = rows * cols;
+    array = nullptr;
+    array = new double [size];
+}
+
+
+void flatArray::identity(int n) {
+
+    startEmptyArray(n, n);
+
+    int row=0;
+
+    for (int i = 0; i < size; ++i) {
+        if (i == row) {
+            array[i] = 1;
+            row += cols + 1;
+        }
+        else {
+            array[i] = 0;
+        }
+    }
+}
+
+
 int flatArray::getRows() {
     return flatArray::rows;
 }
@@ -41,13 +69,6 @@ void flatArray::setElement(double value, int row, int col) {
     array[cols*row+col%cols] = value;
 }
 
-void flatArray::startEmptyArray(int rows, int cols) {
-    flatArray::rows = rows;
-    flatArray::cols = cols;
-    size = rows * cols;
-    array = new double [size];
-}
-
 flatArray* flatArray::transpose() {
     // faster transpose method
     auto result = new flatArray;
@@ -55,10 +76,12 @@ flatArray* flatArray::transpose() {
     result->startEmptyArray(cols, rows);
 
     for (int n = 0; n < rows * cols; ++n) {
+
         int column = n / rows;
         int row = n % rows * cols;
 
         result->setNElement(array[row + column], n);
+
         }
 
     return result;
@@ -172,7 +195,7 @@ flatArray *flatArray::dot(flatArray *other) {
                 result->setNElement(eResult, n);
             }
         }
-        
+
         return result;
     }
 

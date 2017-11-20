@@ -31,6 +31,7 @@ public:
     // initialisers
     void readFromPythonList(PyObject *pyList);
     void startEmptyArray(int rows_, int cols_);
+    void identity(int n);
 
     // GETTERS/SETTERS
     // column and row size
