@@ -1,13 +1,14 @@
 from ..base import BaseLearner
-from ..maths import mean, argsort, argmin
+from pyml.base import Predictor
+from ..maths import mean, argmin
 from ..metrics.distances import calculate_distance
 import random
 
 
-class ClusterBase(BaseLearner):
+class ClusterBase(BaseLearner, Predictor):
 
     def __init__(self):
-        BaseLearner.__init__(self)
+        pass
 
     def _get_cluster(self, cluster_label=0):
         """

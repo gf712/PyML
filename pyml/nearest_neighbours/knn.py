@@ -1,9 +1,10 @@
 from .base import KNNBase
+from pyml.base import Predictor, Classifier
 from ..maths import max_occurence, mean
 from pyml.metrics.scores import mean_squared_error, mean_absolute_error
 
 
-class KNNClassifier(KNNBase):
+class KNNClassifier(KNNBase, Classifier):
     def __init__(self, n=3, norm='l1'):
         KNNBase.__init__(self)
         self.n = n
