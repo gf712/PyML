@@ -395,7 +395,7 @@ static PyObject* eigenSolve(PyObject* self, PyObject *args) {
     auto X = new flatArray;
     auto eigFArray = new flatArray;
 
-    PyObject *pX;
+    PyObject *pX = nullptr;
     PyObject *FinalResult = nullptr;
 
     // return error if we don't get all the arguments
@@ -412,7 +412,9 @@ static PyObject* eigenSolve(PyObject* self, PyObject *args) {
 
     eigFArray->startEmptyArray(result->getCols(), result->getCols());
     for (int i = 1; i < result->getRows(); ++i) {
-        eigFArray->setRow(result->getRow(i), i - 1);
+        double *rowResult = result->getRow(i);
+        eigFArray->setRow(rowResult, i - 1);
+        delete [] rowResult;
     }
 
     PyObject *eigE = ConvertFlatArray_PyList(eigFArray, "float");
@@ -420,6 +422,7 @@ static PyObject* eigenSolve(PyObject* self, PyObject *args) {
     FinalResult = Py_BuildValue("OO", eigV, eigE);
 
     Py_DECREF(eigE);
+    Py_DECREF(eigV);
 
     delete X;
     delete result;

@@ -4,9 +4,6 @@
 
 #include <flatArrays.h>
 #include "linearalgebramodule.h"
-#include "maths.h"
-#include <iostream>
-#include <Python.h>
 
 // Handle errors
 // static PyObject *algebraError;
@@ -245,7 +242,6 @@ void *maxElementOffDiag(flatArray *S, double result[3]) {
         }
 
         delete [] row;
-
     }
 
     return result;
@@ -264,30 +260,27 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
 
     int l, k;
     double s, c, t, y, temp, diff, phi;
-    double *maxValues = nullptr;
 
-    maxValues = new double[3];
     auto E = new flatArray;
     auto result = new flatArray;
+
+    double *maxValues = nullptr;
+    maxValues = new double[3];
 
     // number of rows
     int n = S->getRows();
 
     // set max iterations to 5 * n ** 2 if this value is not set
     if (maxIterations == 0) {
-        maxIterations = 5 * pow(n, 2);
+        maxIterations = static_cast<int>( 5 * pow(n, 2));
     }
 
     // initialise e, E, ind and changed
     // memory allocation
-    E->startEmptyArray(n, n);
     result->startEmptyArray(n + 1, n);
 
-
     // initialise values
-    for (int i = 0; i < n; ++i) {
-        E->setNElement(1, i * n + i);
-    }
+    E->identity(n);
 
     int iteration = 0;
 
@@ -309,6 +302,7 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
         if (fabs(S->getNElement(k * n + l)) < fabs(diff) * 1.0e-40) {
             y = S->getNElement(k * n + l) / diff;
         }
+
         else {
             phi = diff / (2 * S->getNElement(k * n + l));
             y = 1.0 / (fabs(phi) + sqrt(pow(phi, 2) + 1.0));
@@ -316,7 +310,6 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
                 y = -y;
             }
         }
-
 
         c = 1.0 / sqrt(pow(y, 2) + 1);
         s = y * c;
@@ -327,7 +320,6 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
         S->setNElement(0, k * n + l);
         S->setNElement(S->getNElement(k * n + k) - y * temp, k * n + k);
         S->setNElement(S->getNElement(l * n + l) + y * temp, l * n + l);
-
 
         for (int i = 0; i < k; ++i) {
             // temp = a[i,k]
@@ -375,7 +367,7 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
 
     for (int j = 1; j < n + 1; ++j) {
         double *row = E->getRow(j -1);
-        result->setRow(row, j );
+        result->setRow(row, j);
         delete [] row;
     }
 

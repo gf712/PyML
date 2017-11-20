@@ -135,22 +135,14 @@ def least_squares(X, y):
     :return: list with the same number of dimensions as the number of columns of X with the solution of the least squares problem
     """
     # TODO: write exceptions to help user with errors from the backend
-    """
 
-    :type X: list
-    :type y: list
-
-    :param X:
-    :param y:
-
-    :rtype: list
-    :return:
-    """
     return Clinear_algebra.least_squares(X, y)
 
 
 def eigen(array, tolerance=1.0e-9, max_iterations=0, sort=True, normalise=True):
+
     # TODO: write exceptions to help user with errors from the backend
+
     E, v = Clinear_algebra.eigen_solve(array, tolerance, max_iterations)
 
     if sort:
