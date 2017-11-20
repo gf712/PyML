@@ -1,17 +1,17 @@
-from ..base import BaseLearner
-from ..maths import mean, argsort
-from ..metrics.distances import calculate_distance
+from pyml.base import BaseLearner, Predictor
+from pyml.maths import mean, argmin
+from pyml.metrics.distances import calculate_distance
 import random
 
 
-class ClusterBase(BaseLearner):
+class ClusterBase(BaseLearner, Predictor):
 
     """
     Base class for clustering.
     """
 
     def __init__(self):
-        BaseLearner.__init__(self)
+        pass
 
     def _get_cluster(self, cluster_label=0):
         """
@@ -79,7 +79,8 @@ class ClusterBase(BaseLearner):
         # distances_T = transpose(distances)
         # # return label of closest cluster to each data point
         # return [x.index(min(x)) for x in distances_T]
-        return [x[0] for x in argsort(distances, axis=0)]
+        # print(distances)
+        return argmin(distances, axis=0)
 
     def _changes(self):
         """

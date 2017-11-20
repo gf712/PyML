@@ -1,8 +1,9 @@
 from pyml.base import BaseLearner
+from pyml.base import Predictor
 import random
 
 
-class LinearBase(BaseLearner):
+class LinearBase(BaseLearner, Predictor):
 
     """
     Base class for linear models
@@ -13,7 +14,7 @@ class LinearBase(BaseLearner):
         Inherits methods from BaseLearner
         """
 
-        BaseLearner.__init__(self)
+        pass
 
     def _initiate_weights(self, bias):
         """

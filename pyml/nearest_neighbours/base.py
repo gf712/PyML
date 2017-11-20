@@ -1,16 +1,16 @@
 from pyml.maths.math_utils import argsort
 from pyml.metrics.distances import calculate_distance
-from pyml.base import BaseLearner
+from pyml.base import BaseLearner, Predictor
 
 
-class KNNBase(BaseLearner):
+class KNNBase(BaseLearner, Predictor):
     def __init__(self):
         """
 
         :param neighbours:
         :param norm:
         """
-        BaseLearner.__init__(self)
+        pass
 
     def _train(self, X, y):
         self.X = X

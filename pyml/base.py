@@ -6,6 +6,13 @@ class BaseLearner:
         self._train(X, y)
         return self
 
+
+class Predictor:
+    
+    def train_predict(self, X, y=None):
+        self.train(X, y)
+        return self.predict(X)
+
     def predict(self, X):
         return self._predict(X)
 
@@ -19,3 +26,16 @@ class Classifier:
 
     def predict_proba(self, X):
         return self._predict_proba(X)
+
+
+class Transformer:
+
+    def __init__(self):
+        pass
+
+    def transform(self, X):
+        return self._transform(X)
+
+    def train_transform(self, X):
+        self.train(X)
+        self.transform(X)

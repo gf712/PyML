@@ -87,7 +87,9 @@ double flatArray::sum() {
 
 double *flatArray::getRow(int i) {
 
-    auto *row = new double [cols];
+    double *row = nullptr;
+
+    row = new double [cols];
     int n = 0;
 
     for (int j = i * cols; j < (i + 1) * cols; ++j) {
@@ -100,7 +102,9 @@ double *flatArray::getRow(int i) {
 
 double *flatArray::getCol(int j) {
 
-    auto *column = new double [rows];
+    double *column = nullptr;
+
+    column = new double [rows];
     int n = 0;
 
     for (int i = j; i < size; i+=cols) {
@@ -205,25 +209,74 @@ flatArray *flatArray::subtract(flatArray *other) {
 
     auto result = new flatArray;
 
-    if (rows != other->getRows()) {
-        PyErr_SetString(PyExc_ValueError, "Arrays must have matching number of rows.");
-        return nullptr;
-    }
-    if (cols != other->getCols()) {
-        PyErr_SetString(PyExc_ValueError, "Arrays must have matching number of columns.");
-        return nullptr;
-    }
-
     result->startEmptyArray(rows, cols);
 
-    double *B = other->getArray();
+    if (other->getRows() == 1 && rows > 1) {
+        // other is a vector and this is a matrix
 
-    for (int n = 0; n < size; ++n) {
-        result->setNElement(array[n] - B[n], n);
+        // if square matrix will prioritise column wise subtraction (consider transposing matrix
+        // if this is not what you want)
+        if (other->getCols() == rows) {
+            // number of rows match number of dimensions of vector
+
+            double *B = other->getRow(0);
+
+            int n = 0;
+            for (int i = 0; i < rows; ++i) {
+
+                for (int j = 0; j < cols; ++j) {
+
+                    // subtract each row by the ith element of other vector
+                    result->setNElement(array[n] - B[i], n);
+
+                    n++;
+                }
+            }
+
+            delete [] B;
+        }
+        else if (other->getCols() == cols){
+            double *B = other->getRow(0);
+
+            int n = 0;
+            for (int i = 0; i < rows; ++i) {
+
+                for (int j = 0; j < cols; ++j) {
+
+                    // subtract each column by the ith element of other vector
+                    result->setNElement(array[n] - B[j], n);
+
+                    n++;
+                }
+            }
+
+            delete [] B;
+        }
+        else {
+            PyErr_SetString(PyExc_ValueError, "Matrix and vector must have matching number of rows or columns.");
+            return nullptr;
+        }
     }
 
-    return result;
+    else {
+        // both are matrices or vectors
 
+        if (rows != other->getRows()) {
+            PyErr_SetString(PyExc_ValueError, "Arrays must have matching number of rows.");
+            return nullptr;
+        }
+        if (cols != other->getCols()) {
+            PyErr_SetString(PyExc_ValueError, "Arrays must have matching number of columns.");
+            return nullptr;
+        }
+
+        double *B = other->getArray();
+
+        for (int n = 0; n < size; ++n) {
+            result->setNElement(array[n] - B[n], n);
+        }
+    }
+    return result;
 }
 
 flatArray *flatArray::power(int p) {
@@ -309,14 +362,13 @@ flatArray *flatArray::mean(int axis) {
         if (axis == 0) {
             // mean of each column
             double colResult;
-            double *colArray = nullptr;
 
             result->startEmptyArray(1 , cols);
 
             for (int i = 0; i < cols; ++i) {
 
                 colResult = 0;
-                colArray = getCol(i);
+                double *colArray = getCol(i);
 
                 for (int j = 0; j < rows; ++j) {
                     colResult += colArray[j];
@@ -326,23 +378,23 @@ flatArray *flatArray::mean(int axis) {
 
                 result->setNElement(colResult, i);
 
+                delete [] colArray;
+
             }
 
-            delete [] colArray;
 
         }
 
         else {
             // mean of each row
             double rowResult;
-            double *rowArray = nullptr;
 
             result->startEmptyArray(1, rows);
 
             for (int i = 0; i < rows; ++i) {
 
                 rowResult = 0;
-                rowArray = getRow(i);
+                double *rowArray = getRow(i);
 
                 for (int j = 0; j < cols; ++j) {
                     rowResult += rowArray[j];
@@ -352,9 +404,8 @@ flatArray *flatArray::mean(int axis) {
 
                 result->setNElement(rowResult, i);
 
+                delete [] rowArray;
             }
-
-            delete [] rowArray;
         }
     }
 
@@ -436,7 +487,6 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
         if (axis == 0) {
             // std of each column
             double colResult;
-            double *colArray = nullptr;
 
             result->startEmptyArray(1, cols);
 
@@ -444,7 +494,7 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
                 colResult = 0;
                 double colMean = arrayMean->getNElement(i);
-                colArray = getCol(i);
+                double *colArray = getCol(i);
 
                 for (int j = 0; j < rows; ++j) {
                     colResult += pow(colArray[j] - colMean, 2);
@@ -454,16 +504,13 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
                 result->setNElement(colResult, i);
 
+                delete [] colArray;
             }
-
-            delete colArray;
-
         }
 
         else {
             // std of each row
             double rowResult;
-            double *rowArray = nullptr;
 
             result->startEmptyArray(1, rows);
 
@@ -471,7 +518,7 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
                 rowResult = 0;
                 double rowMean = arrayMean->getNElement(i);
-                rowArray = getRow(i);
+                double *rowArray = getRow(i);
 
                 for (int j = 0; j < cols; ++j) {
                     rowResult += pow(rowArray[j] - rowMean, 2);
@@ -481,9 +528,8 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
                 result->setNElement(rowResult, i);
 
+                delete [] rowArray;
             }
-
-            delete rowArray;
         }
     }
 
@@ -491,6 +537,7 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
     return result;
 }
+
 
 double *flatArray::getRowSlice(int i, int start, int end) {
     double *row = getRow(i);

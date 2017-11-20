@@ -138,19 +138,17 @@ def least_squares(X, y):
     return Clinear_algebra.least_squares(X, y)
 
 
-def eigen(array, tolerance=1.0e-9, max_iterations=0, normalise=True):
+def eigen(array, tolerance=1.0e-9, max_iterations=0, sort=True, normalise=True):
     # TODO: write exceptions to help user with errors from the backend
-    if normalise:
-        E, v = Clinear_algebra.eigen_solve(array, tolerance, max_iterations)
+    E, v = Clinear_algebra.eigen_solve(array, tolerance, max_iterations)
 
-        # sort eigenvalues and eigenvectors
-        idx = argsort(E)
+    if sort:
+        # sort eigenvalues and eigenvectors from biggest to smallest
+        idx = argsort(E)[::-1]
         E = [E[i] for i in idx]
         v = [[x[i] for i in idx] for x in v]
 
+    if normalise:
         v = [[x[i] / v[0][i] for i in range(len(x))] for x in v]
 
-        return E, v
-
-    else:
-        return Clinear_algebra.eigen_solve(array, tolerance, max_iterations)
+    return E, v

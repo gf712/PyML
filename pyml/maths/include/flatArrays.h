@@ -26,7 +26,6 @@ public:
     };
     ~flatArray() {
         delete [] array;
-        array = nullptr;
     };
 
     void readFromPythonList(PyObject *pyList);
