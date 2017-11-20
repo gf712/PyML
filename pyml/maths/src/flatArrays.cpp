@@ -87,7 +87,9 @@ double flatArray::sum() {
 
 double *flatArray::getRow(int i) {
 
-    auto *row = new double [cols];
+    double *row = nullptr;
+
+    row = new double [cols];
     int n = 0;
 
     for (int j = i * cols; j < (i + 1) * cols; ++j) {
@@ -100,7 +102,9 @@ double *flatArray::getRow(int i) {
 
 double *flatArray::getCol(int j) {
 
-    auto *column = new double [rows];
+    double *column = nullptr;
+
+    column = new double [rows];
     int n = 0;
 
     for (int i = j; i < size; i+=cols) {
@@ -358,14 +362,13 @@ flatArray *flatArray::mean(int axis) {
         if (axis == 0) {
             // mean of each column
             double colResult;
-            double *colArray = nullptr;
 
             result->startEmptyArray(1 , cols);
 
             for (int i = 0; i < cols; ++i) {
 
                 colResult = 0;
-                colArray = getCol(i);
+                double *colArray = getCol(i);
 
                 for (int j = 0; j < rows; ++j) {
                     colResult += colArray[j];
@@ -375,23 +378,23 @@ flatArray *flatArray::mean(int axis) {
 
                 result->setNElement(colResult, i);
 
+                delete [] colArray;
+
             }
 
-            delete [] colArray;
 
         }
 
         else {
             // mean of each row
             double rowResult;
-            double *rowArray = nullptr;
 
             result->startEmptyArray(1, rows);
 
             for (int i = 0; i < rows; ++i) {
 
                 rowResult = 0;
-                rowArray = getRow(i);
+                double *rowArray = getRow(i);
 
                 for (int j = 0; j < cols; ++j) {
                     rowResult += rowArray[j];
@@ -401,9 +404,8 @@ flatArray *flatArray::mean(int axis) {
 
                 result->setNElement(rowResult, i);
 
+                delete [] rowArray;
             }
-
-            delete [] rowArray;
         }
     }
 
@@ -485,7 +487,6 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
         if (axis == 0) {
             // std of each column
             double colResult;
-            double *colArray = nullptr;
 
             result->startEmptyArray(1, cols);
 
@@ -493,7 +494,7 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
                 colResult = 0;
                 double colMean = arrayMean->getNElement(i);
-                colArray = getCol(i);
+                double *colArray = getCol(i);
 
                 for (int j = 0; j < rows; ++j) {
                     colResult += pow(colArray[j] - colMean, 2);
@@ -503,16 +504,13 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
                 result->setNElement(colResult, i);
 
+                delete [] colArray;
             }
-
-            delete colArray;
-
         }
 
         else {
             // std of each row
             double rowResult;
-            double *rowArray = nullptr;
 
             result->startEmptyArray(1, rows);
 
@@ -520,7 +518,7 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
                 rowResult = 0;
                 double rowMean = arrayMean->getNElement(i);
-                rowArray = getRow(i);
+                double *rowArray = getRow(i);
 
                 for (int j = 0; j < cols; ++j) {
                     rowResult += pow(rowArray[j] - rowMean, 2);
@@ -530,9 +528,8 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
                 result->setNElement(rowResult, i);
 
+                delete [] rowArray;
             }
-
-            delete rowArray;
         }
     }
 
@@ -540,6 +537,7 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
     return result;
 }
+
 
 double *flatArray::getRowSlice(int i, int start, int end) {
     double *row = getRow(i);

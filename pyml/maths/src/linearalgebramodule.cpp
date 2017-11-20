@@ -163,9 +163,6 @@ flatArray *covariance(flatArray *X) {
     auto covMatrix = new flatArray;
     int cols, rows;
     flatArray *XVar = nullptr;
-    double *XVecMean = nullptr;
-    double *Vec1 = nullptr;
-    double *Vec2 = nullptr;
     auto vecProd = new flatArray;
 
     // get number of cols and rows (quicker than calling getter all the time)
@@ -178,7 +175,7 @@ flatArray *covariance(flatArray *X) {
     covMatrix->startEmptyArray(cols, cols);
 
     // get mean and variance of each column
-    XVecMean = X->mean(0)->getArray();
+    flatArray *XVecMean = X->mean(0);
     XVar = X->var(0, 0);
 
     vecProd->startEmptyArray(1, rows);
@@ -188,13 +185,13 @@ flatArray *covariance(flatArray *X) {
         covMatrix->setNElement(XVar->getNElement(i), i + i * cols);
 
         // get ith vector
-        Vec1 = X->getCol(i);
+        double *Vec1 = X->getCol(i);
 
         // only need to calculate the upper triangle
         for (int j = cols - 1; j > i; --j) {
 
             // get jth vector
-            Vec2 = X->getCol(j);
+            double *Vec2 = X->getCol(j);
 
             for (int k = 0; k < rows; ++k) {
                 vecProd->setNElement(Vec1[k] * Vec2[k], k);
@@ -202,18 +199,22 @@ flatArray *covariance(flatArray *X) {
 
             // cov(X, Y) = E(X*Y) - E(X)*E(Y)
             // where X is the ith vector and Y the jth vector
-            double result = vecProd->mean(0)->getNElement(0) - XVecMean[i] * XVecMean[j];
+            flatArray *vecProdMean = vecProd->mean(0);
+            double result = vecProdMean->getNElement(0) - XVecMean->getNElement(i) * XVecMean->getNElement(j);
 
             // set S(i, j) = S(j, i) = cov(i, j)
             covMatrix->setNElement(result, i * cols + j);
             covMatrix->setNElement(result, j * cols + i);
+
+            delete [] Vec2;
+            delete vecProdMean;
         }
+
+        delete [] Vec1;
     }
 
     // memory dellocation
     delete XVecMean;
-    delete Vec1;
-    delete Vec2;
     delete XVar;
     delete vecProd;
 
