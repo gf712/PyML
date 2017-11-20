@@ -7,7 +7,14 @@ from math import exp
 def sort(array, axis=0):
     """
     sort array elements in ascending order using the quicksort algorithm
-    :param array:
+
+    :type array: list
+    :type axis: int
+
+    :param array: list of lists (matrix) or list (vector)
+    :param axis: if array is a matrix this is used to determine whether to order array column or row wise
+
+    :rtype: list or list of lists with same shape as input array
     :return: sorted array in ascending order
     """
     return quick_sort(array, axis)[0]
@@ -16,8 +23,15 @@ def sort(array, axis=0):
 def argsort(array, axis=0):
     """
     calculate order of elements in array
-    :param array:
-    :return: sorted indices in ascending order
+
+    :type array: list
+    :type axis: int
+
+    :param array: list of lists (matrix) or list (vector)
+    :param axis: if array is a matrix this is used to determine whether to order array column or row wise
+
+    :rtype: list or list of lists with same shape as input array
+    :return: sorted array in ascending order
     """
     return quick_sort(array, axis)[1]
 
@@ -45,8 +59,13 @@ def argmax(array, axis=0):
 def max_occurence(array):
     """
     find the element with highest occurrence in an array
-    :param array:
-    :return:
+
+    :type array: list
+
+    :param array: a vector
+
+    :rtype: int/float
+    :return: element with highest occurence
     """
     count = Counter(array)
     return max(count, key=count.get)
@@ -55,9 +74,15 @@ def max_occurence(array):
 def mean(array, axis=None):
     """
     numpy style mean of array
-    :param array:
-    :param axis:
-    :return:
+
+    :type array: list
+    :type axis: int
+
+    :param array: list of lists (matrix) or list (vector)
+    :param axis: if array is a matrix this is used to determine whether to calculate mean of array column or row wise
+
+    :rtype: list or int
+    :return: list with row/column mean(s) or int of overall mean
     """
     if isinstance(array, list):
 
@@ -87,9 +112,15 @@ def std(array, degrees_of_freedom=0, axis=None):
 
     """
     numpy style standard deviation of array
-    :param array:
-    :param axis:
-    :return:
+
+    :type array: list
+    :type axis: int
+
+    :param array: list of lists (matrix) or list (vector)
+    :param axis: if array is a matrix this is used to determine whether to calculate standard deviation of array column or row wise
+
+    :rtype: list or int
+    :return: list with row/column standard deviation(s) or int of overall standard deviation
     """
     if isinstance(array, list):
 
@@ -118,9 +149,15 @@ def variance(array, degrees_of_freedom=0, axis=None):
 
     """
     numpy style standard deviation of array
-    :param array:
-    :param axis:
-    :return:
+
+    :type array: list
+    :type axis: int
+
+    :param array: list of lists (matrix) or list (vector)
+    :param axis: if array is a matrix this is used to determine whether to calculate variance of array column or row wise
+
+    :rtype: list or int
+    :return: list with row/column standard deviation(s) or int of overall variance
     """
     if isinstance(array, list):
 
@@ -148,9 +185,14 @@ def variance(array, degrees_of_freedom=0, axis=None):
 def covariance(array):
 
     """
+    Calculates covariance matrix.
 
-    :param array: list of lists
-    :return:
+    :type array: list
+
+    :param array: list of lists representing a matrix
+
+    :rtype: list
+    :return: list of lists representing the covariance matrix of array
     """
 
     return Ccovariance(array)
@@ -158,8 +200,12 @@ def covariance(array):
 
 def sigmoid(array):
     """
-    Python implementation of element wise sigmoid
-    :param array: list
-    :return: list
+    Python implementation of element wise sigmoid of a vector
+
+    :type array: list
+    :param array: list representing a vector
+
+    :rtype: list
+    :return: list of same size as array
     """
-    return [1 / (1 + exp(-array_i)) for array_i in array]
+    return [1 / (1 + exp(-el)) for el in array]
