@@ -116,10 +116,10 @@ class LinearAlgebraTest(unittest.TestCase):
 
     def test_eigen_normalised(self):
         S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]
-        self.assertAlmostEqual(eigen(S, normalise=False)[0][0], 3)
-        self.assertAlmostEqual(eigen(S, normalise=False)[1][0][0], 0.7071067811865476)
+        self.assertAlmostEqual(eigen(S, sort=True, normalise=False)[0][0], 4)
+        self.assertAlmostEqual(eigen(S, sort=True, normalise=False)[1][0][0], 0.5773502691313449)
 
     def test_eigen_unnormalised(self):
         S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]
-        self.assertAlmostEqual(eigen(S, normalise=True)[0][0], 1)
-        self.assertAlmostEqual(eigen(S, normalise=True)[1][0][0], 1)
+        self.assertAlmostEqual(eigen(S, sort=True, normalise=True)[0][0], 4)
+        self.assertAlmostEqual(eigen(S, sort=True, normalise=True)[1][0][0], 1)

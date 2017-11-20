@@ -14,17 +14,17 @@ def dot_product(u, v):
     >>> v = [4, 5, 6]
     >>> x = dot_product(u, v)
     >>> print(x)
-    32
+    [32.0]
     >>> A = [[1, -1, 2], [0, -3, 1]]
     >>> x = [2, 1, 0]
     >>> result = dot_product(A, x)
     >>> print(result)
-    [1, -3]
+    [1.0, -3.0]
     >>> A = [[0, -4, 4], [-3, -2, 0]]
     >>> B = [[0, 1], [2, 1], [-1, 3]]
     >>> result = dot_product(A, B)
     >>> print(result)
-    [[0.0, -10.0], [-3.0, -1.0]]
+    [[-12.0, 8.0], [-4.0, -5.0]]
 
     """
     # TODO: write exceptions to help user with errors from the backend
@@ -71,20 +71,18 @@ def least_squares(X, y):
     return Clinear_algebra.least_squares(X, y)
 
 
-def eigen(array, tolerance=1.0e-9, max_iterations=0, normalise=True):
+def eigen(array, tolerance=1.0e-9, max_iterations=0, sort=True, normalise=True):
     # TODO: write exceptions to help user with errors from the backend
 
-    if normalise:
-        E, v = Clinear_algebra.eigen_solve(array, tolerance, max_iterations)
+    E, v = Clinear_algebra.eigen_solve(array, tolerance, max_iterations)
 
-        # sort eigenvalues and eigenvectors
-        idx = argsort(E)
+    if sort:
+        # sort eigenvalues and eigenvectors from biggest to smallest
+        idx = argsort(E)[::-1]
         E = [E[i] for i in idx]
         v = [[x[i] for i in idx] for x in v]
 
+    if normalise:
         v = [[x[i] / v[0][i] for i in range(len(x))] for x in v]
 
-        return E, v
-
-    else:
-        return Clinear_algebra.eigen_solve(array, tolerance, max_iterations)
+    return E, v
