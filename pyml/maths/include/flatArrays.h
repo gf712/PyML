@@ -1,6 +1,19 @@
-//
-// Created by Gil Ferreira Hoben on 10/11/17.
-//
+/**
+ *  @file    flatArrays.h
+ *  @author  Gil Ferreira Hoben (gf712)
+ *  @date    10/11/2017
+ *  @version 0.1
+ *
+ *  @brief Flat representation of 2D arrays
+ *
+ *  @section DESCRIPTION
+ *
+ *  This class represents 2D arrays with a 1D array
+ *  This improves computational as less time is spent
+ *  following pointers of pointers
+ *
+ */
+
 #include <Python.h>
 
 #ifndef PYML_FLATARRAYS_H

@@ -9,6 +9,7 @@
 #include <linearalgebramodule.h>
 #include "pythonconverters.h"
 #include <iostream>
+#include "../../utils/include/exceptionClasses.h"
 
 static PyObject* dot_product(PyObject* self, PyObject *args) {
 
@@ -17,6 +18,7 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
     // V is a list (vector)
     auto A = new flatArray;
     auto V = new flatArray;
+    flatArray * result = nullptr;
 
     // pointers to python lists
     PyObject * pAArray;
@@ -33,7 +35,15 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
 
 
     // calculate dot product
-    flatArray *result = A->dot(V);
+    try {
+        result = A->dot(V);
+    }
+    catch (flatArrayDimensionMismatch &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+    }
+    catch (flatArrayColumnMismatch &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+    }
 
     // convert result to python list
     PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
@@ -93,10 +103,12 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
     // variable instantiation
     auto A = new flatArray;
     auto B = new flatArray;
+    flatArray *result = nullptr;
 
     PyObject *pA;
     PyObject *pB;
     PyObject *result_py_list;
+    PyObject *FinalResult;
 
     // return error if we don't get all the arguments
     if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pA, &PyList_Type, &pB)) {
@@ -109,11 +121,27 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
     B->readFromPythonList(pB);
 
     // subtraction
-    flatArray *result = A->subtract(B);
+    try {
+        result = A->subtract(B);
+    }
+
+    catch (flatArrayDimensionMismatch &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return nullptr;
+    }
+
+    catch (flatArrayColumnMismatch &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return nullptr;
+    }
+
+    catch (flatArrayRowMismatch &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return nullptr;
+    }
 
     result_py_list = ConvertFlatArray_PyList(result, "float");
-
-    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+    FinalResult = Py_BuildValue("O", result_py_list);
 
     // memory deallocation
     delete result;

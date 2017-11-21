@@ -1,7 +1,21 @@
-//
-// Created by Gil Ferreira Hoben on 10/11/17.
-//
+/**
+ *  @file    flatArrays.cpp
+ *  @author  Gil Ferreira Hoben (gf712)
+ *  @date    10/11/2017
+ *  @version 0.1
+ *
+ *  @brief Flat representation of 2D arrays
+ *
+ *  @section DESCRIPTION
+ *
+ *  This class represents 2D arrays with a 1D array
+ *  This improves computational as less time is spent
+ *  following pointers of pointers
+ *
+ */
 #include "pythonconverters.h"
+#include "../../utils/include/exceptionClasses.h"
+
 
 void flatArray::readFromPythonList(PyObject *pyList) {
 
@@ -187,8 +201,7 @@ flatArray *flatArray::dot(flatArray *other) {
     if (other->getRows() > 1) {
         // matrix matrix multiplication
         if (cols != other->getRows()) {
-            PyErr_SetString(PyExc_ValueError, "Number of columns in A must be the same as the number of rows in B");
-            return nullptr;
+            throw flatArrayColumnMismatch(this, other);
         }
 
         auto result = new flatArray;
@@ -225,8 +238,7 @@ flatArray *flatArray::dot(flatArray *other) {
     else if (other->getRows() == 1) {
         // matrix vector multiplication
         if (cols != other->getCols()){
-            PyErr_SetString(PyExc_ValueError, "A and v must have the same size");
-            return nullptr;
+            throw flatArrayColumnMismatch(this, other);
         }
 
         auto result = new flatArray;
@@ -247,8 +259,7 @@ flatArray *flatArray::dot(flatArray *other) {
     }
 
     else {
-        // ERROR
-        return nullptr;
+        throw flatArrayDimensionMismatch(this, other);
     }
 }
 
@@ -302,21 +313,28 @@ flatArray *flatArray::subtract(flatArray *other) {
         }
 
         else {
-            PyErr_SetString(PyExc_ValueError, "Matrix and vector must have matching number of rows or columns.");
-            return nullptr;
+            throw flatArrayDimensionMismatch(this, other);
         }
     }
 
-    else {
-        // both are matrices or vectors
+    else if (other->getRows() == 1 && other->getCols() == 1) {
+        // other is a scalar represented as an array
+        double B = other->getNElement(0);
+
+        for (int i = 0; i < size; ++i) {
+            result->setNElement(array[i] - B, i);
+        }
+
+    }
+
+    else if (other->getSize() == size) {
+        // both are matrices or vectors (with same size)
 
         if (rows != other->getRows()) {
-            PyErr_SetString(PyExc_ValueError, "Arrays must have matching number of rows.");
-            return nullptr;
+            throw flatArrayRowMismatch(this, other);
         }
         if (cols != other->getCols()) {
-            PyErr_SetString(PyExc_ValueError, "Arrays must have matching number of columns.");
-            return nullptr;
+            throw flatArrayColumnMismatch(this, other);
         }
 
         double *B = other->getArray();
@@ -326,8 +344,13 @@ flatArray *flatArray::subtract(flatArray *other) {
         }
     }
 
+    else {
+        throw flatArrayDimensionMismatch(this, other);
+    }
+
     return result;
 }
+
 
 flatArray *flatArray::power(int p) {
 

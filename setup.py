@@ -20,7 +20,8 @@ linear_algebra_module = Extension('pyml.maths.Clinear_algebra',
                                            'pyml/maths/src/maths.cpp'],
                                   extra_compile_args=['-std=c++11'],
                                   # extra_link_args=['-lgomp'],
-                                  include_dirs=['pyml/maths/include'],
+                                  include_dirs=['pyml/maths/include',
+                                                'pyml/utils/include'],
                                   language='c++')
 
 optimisers_module = Extension('pyml.maths.optimisers',
@@ -30,7 +31,8 @@ optimisers_module = Extension('pyml.maths.optimisers',
                                        'pyml/maths/src/flatArrays.cpp'],
                               extra_compile_args=['-std=c++11'],
                               # extra_link_args=['-lgomp'],
-                              include_dirs=['pyml/maths/include'],
+                              include_dirs=['pyml/maths/include',
+                                            'pyml/utils/include'],
                               language='c++')
 
 distances = Extension('pyml.metrics.CMetrics',
@@ -40,7 +42,8 @@ distances = Extension('pyml.metrics.CMetrics',
                                'pyml/maths/src/flatArrays.cpp'],
                       extra_compile_args=['-std=c++11'],
                       include_dirs=['pyml/metrics/include',
-                                    'pyml/maths/include'],
+                                    'pyml/maths/include',
+                                    'pyml/utils/include'],
                       language='c++')
 
 maths = Extension('pyml.maths.CMaths',
@@ -49,7 +52,8 @@ maths = Extension('pyml.maths.CMaths',
                            'pyml/maths/src/pythonconverters.cpp',
                            'pyml/maths/src/flatArrays.cpp'],
                   extra_compile_args=['-std=c++11'],
-                  include_dirs=['pyml/maths/include'],
+                  include_dirs=['pyml/maths/include',
+                                'pyml/utils/include'],
                   language='c++')
 
 setup(
