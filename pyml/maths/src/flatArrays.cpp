@@ -49,6 +49,29 @@ void flatArray::identity(int n) {
 }
 
 
+void flatArray::constArray(int rows_, int cols_, int c) {
+
+    startEmptyArray(rows_, cols_);
+
+    for (int i = 0; i < size; ++i) {
+        array[i] = c;
+    }
+
+}
+
+
+void flatArray::zeroArray(int rows_, int cols_) {
+
+    constArray(rows_, cols_, 0);
+}
+
+
+void flatArray::oneArray(int rows_, int cols_) {
+
+    constArray(rows_, cols_, 1);
+}
+
+
 int flatArray::getRows() {
     return flatArray::rows;
 }

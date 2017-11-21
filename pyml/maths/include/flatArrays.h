@@ -32,6 +32,9 @@ public:
     void readFromPythonList(PyObject *pyList);
     void startEmptyArray(int rows_, int cols_);
     void identity(int n);
+    void zeroArray(int rows_, int cols_);
+    void oneArray(int rows_, int cols_);
+    void constArray(int rows_, int cols_, int c);
 
     // GETTERS/SETTERS
     // column and row size
