@@ -126,6 +126,43 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
 }
 
 
+static PyObject* divide(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    auto A = new flatArray;
+    double n;
+
+    // pointers to python lists
+    PyObject * pAArray;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!d", &PyList_Type, &pAArray, &n)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and a float!");
+        return nullptr;
+    }
+
+    // read in python list
+    A->readFromPythonList(pAArray);
+
+    // calculate elementwise division by n
+    flatArray *result = A->divide(n);
+
+    // convert vector to python list
+    PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
+
+    // build python object
+    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    // deallocate memory
+    delete A;
+    delete result;
+
+    Py_DECREF(result_py_list);
+
+    return FinalResult;
+}
+
+
 static PyObject* sum(PyObject* self, PyObject *args) {
 
     // sum of all elements in a matrix/vector
@@ -437,6 +474,7 @@ static PyMethodDef linearAlgebraMethods[] = {
         {"dot_product",   dot_product,            METH_VARARGS,            "Calculate the dot product of two vectors"},
         {"power",         power,                  METH_VARARGS,            "Calculate element wise power"},
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
+        {"divide",        divide,                 METH_VARARGS,            "Calculate element wise division"},
         {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
         {"transpose",     pyTranspose,            METH_VARARGS,            "Transpose a 2D matrix"},
         {"least_squares", least_squares,          METH_VARARGS,            "Perform least squares"},

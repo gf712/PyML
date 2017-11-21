@@ -118,12 +118,33 @@ def power(A, n):
     return Clinear_algebra.power(A, n)
 
 
-def divide(u, n):
-    return [x / n for x in u]
+def divide(A, n):
+    """
+    Calculates elementwise division of a list (vector) or list of lists (matrix)
+
+    :type A: list
+    :type n: float
+
+    :param A: either a list or a list of lists
+    :param n: scalar to perform division
+
+    :rtype: list
+    :return: same shape as A (list or list of lists)
+
+    Example:
+    --------
+
+    >>> from pyml.maths import divide
+    >>> A = [[0, -4, 4], [-3, -2, 0]]
+    >>> print(divide(A, 2))
+    [[0.0, -2.0, 2.0], [-1.5, -1.0, 0.0]]
+    """
+    return Clinear_algebra.divide(A, n)
 
 
 def least_squares(X, y):
     """
+    Solves a system of linear equations using Gaussian elimination
 
     :type X: list
     :type y: list
@@ -132,7 +153,8 @@ def least_squares(X, y):
     :param y: a vector with all targets
 
     :rtype: list
-    :return: list with the same number of dimensions as the number of columns of X with the solution of the least squares problem
+    :return: list with the same number of dimensions as the number of columns of X with the solution of the system of
+    linear equations
     """
     # TODO: write exceptions to help user with errors from the backend
 
@@ -140,6 +162,31 @@ def least_squares(X, y):
 
 
 def eigen(array, tolerance=1.0e-9, max_iterations=0, sort=True, normalise=True):
+    """
+    :type array: list
+    :type tolerance: float
+    :type max_iterations: int
+    :type sort: bool
+    :type normalise: bool
+
+    :param array: list of lists representing a matrix
+    :param tolerance: early stopping parameter of Jacobi matrix decomposition algorithm
+    :param max_iterations: maximum number of iterations of Jacobi matrix decomposition algorithm
+    :param sort: whether or not to sort eigenvalues (descending) and respective eigenvectors
+    :param normalise: whether or not to normalise eigenvectors using eigenvectors of the first eigenvalue
+
+    :rtype: tuple
+    :return: (eigenvalues (list), eigenvectors(list of lists))
+
+    Example:
+    --------
+
+    >>> from pyml.maths import eigen
+    >>> S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]
+    >>> print(eigen(S))
+    ([4.0, 3.0, 1.0], [[1.0, 1.0, 1.0], [-1.0, -3.7e-10, 2.0], [1.0, -1.0, 1.0]])
+
+    """
 
     # TODO: write exceptions to help user with errors from the backend
 
