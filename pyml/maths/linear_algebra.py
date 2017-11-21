@@ -95,7 +95,7 @@ def subtract(A, B):
 
 def power(A, n):
     """
-    Calculates elementwise power of each element in a list (vector) or list of lists (matrix)
+    Calculates elementwise power of a list (vector) or list of lists (matrix)
 
     :type A: list
     :type n: int

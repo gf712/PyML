@@ -11,12 +11,6 @@ def calculate_distance(u, v, p):
         else:
             raise ValueError("Unknown norm.")
 
-    if isinstance(u, (float, int)):
-        u = [u]
-
-    if isinstance(v, (float, int)):
-        v = [v]
-
     if p == 1:
         return manhattan_distance(u, v)
     elif p == 2:

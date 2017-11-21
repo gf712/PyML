@@ -55,7 +55,6 @@ static PyObject* power(PyObject* self, PyObject *args) {
 
     // variable declaration
     auto A = new flatArray;
-    auto result = new flatArray;
     int p;
 
     // pointers to python lists
@@ -72,7 +71,7 @@ static PyObject* power(PyObject* self, PyObject *args) {
     A->readFromPythonList(pAArray);
 
     // calculate the power elementwise
-    result = A->power(p);
+    flatArray *result = A->power(p);
 
     // convert vector to python list
     PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
@@ -151,11 +150,11 @@ static PyObject* sum(PyObject* self, PyObject *args) {
     return FinalResult;
 }
 
+
 static PyObject* pyTranspose(PyObject* self, PyObject *args) {
 
     // declarations
     auto A = new flatArray;
-//    int block_size;
     PyObject* pyResult;
     PyObject* pArray;
 
@@ -164,10 +163,6 @@ static PyObject* pyTranspose(PyObject* self, PyObject *args) {
         PyErr_SetString(PyExc_TypeError, "Expected a list!");
         return nullptr;
     }
-
-//    if (block_size <= 0) {
-//        block_size = 1;
-//    }
 
     A->readFromPythonList(pArray);
 

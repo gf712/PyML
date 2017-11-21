@@ -53,7 +53,7 @@ def argmax(array, axis=0):
     :param axis:
     :return:
     """
-    return Cargmin(array, axis)
+    return Cargmax(array, axis)
 
 
 def max_occurence(array):
