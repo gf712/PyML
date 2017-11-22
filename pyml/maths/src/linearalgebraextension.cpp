@@ -11,6 +11,7 @@
 #include <iostream>
 #include "../../utils/include/exceptionClasses.h"
 
+
 static PyObject* dot_product(PyObject* self, PyObject *args) {
 
     // variable instantiation
@@ -38,10 +39,10 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
     try {
         result = A->dot(V);
     }
-    catch (flatArrayDimensionMismatch &e) {
+    catch (flatArrayDimensionMismatchException &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
     }
-    catch (flatArrayColumnMismatch &e) {
+    catch (flatArrayColumnMismatchException &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
     }
 
@@ -125,17 +126,17 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
         result = A->subtract(B);
     }
 
-    catch (flatArrayDimensionMismatch &e) {
+    catch (flatArrayDimensionMismatchException &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
         return nullptr;
     }
 
-    catch (flatArrayColumnMismatch &e) {
+    catch (flatArrayColumnMismatchException &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
         return nullptr;
     }
 
-    catch (flatArrayRowMismatch &e) {
+    catch (flatArrayRowMismatchException &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
         return nullptr;
     }
@@ -493,7 +494,7 @@ static PyObject* eigenSolve(PyObject* self, PyObject *args) {
 
 
 static PyObject* version(PyObject* self) {
-    return Py_BuildValue("s", "Version 0.2");
+    return Py_BuildValue("s", "Version 0.3");
 }
 
 

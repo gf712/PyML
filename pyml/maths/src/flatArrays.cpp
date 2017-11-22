@@ -9,7 +9,7 @@
  *  @section DESCRIPTION
  *
  *  This class represents 2D arrays with a 1D array
- *  This improves computational as less time is spent
+ *  This improves computation speed as less time is spent
  *  following pointers of pointers
  *
  */
@@ -94,17 +94,60 @@ int flatArray::getCols() {
     return flatArray::cols;
 }
 
+
+void flatArray::setRows(int r) {
+    rows = r;
+    // update size
+    size = rows * cols;
+}
+
+
+void flatArray::setCols(int c) {
+    cols = c;
+    // update size
+    size = rows * cols;
+}
+
+
 double *flatArray::getArray() {
     return flatArray::array;
 }
 
-double flatArray::getElement(int row, int col) {
-    return array[cols*row+col%cols];
+
+int flatArray::getSize() {
+    return size;
 }
 
-void flatArray::setElement(double value, int row, int col) {
-    array[cols*row+col%cols] = value;
+
+double flatArray::getNElement(int n) {
+    if (n > size) {
+        throw flatArrayOutOfBoundsException(this, n);
+    }
+    return array[n];
 }
+
+
+void flatArray::setNElement(double value, int n) {
+    if (n > size) {
+        throw flatArrayOutOfBoundsException(this, n);
+    }
+    array[n] = value;
+}
+
+
+void flatArray::setElement(double value, int row, int col) {
+    int n = cols * row + col;
+
+    setNElement(value, n);
+}
+
+
+double flatArray::getElement(int row, int col) {
+    int n = cols * row + col;
+
+    return getNElement(n);
+}
+
 
 flatArray* flatArray::transpose() {
     // faster transpose method
@@ -124,17 +167,6 @@ flatArray* flatArray::transpose() {
     return result;
 }
 
-double flatArray::getNElement(int n) {
-    return array[n];
-}
-
-void flatArray::setNElement(double value, int n) {
-    array[n] = value;
-}
-
-int flatArray::getSize() {
-    return size;
-}
 
 double flatArray::sum() {
 
@@ -147,7 +179,12 @@ double flatArray::sum() {
     return result;
 }
 
+
 double *flatArray::getRow(int i) {
+
+    if (i > rows) {
+        throw flatArrayOutOfBoundsRowException(this, i);
+    }
 
     double *row = nullptr;
 
@@ -162,7 +199,12 @@ double *flatArray::getRow(int i) {
     return row;
 }
 
+
 double *flatArray::getCol(int j) {
+
+    if (j > cols) {
+        throw flatArrayOutOfBoundsColumnException(this, j);
+    }
 
     double *column = nullptr;
 
@@ -177,7 +219,12 @@ double *flatArray::getCol(int j) {
     return column;
 }
 
+
 void flatArray::setRow(double *row, int i) {
+
+    if (i > rows) {
+        throw flatArrayOutOfBoundsRowException(this, i);
+    }
 
     int n = 0;
 
@@ -187,7 +234,12 @@ void flatArray::setRow(double *row, int i) {
     }
 }
 
+
 void flatArray::setCol(double *column, int j) {
+
+    if (j > cols) {
+        throw flatArrayOutOfBoundsColumnException(this, j);
+    }
 
     int n = 0;
     for (int k = j; k < size; k+=cols) {
@@ -196,12 +248,13 @@ void flatArray::setCol(double *column, int j) {
     }
 }
 
+
 flatArray *flatArray::dot(flatArray *other) {
 
     if (other->getRows() > 1) {
         // matrix matrix multiplication
         if (cols != other->getRows()) {
-            throw flatArrayColumnMismatch(this, other);
+            throw flatArrayColumnMismatchException(this, other);
         }
 
         auto result = new flatArray;
@@ -238,7 +291,7 @@ flatArray *flatArray::dot(flatArray *other) {
     else if (other->getRows() == 1) {
         // matrix vector multiplication
         if (cols != other->getCols()){
-            throw flatArrayColumnMismatch(this, other);
+            throw flatArrayDimensionMismatchException(this, other);
         }
 
         auto result = new flatArray;
@@ -259,9 +312,10 @@ flatArray *flatArray::dot(flatArray *other) {
     }
 
     else {
-        throw flatArrayDimensionMismatch(this, other);
+        throw flatArrayDimensionMismatchException(this, other);
     }
 }
+
 
 flatArray *flatArray::subtract(flatArray *other) {
 
@@ -313,7 +367,7 @@ flatArray *flatArray::subtract(flatArray *other) {
         }
 
         else {
-            throw flatArrayDimensionMismatch(this, other);
+            throw flatArrayDimensionMismatchException(this, other);
         }
     }
 
@@ -330,11 +384,8 @@ flatArray *flatArray::subtract(flatArray *other) {
     else if (other->getSize() == size) {
         // both are matrices or vectors (with same size)
 
-        if (rows != other->getRows()) {
-            throw flatArrayRowMismatch(this, other);
-        }
-        if (cols != other->getCols()) {
-            throw flatArrayColumnMismatch(this, other);
+        if (rows != other->getRows() || cols != other->getCols()) {
+            throw flatArrayDimensionMismatchException(this, other);
         }
 
         double *B = other->getArray();
@@ -345,7 +396,7 @@ flatArray *flatArray::subtract(flatArray *other) {
     }
 
     else {
-        throw flatArrayDimensionMismatch(this, other);
+        throw flatArrayDimensionMismatchException(this, other);
     }
 
     return result;
@@ -365,30 +416,25 @@ flatArray *flatArray::power(int p) {
     return result;
 }
 
+
 flatArray *flatArray::divide(double m) {
+
+    if (m == 0) {
+        throw flatArrayZeroDivisionError();
+    }
 
     auto result = new flatArray;
 
     result->startEmptyArray(rows, cols);
 
     for (int n = 0; n < size; ++n) {
+
         result->setNElement(array[n] / m, n);
     }
 
     return result;
 }
 
-void flatArray::setRows(int r) {
-    rows = r;
-    // update size
-    size = rows * cols;
-}
-
-void flatArray::setCols(int c) {
-    cols = c;
-    // update size
-    size = rows * cols;
-}
 
 flatArray *flatArray::multiply(flatArray *other) {
     auto result = new flatArray;
@@ -402,9 +448,10 @@ flatArray *flatArray::multiply(flatArray *other) {
     return result;
 }
 
-flatArray *flatArray::nlog(double base) {
-    auto result = new flatArray;
 
+flatArray *flatArray::nlog(double base) {
+
+    auto result = new flatArray;
 
     result->startEmptyArray(rows, cols);
 
@@ -414,6 +461,7 @@ flatArray *flatArray::nlog(double base) {
 
     return result;
 }
+
 
 flatArray *flatArray::mean(int axis) {
 
@@ -459,7 +507,7 @@ flatArray *flatArray::mean(int axis) {
             }
         }
 
-        else {
+        else if (axis == 1) {
             // mean of each row
             double rowResult;
 
@@ -481,10 +529,16 @@ flatArray *flatArray::mean(int axis) {
                 delete [] rowArray;
             }
         }
+
+        else {
+            throw flatArrayUnknownAxis(axis);
+        }
+
     }
 
     return result;
 }
+
 
 flatArray *flatArray::std(int degreesOfFreedom, int axis) {
 
@@ -581,7 +635,7 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
             }
         }
 
-        else {
+        else if (axis == 1) {
             // std of each row
             double rowResult;
 
@@ -604,6 +658,10 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
                 delete [] rowArray;
             }
         }
+
+        else {
+            throw flatArrayUnknownAxis(axis);
+        }
     }
 
     delete arrayMean;
@@ -616,6 +674,10 @@ double *flatArray::getRowSlice(int i, int start, int end) {
 
     double *row = getRow(i);
     double *result = nullptr;
+
+    if (end > getCols()) {
+        arrayOutOfBoundsException(getRows(), end);
+    }
 
     result = new double [end - start];
 
@@ -632,10 +694,15 @@ double *flatArray::getRowSlice(int i, int start, int end) {
     return result;
 }
 
+
 double *flatArray::getColSlice(int j, int start, int end) {
 
     double *col = getCol(j);
     double *result = nullptr;
+
+    if (end > getCols()) {
+        arrayOutOfBoundsException(getCols(), end);
+    }
 
     result = new double[end - start];
 
@@ -651,6 +718,7 @@ double *flatArray::getColSlice(int j, int start, int end) {
 
     return result;
 }
+
 
 double *flatArray::diagonal() {
 

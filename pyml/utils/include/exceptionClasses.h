@@ -21,10 +21,10 @@ public:
 };
 
 
-class flatArrayDimensionMismatch: public flatArrayException {
+class flatArrayDimensionMismatchException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayDimensionMismatch(flatArray *A, flatArray* B) {
+    flatArrayDimensionMismatchException(flatArray *A, flatArray* B) {
         std::string thisColumn = std::to_string(A->getCols());
         std::string thisRow = std::to_string(A->getRows());
         std::string otherColumn = std::to_string(B->getCols());
@@ -32,7 +32,7 @@ public:
 
         std::string msg = "Shape mismatch! Got an array of shape {" + thisRow + ", " + thisColumn + "} and {" + otherRow + ", " + otherColumn + "}!";
 
-        flatArrayDimensionMismatch::errorMsg = msg.c_str();
+        flatArrayDimensionMismatchException::errorMsg = msg.c_str();
     };
 
     const char* what() const throw() override {
@@ -41,16 +41,16 @@ public:
 };
 
 
-class flatArrayColumnMismatch: public flatArrayException {
+class flatArrayColumnMismatchException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayColumnMismatch(flatArray *A, flatArray* B) {
+    flatArrayColumnMismatchException(flatArray *A, flatArray* B) {
         std::string thisColumn = std::to_string(A->getCols());
         std::string otherColumn = std::to_string(B->getCols());
 
-        std::string msg = "Column number mismatch! Got an array with " + thisColumn + " columns " + " and an array with " + otherColumn + " columns!";
+        std::string msg = "Column number mismatch! Got an array with " + thisColumn + " columns and an array with " + otherColumn + " columns!";
 
-        flatArrayColumnMismatch::errorMsg = msg.c_str();
+        flatArrayColumnMismatchException::errorMsg = msg.c_str();
     };
 
     const char* what() const throw() override {
@@ -59,22 +59,144 @@ public:
 };
 
 
-class flatArrayRowMismatch: public flatArrayException {
+class flatArrayRowMismatchException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayRowMismatch(flatArray *A, flatArray* B) {
+    flatArrayRowMismatchException(flatArray *A, flatArray* B) {
         std::string thisRow = std::to_string(A->getRows());
         std::string otherRow = std::to_string(B->getRows());
 
-        std::string msg = "Rows number mismatch! Got an array with " + thisRow + " rows " + " and an array with " + otherRow + " rows!";
+        std::string msg = "Row number mismatch! Got an array with " + thisRow + " rows and an array with " + otherRow + " rows!";
 
-        flatArrayRowMismatch::errorMsg = msg.c_str();
+        flatArrayRowMismatchException::errorMsg = msg.c_str();
     };
 
     const char* what() const throw() override {
         return errorMsg.c_str();
     }
 };
+
+
+class flatArrayOutOfBoundsException: public flatArrayException {
+    std::string errorMsg;
+public:
+    flatArrayOutOfBoundsException(flatArray *A, int n) {
+
+        std::string nString = std::to_string(n);
+        std::string sizeString = std::to_string(A->getSize());
+
+        std::string msg = "Accessing an element that is out of bounds! Attempting to access element at position "
+                          + nString + " in an array of size " + sizeString + " !";
+
+        flatArrayOutOfBoundsException::errorMsg = msg.c_str();
+    };
+
+    const char* what() const throw() override {
+        return errorMsg.c_str();
+    }
+};
+
+class flatArrayOutOfBoundsRowException: public flatArrayException {
+    std::string errorMsg;
+public:
+    flatArrayOutOfBoundsRowException(flatArray *A, int n) {
+
+        std::string nString = std::to_string(n);
+        std::string sizeString = std::to_string(A->getRows());
+
+        std::string msg = "Accessing an element that is out of bounds! Attempting to access row "
+                          + nString + " in an array with " + sizeString + " rows!";
+
+        flatArrayOutOfBoundsRowException::errorMsg = msg.c_str();
+    };
+
+    const char* what() const throw() override {
+        return errorMsg.c_str();
+    }
+};
+
+
+class flatArrayOutOfBoundsColumnException: public flatArrayException {
+    std::string errorMsg;
+public:
+    flatArrayOutOfBoundsColumnException(flatArray *A, int n) {
+
+        std::string nString = std::to_string(n);
+        std::string sizeString = std::to_string(A->getCols());
+
+        std::string msg = "Accessing an element that is out of bounds! Attempting to access column "
+                          + nString + " in an array with " + sizeString + " rows!";
+
+        flatArrayOutOfBoundsColumnException::errorMsg = msg.c_str();
+    };
+
+    const char* what() const throw() override {
+        return errorMsg.c_str();
+    }
+};
+
+
+class flatArrayZeroDivisionError: public flatArrayException {
+    std::string errorMsg;
+public:
+    flatArrayZeroDivisionError() {
+
+        std::string msg = "Trying to divide array by zero!";
+
+        flatArrayZeroDivisionError::errorMsg = msg.c_str();
+    };
+
+    const char* what() const throw() override {
+        return errorMsg.c_str();
+    }
+};
+
+
+class flatArrayUnknownAxis: public flatArrayException {
+    std::string errorMsg;
+public:
+    flatArrayUnknownAxis(int axis) {
+
+        std::string stringAxis = std::to_string(axis);
+
+        std::string msg = "Axis " + stringAxis + " is greater than 1!";
+
+        flatArrayUnknownAxis::errorMsg = msg.c_str();
+    };
+
+    const char* what() const throw() override {
+        return errorMsg.c_str();
+    }
+};
+
+
+class arrayException: public std::exception {
+public:
+    const char* what() const throw() override {
+        return "Array Exception";
+    }
+};
+
+
+class arrayOutOfBoundsException: public flatArrayException {
+    std::string errorMsg;
+public:
+    arrayOutOfBoundsException(int size, int n) {
+
+        std::string nString = std::to_string(n);
+        std::string sizeString = std::to_string(size);
+
+        std::string msg = "Accessing an element that is out of bounds! Attempting to access element at position "
+                          + nString + " in an array of size " + sizeString + " !";
+
+        arrayOutOfBoundsException::errorMsg = msg.c_str();
+    };
+
+    const char* what() const throw() override {
+        return errorMsg.c_str();
+    }
+};
+
 
 
 #ifdef __cplusplus
