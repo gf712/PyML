@@ -3,16 +3,16 @@
 //
 #include "maths.h"
 
-
-void swapDouble(double* a, double* b)
+template <typename T>
+inline void swap(T& a, T& b)
 {
-    double t = *a;
-    *a = *b;
-    *b = t;
+    T t = a;
+    a = b;
+    b = t;
 }
 
 
-int factorial(int size) {
+inline int factorial(int size) {
     int fact=1;
 
     for(int i=2; i<=size; i++) {
@@ -23,14 +23,14 @@ int factorial(int size) {
 }
 
 
-void permutations(double* array, double** result, int size) {
+inline void permutations(double* array, double** result, int size) {
 
     int fact=factorial(size);
 
     for(int i=0;i<fact;i++) {
         int j = i % (size-1);
 
-        swapDouble(&array[j], &array[j+1]);
+        swap(array[j], array[j+1]);
 
         for (int k = 0; k < size; ++k) {
             result[i][k] = array[k];
@@ -41,24 +41,26 @@ void permutations(double* array, double** result, int size) {
 }
 
 
-int partition(double* array, double* order, int low, int high) {
+template <typename T>
+int partition(T* array, int* order, int low, int high) {
     double pivot = array[low];
     int i = low;
 
     for (int j = i + 1; j < high; ++j) {
         if (array[j] <= pivot) {
             i++;
-            swapDouble(&array[i], &array[j]);
-            swapDouble(&order[i], &order[j]);
+            swap(array[i], array[j]);
+            swap(order[i], order[j]);
         }
     }
-    swapDouble(&array[i], &array[low]);
-    swapDouble(&order[i], &order[low]);
+    swap(array[i], array[low]);
+    swap(order[i], order[low]);
     return i;
 }
 
 
-void quicksort(double* array, double* order, int low, int high) {
+template <typename T>
+void quicksort(T* array, int* order, int low, int high) {
     if (low < high) {
         int p = partition(array, order, low, high);
         quicksort(array, order, low, p);
@@ -67,7 +69,7 @@ void quicksort(double* array, double* order, int low, int high) {
 }
 
 
-int argmax(const double *array, int size) {
+inline int argmax(const double *array, int size) {
 
     int result = 0;
     double max = array[result];
@@ -83,7 +85,7 @@ int argmax(const double *array, int size) {
 }
 
 
-int argmin(const double *array, int size) {
+inline int argmin(const double *array, int size) {
 
     int result = 0;
     double min = array[result];

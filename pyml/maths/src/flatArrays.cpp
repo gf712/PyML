@@ -15,145 +15,80 @@
  */
 #include "pythonconverters.h"
 #include "../../utils/include/exceptionClasses.h"
+#include "arrayInitialisers.h"
 
 
-void flatArray::readFromPythonList(PyObject *pyList) {
-
-    // read in array from Python list
-    // check if it's a matrix or a vector
-    if (PyFloat_Check(PyList_GET_ITEM(pyList, 0)) || PyLong_Check(PyList_GET_ITEM(pyList, 0))) {
-        cols = static_cast<int>(PyList_GET_SIZE(pyList));
-        rows = 1;
-    }
-    else {
-        rows = static_cast<int>(PyList_GET_SIZE(pyList));
-        cols = static_cast<int>(PyList_GET_SIZE(PyList_GET_ITEM(pyList, 0)));
-    }
-    // memory allocation of array
-    startEmptyArray(rows, cols);
-
-    convertPy_flatArray(pyList, this);
-}
-
-
-void flatArray::startEmptyArray(int rows, int cols) {
-    flatArray::rows = rows;
-    flatArray::cols = cols;
-    size = rows * cols;
-    array = nullptr;
-    array = new double [size];
-}
-
-
-void flatArray::identity(int n) {
-
-    startEmptyArray(n, n);
-
-    int row=0;
-
-    for (int i = 0; i < size; ++i) {
-        if (i == row) {
-            array[i] = 1;
-            row += cols + 1;
-        }
-        else {
-            array[i] = 0;
-        }
-    }
-}
-
-
-void flatArray::constArray(int rows_, int cols_, int c) {
-
-    startEmptyArray(rows_, cols_);
-
-    for (int i = 0; i < size; ++i) {
-        array[i] = c;
-    }
-
-}
-
-
-void flatArray::zeroArray(int rows_, int cols_) {
-
-    constArray(rows_, cols_, 0);
-}
-
-
-void flatArray::oneArray(int rows_, int cols_) {
-
-    constArray(rows_, cols_, 1);
-}
-
-
-int flatArray::getRows() {
+template <class T>
+int flatArray<T>::getRows() {
     return flatArray::rows;
 }
 
-int flatArray::getCols() {
+template <class T>
+int flatArray<T>::getCols() {
     return flatArray::cols;
 }
 
-
-void flatArray::setRows(int r) {
+template <class T>
+void flatArray<T>::setRows(int r) {
     rows = r;
     // update size
     size = rows * cols;
 }
 
-
-void flatArray::setCols(int c) {
+template <class T>
+void flatArray<T>::setCols(int c) {
     cols = c;
     // update size
     size = rows * cols;
 }
 
-
-double *flatArray::getArray() {
+template <class T>
+T* flatArray<T>::getArray() {
     return flatArray::array;
 }
 
-
-int flatArray::getSize() {
+template <class T>
+int flatArray<T>::getSize() {
     return size;
 }
 
-
-double flatArray::getNElement(int n) {
+template <class T>
+T flatArray<T>::getNElement(int n) {
     if (n > size) {
-        throw flatArrayOutOfBoundsException(this, n);
+        throw flatArrayOutOfBoundsException<T>(this, n);
     }
     return array[n];
 }
 
-
-void flatArray::setNElement(double value, int n) {
+template <class T>
+void flatArray<T>::setNElement(T value, int n) {
     if (n > size) {
-        throw flatArrayOutOfBoundsException(this, n);
+        throw flatArrayOutOfBoundsException<T>(this, n);
     }
     array[n] = value;
 }
 
-
-void flatArray::setElement(double value, int row, int col) {
+template <class T>
+void flatArray<T>::setElement(T value, int row, int col) {
     int n = cols * row + col;
 
     setNElement(value, n);
 }
 
-
-double flatArray::getElement(int row, int col) {
+template <class T>
+T flatArray<T>::getElement(int row, int col) {
     int n = cols * row + col;
 
     return getNElement(n);
 }
 
 
-flatArray* flatArray::transpose() {
+template <class T>
+flatArray<T>* flatArray<T>::transpose() {
     // faster transpose method
-    auto result = new flatArray;
+    flatArray* result = nullptr;
 
-    result->startEmptyArray(cols, rows);
+    result = emptyArray <T> (cols, rows);
 
     for (int n = 0; n < rows * cols; ++n) {
 
@@ -167,10 +102,10 @@ flatArray* flatArray::transpose() {
     return result;
 }
 
+template <class T>
+T flatArray<T>::sum() {
 
-double flatArray::sum() {
-
-    double result = 0;
+    T result = 0;
 
     for (int n = 0; n < size; ++n) {
         result += array[n];
@@ -179,16 +114,16 @@ double flatArray::sum() {
     return result;
 }
 
-
-double *flatArray::getRow(int i) {
+template <class T>
+T* flatArray<T>::getRow(int i) {
 
     if (i > rows) {
-        throw flatArrayOutOfBoundsRowException(this, i);
+        throw flatArrayOutOfBoundsRowException<T>(this, i);
     }
 
-    double *row = nullptr;
+    T *row = nullptr;
 
-    row = new double [cols];
+    row = new T [cols];
     int n = 0;
 
     for (int j = i * cols; j < (i + 1) * cols; ++j) {
@@ -199,16 +134,16 @@ double *flatArray::getRow(int i) {
     return row;
 }
 
-
-double *flatArray::getCol(int j) {
+template <class T>
+T *flatArray<T>::getCol(int j) {
 
     if (j > cols) {
-        throw flatArrayOutOfBoundsColumnException(this, j);
+        throw flatArrayOutOfBoundsColumnException<T>(this, j);
     }
 
-    double *column = nullptr;
+    T *column = nullptr;
 
-    column = new double [rows];
+    column = new T [rows];
     int n = 0;
 
     for (int i = j; i < size; i+=cols) {
@@ -219,11 +154,11 @@ double *flatArray::getCol(int j) {
     return column;
 }
 
-
-void flatArray::setRow(double *row, int i) {
+template <class T>
+void flatArray<T>::setRow(T *row, int i) {
 
     if (i > rows) {
-        throw flatArrayOutOfBoundsRowException(this, i);
+        throw flatArrayOutOfBoundsRowException<T>(this, i);
     }
 
     int n = 0;
@@ -234,11 +169,11 @@ void flatArray::setRow(double *row, int i) {
     }
 }
 
-
-void flatArray::setCol(double *column, int j) {
+template <class T>
+void flatArray<T>::setCol(T *column, int j) {
 
     if (j > cols) {
-        throw flatArrayOutOfBoundsColumnException(this, j);
+        throw flatArrayOutOfBoundsColumnException<T>(this, j);
     }
 
     int n = 0;
@@ -248,25 +183,26 @@ void flatArray::setCol(double *column, int j) {
     }
 }
 
+template <class T>
+flatArray<T>* flatArray<T>::dot(flatArray* other) {
 
-flatArray *flatArray::dot(flatArray *other) {
+    flatArray* result = nullptr;
 
     if (other->getRows() > 1) {
         // matrix matrix multiplication
         if (cols != other->getRows()) {
-            throw flatArrayColumnMismatchException(this, other);
+            throw flatArrayColumnMismatchException<T>(this, other);
         }
 
-        auto result = new flatArray;
-        result->startEmptyArray(rows, other->getCols());
+        result = emptyArray<T>(rows, other->getCols());
 
         int rRows = result->getRows();
         int rCols = result->getCols();
         int N = getCols();
         int M = other->getCols();
         int n, i, j, k, posA, posB;
-        double eResult;
-        double *otherArray = other->getArray();
+        T eResult;
+        T *otherArray = other->getArray();
 
         for (i = 0; i < rRows; ++i) {
             for (j = 0; j < rCols; ++j) {
@@ -291,16 +227,15 @@ flatArray *flatArray::dot(flatArray *other) {
     else if (other->getRows() == 1) {
         // matrix vector multiplication
         if (cols != other->getCols()){
-            throw flatArrayDimensionMismatchException(this, other);
+            throw flatArrayDimensionMismatchException<T>(this, other);
         }
 
-        auto result = new flatArray;
-        result->startEmptyArray(1, rows);
-        double *v = other->getArray();
+        result = emptyArray<T>(1, rows);
+        T *v = other->getArray();
 
         int n = 0;
         for (int i = 0; i < rows; ++i) {
-            double row_result  = 0;
+            T row_result  = 0;
             for (int j = 0; j < cols; ++j) {
                 row_result += array[n] * v[j];
                 n++;
@@ -312,16 +247,16 @@ flatArray *flatArray::dot(flatArray *other) {
     }
 
     else {
-        throw flatArrayDimensionMismatchException(this, other);
+        throw flatArrayDimensionMismatchException<T>(this, other);
     }
 }
 
+template <class T>
+flatArray<T>* flatArray<T>::subtract(flatArray *other) {
 
-flatArray *flatArray::subtract(flatArray *other) {
+    flatArray* result = nullptr;
 
-    auto result = new flatArray;
-
-    result->startEmptyArray(rows, cols);
+    result = emptyArray<T>(rows, cols);
 
     if (other->getRows() == 1 && rows > 1) {
         // other is a vector and this is a matrix
@@ -331,7 +266,7 @@ flatArray *flatArray::subtract(flatArray *other) {
         if (other->getCols() == rows) {
             // number of rows match number of dimensions of vector
 
-            double *B = other->getRow(0);
+            T *B = other->getRow(0);
 
             int n = 0;
             for (int i = 0; i < rows; ++i) {
@@ -349,7 +284,7 @@ flatArray *flatArray::subtract(flatArray *other) {
         }
 
         else if (other->getCols() == cols){
-            double *B = other->getRow(0);
+            T *B = other->getRow(0);
 
             int n = 0;
             for (int i = 0; i < rows; ++i) {
@@ -367,13 +302,13 @@ flatArray *flatArray::subtract(flatArray *other) {
         }
 
         else {
-            throw flatArrayDimensionMismatchException(this, other);
+            throw flatArrayDimensionMismatchException<T>(this, other);
         }
     }
 
     else if (other->getRows() == 1 && other->getCols() == 1) {
         // other is a scalar represented as an array
-        double B = other->getNElement(0);
+        T B = other->getNElement(0);
 
         for (int i = 0; i < size; ++i) {
             result->setNElement(array[i] - B, i);
@@ -385,10 +320,10 @@ flatArray *flatArray::subtract(flatArray *other) {
         // both are matrices or vectors (with same size)
 
         if (rows != other->getRows() || cols != other->getCols()) {
-            throw flatArrayDimensionMismatchException(this, other);
+            throw flatArrayDimensionMismatchException<T>(this, other);
         }
 
-        double *B = other->getArray();
+        T *B = other->getArray();
 
         for (int n = 0; n < size; ++n) {
             result->setNElement(array[n] - B[n], n);
@@ -396,18 +331,18 @@ flatArray *flatArray::subtract(flatArray *other) {
     }
 
     else {
-        throw flatArrayDimensionMismatchException(this, other);
+        throw flatArrayDimensionMismatchException<T>(this, other);
     }
 
     return result;
 }
 
+template <class T>
+flatArray<T>* flatArray<T>::power(int p) {
 
-flatArray *flatArray::power(int p) {
+    flatArray* result = nullptr;
 
-    auto result = new flatArray;
-
-    result->startEmptyArray(rows, cols);
+    result = emptyArray<T>(rows, cols);
 
     for (int n = 0; n < size; ++n) {
         result->setNElement(pow(array[n], p), n);
@@ -416,16 +351,16 @@ flatArray *flatArray::power(int p) {
     return result;
 }
 
-
-flatArray *flatArray::divide(double m) {
+template <class T>
+flatArray<T>* flatArray<T>::divide(double m) {
 
     if (m == 0) {
         throw flatArrayZeroDivisionError();
     }
 
-    auto result = new flatArray;
+    flatArray* result = nullptr;
 
-    result->startEmptyArray(rows, cols);
+    result = emptyArray<T>(rows, cols);
 
     for (int n = 0; n < size; ++n) {
 
@@ -435,11 +370,12 @@ flatArray *flatArray::divide(double m) {
     return result;
 }
 
+template <class T>
+flatArray<T>* flatArray<T>::multiply(flatArray *other) {
 
-flatArray *flatArray::multiply(flatArray *other) {
-    auto result = new flatArray;
+    flatArray* result = nullptr;
 
-    result->startEmptyArray(rows, cols);
+    result = emptyArray<T>(rows, cols);
 
     for (int n = 0; n < size; ++n) {
         result->setNElement(array[n] * other->getNElement(n), n);
@@ -448,12 +384,12 @@ flatArray *flatArray::multiply(flatArray *other) {
     return result;
 }
 
+template <class T>
+flatArray<T>* flatArray<T>::nlog(double base) {
 
-flatArray *flatArray::nlog(double base) {
+    flatArray* result = nullptr;
 
-    auto result = new flatArray;
-
-    result->startEmptyArray(rows, cols);
+    result = emptyArray<T>(rows, cols);
 
     for (int n = 0; n < size; ++n) {
         result->setNElement(log(array[n]) / log(base), n);
@@ -462,22 +398,22 @@ flatArray *flatArray::nlog(double base) {
     return result;
 }
 
+template <class T>
+flatArray<T>* flatArray<T>::mean(int axis) {
 
-flatArray *flatArray::mean(int axis) {
-
-    auto result = new flatArray;
+    flatArray* result = nullptr;
 
     if (rows == 1) {
         // vector
-        double rowResult = 0;
+        T rowResult = 0;
 
-        result->startEmptyArray(1, 1);
+        result = emptyArray<T>(1, 1);
 
         for (int i = 0; i < cols; ++i) {
             rowResult += array[i];
         }
 
-        rowResult /= (double) cols;
+        rowResult /= static_cast<T>(cols);
 
         result->setNElement(rowResult, 0);
     }
@@ -486,20 +422,20 @@ flatArray *flatArray::mean(int axis) {
         // matrix
         if (axis == 0) {
             // mean of each column
-            double colResult;
+            T colResult;
 
-            result->startEmptyArray(1 , cols);
+            result = emptyArray<T>(1 , cols);
 
             for (int i = 0; i < cols; ++i) {
 
                 colResult = 0;
-                double *colArray = getCol(i);
+                T *colArray = getCol(i);
 
                 for (int j = 0; j < rows; ++j) {
                     colResult += colArray[j];
                 }
 
-                colResult /= (double) rows;
+                colResult /= static_cast<T>(rows);
 
                 result->setNElement(colResult, i);
 
@@ -509,20 +445,20 @@ flatArray *flatArray::mean(int axis) {
 
         else if (axis == 1) {
             // mean of each row
-            double rowResult;
+            T rowResult;
 
-            result->startEmptyArray(1, rows);
+            result = emptyArray<T>(1, rows);
 
             for (int i = 0; i < rows; ++i) {
 
                 rowResult = 0;
-                double *rowArray = getRow(i);
+                T *rowArray = getRow(i);
 
                 for (int j = 0; j < cols; ++j) {
                     rowResult += rowArray[j];
                 }
 
-                rowResult /= (double) cols;
+                rowResult /= static_cast<T>(cols);
 
                 result->setNElement(rowResult, i);
 
@@ -539,18 +475,19 @@ flatArray *flatArray::mean(int axis) {
     return result;
 }
 
+template <class T>
+flatArray<T>* flatArray<T>::std(int degreesOfFreedom, int axis) {
 
-flatArray *flatArray::std(int degreesOfFreedom, int axis) {
+    flatArray* result = nullptr;
+    flatArray *arrayVar = nullptr;
 
-    auto result = new flatArray;
-
-    flatArray *arrayVar = var(degreesOfFreedom, axis);
+    arrayVar = var(degreesOfFreedom, axis);
 
     if (rows == 1) {
         // vector
-        result->startEmptyArray(1, 1);
+        result = emptyArray<T>(1, 1);
 
-        double arrayMean_i = arrayVar->getNElement(0);
+        T arrayMean_i = arrayVar->getNElement(0);
 
         result->setNElement(pow(arrayMean_i, 0.5), 0);
     }
@@ -559,7 +496,7 @@ flatArray *flatArray::std(int degreesOfFreedom, int axis) {
         // matrix
         if (axis == 0) {
             // std of each column
-            result->startEmptyArray(1, cols);
+            result = emptyArray<T>(1, cols);
 
             for (int i = 0; i < cols; ++i) {
 
@@ -570,7 +507,7 @@ flatArray *flatArray::std(int degreesOfFreedom, int axis) {
 
         else {
             // std of each row
-            result->startEmptyArray(1, rows);
+            result = emptyArray<T>(1, rows);
 
             for (int i = 0; i < rows; ++i) {
 
@@ -585,26 +522,27 @@ flatArray *flatArray::std(int degreesOfFreedom, int axis) {
     return result;
 }
 
+template <class T>
+flatArray<T>* flatArray<T>::var(int degreesOfFreedom, int axis) {
 
-flatArray *flatArray::var(int degreesOfFreedom, int axis) {
+    flatArray<T>* result = nullptr;
+    flatArray<T>* arrayMean = nullptr;
 
-    auto result = new flatArray;
-
-    flatArray *arrayMean = mean(axis);
+    arrayMean = mean(axis);
 
     if (rows == 1) {
         // vector
-        double rowResult = 0;
+        T rowResult = 0;
 
-        result->startEmptyArray(1, 1);
+        result = emptyArray<T>(1, 1);
 
-        double arrayMean_i = arrayMean->getNElement(0);
+        T arrayMean_i = arrayMean->getNElement(0);
 
         for (int i = 0; i < size; ++i) {
             rowResult += pow(array[i] - arrayMean_i, 2);
         }
 
-        rowResult /= (double) (size - degreesOfFreedom);
+        rowResult /= static_cast<T>(size - degreesOfFreedom);
 
         result->setNElement(rowResult, 0);
     }
@@ -613,21 +551,21 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
         // matrix
         if (axis == 0) {
             // std of each column
-            double colResult;
+            T colResult;
 
-            result->startEmptyArray(1, cols);
+            result = emptyArray<T>(1, cols);
 
             for (int i = 0; i < cols; ++i) {
 
                 colResult = 0;
-                double colMean = arrayMean->getNElement(i);
-                double *colArray = getCol(i);
+                T colMean = arrayMean->getNElement(i);
+                T *colArray = getCol(i);
 
                 for (int j = 0; j < rows; ++j) {
                     colResult += pow(colArray[j] - colMean, 2);
                 }
 
-                colResult /= (double) (rows - degreesOfFreedom);
+                colResult /= static_cast<T>(rows - degreesOfFreedom);
 
                 result->setNElement(colResult, i);
 
@@ -637,21 +575,21 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
 
         else if (axis == 1) {
             // std of each row
-            double rowResult;
+            T rowResult;
 
-            result->startEmptyArray(1, rows);
+            result = emptyArray<T>(1, rows);
 
             for (int i = 0; i < rows; ++i) {
 
                 rowResult = 0;
-                double rowMean = arrayMean->getNElement(i);
-                double *rowArray = getRow(i);
+                T rowMean = arrayMean->getNElement(i);
+                T *rowArray = getRow(i);
 
                 for (int j = 0; j < cols; ++j) {
                     rowResult += pow(rowArray[j] - rowMean, 2);
                 }
 
-                rowResult /= (double) (cols - degreesOfFreedom);
+                rowResult /=  static_cast<T>(cols - degreesOfFreedom);
 
                 result->setNElement(rowResult, i);
 
@@ -669,17 +607,19 @@ flatArray *flatArray::var(int degreesOfFreedom, int axis) {
     return result;
 }
 
+template <class T>
+T* flatArray<T>::getRowSlice(int i, int start, int end) {
 
-double *flatArray::getRowSlice(int i, int start, int end) {
+    T* result = nullptr;
+    T* row = nullptr;
 
-    double *row = getRow(i);
-    double *result = nullptr;
+    row = getRow(i);
 
     if (end > getCols()) {
         arrayOutOfBoundsException(getRows(), end);
     }
 
-    result = new double [end - start];
+    result = new T [end - start];
 
     int n = 0;
     for (int j = start; j < end; ++j) {
@@ -694,17 +634,19 @@ double *flatArray::getRowSlice(int i, int start, int end) {
     return result;
 }
 
+template <class T>
+T* flatArray<T>::getColSlice(int j, int start, int end) {
 
-double *flatArray::getColSlice(int j, int start, int end) {
+    T* result = nullptr;
+    T* col = nullptr;
 
-    double *col = getCol(j);
-    double *result = nullptr;
+    col = getCol(j);
 
     if (end > getCols()) {
         arrayOutOfBoundsException(getCols(), end);
     }
 
-    result = new double[end - start];
+    result = new T[end - start];
 
     int n = 0;
     for (int i = start; i < end; ++i) {
@@ -719,12 +661,12 @@ double *flatArray::getColSlice(int j, int start, int end) {
     return result;
 }
 
+template <class T>
+T* flatArray<T>::diagonal() {
 
-double *flatArray::diagonal() {
+    T *result = nullptr;
 
-    double *result = nullptr;
-
-    result = new double [rows];
+    result = new T [rows];
 
     for (int i = 0; i < rows; ++i) {
         result[i] = array[i + i * rows];

@@ -7,16 +7,14 @@
 #ifndef MATHS_LINEARALGEBRAMODULE_H
 #define MATHS_LINEARALGEBRAMODULE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+template <typename T>
+void leastSquares(flatArray<T>* X, flatArray<T>* y, T *theta);
 
-void leastSquares(flatArray *X, flatArray *y, double *theta);
-flatArray *covariance(flatArray *X);
-flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxIterations);
+template <typename T>
+flatArray<T>* covariance(flatArray<T> *X);
 
-#ifdef __cplusplus
-}
-#endif
+template <typename T>
+flatArray<T>* jacobiEigenDecomposition(flatArray<T> *S, double tolerance, int maxIterations);
+
 
 #endif //SRC_LINEARALGEBRAMODULE_H

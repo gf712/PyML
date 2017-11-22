@@ -4,14 +4,16 @@
 #include <Python.h>
 #include "maths.h"
 #include "pythonconverters.h"
-#include "flatArrays.h"
-
+#include "arrayInitialisers.h"
+#include "flatArrays.cpp"
+#include "arrayInitialisers.cpp"
+#include "maths.cpp"
 
 static PyObject* quick_sort(PyObject* self, PyObject *args) {
 
     // variable instantiation
-    auto A = new flatArray;
-    auto order = new flatArray;
+    flatArray<double>* A = nullptr;
+    flatArray<int>* order = nullptr;
     int axis;
 
     // pointers to python lists
@@ -24,22 +26,23 @@ static PyObject* quick_sort(PyObject* self, PyObject *args) {
     }
 
     // read in Python list
-    A->readFromPythonList(pA);
+    A = readFromPythonList<double>(pA);
 
     if (A->getRows() == 1) {
 
-        order->startEmptyArray(A->getRows(), A->getCols());
+        order = emptyArray<int>(A->getRows(), A->getCols());
 
         // if A is a vector
-        auto *orderArray = new double[A->getSize()];
-        double *array = A->getRow(0);
+        int*orderArray = nullptr;
 
+        orderArray = new int[A->getSize()];
+        double *array = A->getRow(0);
 
         for (int i = 0; i < A->getSize(); ++i) {
             orderArray[i] = i;
         }
 
-        quicksort(array, orderArray, 0, A->getSize());
+        quicksort<double>(array, orderArray, 0, A->getSize());
 
         order->setRow(orderArray, 0);
         A->setRow(array, 0);
@@ -49,20 +52,19 @@ static PyObject* quick_sort(PyObject* self, PyObject *args) {
         // if A is a matrix
         if (axis == 1) {
 
-            order->startEmptyArray(A->getRows(), A->getCols());
-
+            order = emptyArray<int>(A->getRows(), A->getCols());
 
             // if axis is 1 return row wise argsort
             for (int i = 0; i < A->getRows(); ++i) {
 
-                auto *orderArray = new double[A->getCols()];
+                auto *orderArray = new int[A->getCols()];
                 double *array = A->getRow(i);
 
                 for (int j = 0; j < A->getCols(); ++j) {
                     orderArray[j] = j;
                 }
 
-                quicksort(array, orderArray, 0, A->getCols());
+                quicksort<double>(array, orderArray, 0, A->getCols());
 
                 order->setRow(orderArray, i);
                 A->setRow(array, i);
@@ -71,20 +73,20 @@ static PyObject* quick_sort(PyObject* self, PyObject *args) {
         }
         else if (axis == 0) {
 
-            order->startEmptyArray(A->getCols(), A->getRows());
+            order = emptyArray<int>(A->getCols(), A->getRows());
 
 
             // if axis is 0 return column wise argsort
             for (int i = 0; i < A->getCols(); ++i) {
 
-                auto *orderArray = new double[A->getRows()];
+                auto *orderArray = new int [A->getRows()];
                 double *array = A->getCol(i);
 
                 for (int j = 0; j < A->getRows(); ++j) {
                     orderArray[j] = j;
                 }
 
-                quicksort(array, orderArray, 0, A->getRows());
+                quicksort<double>(array, orderArray, 0, A->getRows());
 
                 order->setRow(orderArray, i);
                 A->setCol(array, i);
@@ -121,8 +123,8 @@ static PyObject* quick_sort(PyObject* self, PyObject *args) {
 static PyObject* Cargmax(PyObject* self, PyObject *args) {
 
     // variable instantiation
-    auto A = new flatArray;
-    auto resultList = new flatArray;
+    flatArray<double>* A = nullptr;
+    flatArray<double>* resultList = nullptr;
     int axis;
 
     // pointers to python lists
@@ -135,14 +137,14 @@ static PyObject* Cargmax(PyObject* self, PyObject *args) {
     }
 
     // read in Python list
-    A->readFromPythonList(pA);
+    A = readFromPythonList<double>(pA);
 
     if (A->getRows() == 1) {
 
         // if A is a vector
         double *array = A->getRow(0);
 
-        resultList->startEmptyArray(1, 1);
+        resultList = emptyArray<double>(1, 1);
 
         resultList->setNElement(argmax(array, A->getCols()), 0);
 
@@ -153,7 +155,7 @@ static PyObject* Cargmax(PyObject* self, PyObject *args) {
         // if A is a matrix
         if (axis == 1) {
 
-            resultList->startEmptyArray(1, A->getRows());
+            resultList = emptyArray<double>(1, A->getRows());
 
             double *array = nullptr;
 
@@ -171,7 +173,7 @@ static PyObject* Cargmax(PyObject* self, PyObject *args) {
         }
         else if (axis == 0) {
 
-            resultList->startEmptyArray(1, A->getCols());
+            resultList = emptyArray<double>(1, A->getCols());
 
             double *array = nullptr;
 
@@ -213,8 +215,8 @@ static PyObject* Cargmax(PyObject* self, PyObject *args) {
 static PyObject* Cargmin(PyObject* self, PyObject *args) {
 
     // variable instantiation
-    auto A = new flatArray;
-    auto resultList = new flatArray;
+    flatArray<double>* A = nullptr;
+    flatArray<double>* resultList = nullptr;
     int axis;
 
     // pointers to python lists
@@ -227,14 +229,14 @@ static PyObject* Cargmin(PyObject* self, PyObject *args) {
     }
 
     // read in Python list
-    A->readFromPythonList(pA);
+    A = readFromPythonList<double>(pA);
 
     if (A->getRows() == 1) {
 
         // if A is a vector
         double *array = A->getRow(0);
 
-        resultList->startEmptyArray(1, 1);
+        resultList = emptyArray<double>(1, 1);
 
         resultList->setNElement(argmin(array, A->getCols()), 0);
 
@@ -245,7 +247,7 @@ static PyObject* Cargmin(PyObject* self, PyObject *args) {
         // if A is a matrix
         if (axis == 1) {
 
-            resultList->startEmptyArray(1, A->getRows());
+            resultList = emptyArray<double>(1, A->getRows());
 
             double *array = nullptr;
 
@@ -263,7 +265,7 @@ static PyObject* Cargmin(PyObject* self, PyObject *args) {
         }
         else if (axis == 0) {
 
-            resultList->startEmptyArray(1, A->getCols());
+            resultList = emptyArray<double>(1, A->getCols());
 
             double *array = nullptr;
 

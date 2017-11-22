@@ -4,16 +4,19 @@
 #include <Python.h>
 #include "pythonconverters.h"
 #include "optimisers.h"
+#include "arrayInitialisers.cpp"
+#include "gradientDescent.cpp"
+
 
 static PyObject *gradient_descent(PyObject *self, PyObject *args) {
 
     // variable declaration
     int m, n, maxIterations, iterations;
     double epsilon, learningRate;
-    auto costArray = new flatArray;
-    auto X = new flatArray;
-    auto y = new flatArray;
-    auto theta = new flatArray;
+    flatArray<double>* costArray = nullptr;
+    flatArray<double>* X = nullptr;
+    flatArray<double>* y = nullptr;
+    flatArray<double>* theta = nullptr;
     char *predType;
 
     PyObject* ptheta;
@@ -29,9 +32,9 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     }
 
     // read python lists
-    X->readFromPythonList(pX);
-    y->readFromPythonList(py);
-    theta->readFromPythonList(ptheta);
+    X = readFromPythonList<double>(pX);
+    y = readFromPythonList<double>(py);
+    theta = readFromPythonList<double>(ptheta);
 
     n = X->getRows();
     m = X->getCols();
@@ -47,7 +50,7 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     }
 
     // memory allocation
-    costArray->startEmptyArray(1, maxIterations);
+    costArray = emptyArray<double>(1, maxIterations);
 
     // gradient descent
     iterations = gradientDescent(X, y, theta, maxIterations, epsilon, learningRate, costArray, predType);

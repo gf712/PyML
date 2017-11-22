@@ -76,10 +76,8 @@ class ClusterBase(BaseLearner, Predictor):
 
         # calculate distance to each centroid
         distances = [calculate_distance(X, self._centroids[i], self.norm) for i in range(self.k)]
-        # distances_T = transpose(distances)
-        # # return label of closest cluster to each data point
-        # return [x.index(min(x)) for x in distances_T]
-        # print(distances)
+
+        # minimum distance column wise 
         return argmin(distances, axis=0)
 
     def _changes(self):

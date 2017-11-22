@@ -56,12 +56,9 @@ static PyObject* norm(PyObject* self, PyObject *args) {
             double* A = nullptr;
             double* B = nullptr;
             double result;
-            // memory allocation
-            A = new double [colsA];
-            B = new double [colsB];
 
-            convertPy_1DArray(pA, A, colsA);
-            convertPy_1DArray(pB, B, colsB);
+            A = convertPy_1DArray<double>(pA, colsA);
+            B = convertPy_1DArray<double>(pB, colsB);
 
             result = vectorVectorNorm(A, B, p, colsA);
 
@@ -94,12 +91,11 @@ static PyObject* norm(PyObject* self, PyObject *args) {
             for (int i = 0; i < rowsA; ++i) {
                 A[i] = new double [colsA];
             }
-            B = new double [colsB];
             result = new double [rowsA];
 
             // convert python to C++
             convertPy_2DArray(pA, A, rowsA, colsA);
-            convertPy_1DArray(pB, B, colsB);
+            B = convertPy_1DArray<double>(pB, colsB);
 
             matrixVectorNorm(A, B, p, rowsA, colsA, result);
 

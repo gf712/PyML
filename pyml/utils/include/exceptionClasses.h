@@ -9,9 +9,6 @@
 #include <exception>
 #include "flatArrays.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 class flatArrayException: public std::exception {
 public:
@@ -21,10 +18,11 @@ public:
 };
 
 
+template <class T>
 class flatArrayDimensionMismatchException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayDimensionMismatchException(flatArray *A, flatArray* B) {
+    flatArrayDimensionMismatchException(flatArray<T> *A, flatArray<T>* B) {
         std::string thisColumn = std::to_string(A->getCols());
         std::string thisRow = std::to_string(A->getRows());
         std::string otherColumn = std::to_string(B->getCols());
@@ -41,10 +39,11 @@ public:
 };
 
 
+template <class T>
 class flatArrayColumnMismatchException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayColumnMismatchException(flatArray *A, flatArray* B) {
+    flatArrayColumnMismatchException(flatArray<T> *A, flatArray<T>* B) {
         std::string thisColumn = std::to_string(A->getCols());
         std::string otherColumn = std::to_string(B->getCols());
 
@@ -59,10 +58,11 @@ public:
 };
 
 
+template <class T>
 class flatArrayRowMismatchException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayRowMismatchException(flatArray *A, flatArray* B) {
+    flatArrayRowMismatchException(flatArray<T> *A, flatArray<T>* B) {
         std::string thisRow = std::to_string(A->getRows());
         std::string otherRow = std::to_string(B->getRows());
 
@@ -77,10 +77,11 @@ public:
 };
 
 
+template <class T>
 class flatArrayOutOfBoundsException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayOutOfBoundsException(flatArray *A, int n) {
+    flatArrayOutOfBoundsException(flatArray<T> *A, int n) {
 
         std::string nString = std::to_string(n);
         std::string sizeString = std::to_string(A->getSize());
@@ -96,10 +97,12 @@ public:
     }
 };
 
+
+template <class T>
 class flatArrayOutOfBoundsRowException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayOutOfBoundsRowException(flatArray *A, int n) {
+    flatArrayOutOfBoundsRowException(flatArray<T> *A, int n) {
 
         std::string nString = std::to_string(n);
         std::string sizeString = std::to_string(A->getRows());
@@ -116,10 +119,11 @@ public:
 };
 
 
+template <class T>
 class flatArrayOutOfBoundsColumnException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayOutOfBoundsColumnException(flatArray *A, int n) {
+    flatArrayOutOfBoundsColumnException(flatArray<T> *A, int n) {
 
         std::string nString = std::to_string(n);
         std::string sizeString = std::to_string(A->getCols());
@@ -196,12 +200,6 @@ public:
         return errorMsg.c_str();
     }
 };
-
-
-
-#ifdef __cplusplus
-}
-#endif
 
 
 #endif //PYML_DEV_EXCEPTIONCLASSES_H

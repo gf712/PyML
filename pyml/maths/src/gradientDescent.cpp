@@ -3,24 +3,29 @@
 //
 
 #include "flatArrays.h"
+#include "flatArrays.cpp"
 #include "optimisers.h"
 
-void sigmoid(flatArray *scores) {
+
+template <typename T>
+void sigmoid(flatArray<T> *scores) {
     for (int i = 0; i < scores->getSize(); ++i) {
         scores->setNElement(1 / (1 + exp(-scores->getNElement(i))), i);
     }
 }
 
 
-flatArray *predict(flatArray *X, flatArray *w) {
+template <typename T>
+flatArray<T> *predict(flatArray<T> *X, flatArray<T> *w) {
 
     return X->dot(w);
 }
 
 
-double logLikelihood(flatArray *scores, flatArray *y) {
+template <typename T>
+T logLikelihood(flatArray<T> *scores, flatArray<T> *y) {
 
-    double result = 0;
+    T result = 0;
 
     for (int i = 0; i < y->getSize(); ++i) {
         result += y->getNElement(i) * scores->getNElement(i) - log(1 + exp(scores->getNElement(i)));
@@ -30,9 +35,13 @@ double logLikelihood(flatArray *scores, flatArray *y) {
 }
 
 
-double cost(flatArray* loss){
-    flatArray *result = loss->power(2);
-    double costResult = result->sum() / (2 * result->getCols());
+template <typename T>
+T cost(flatArray<T>* loss){
+    flatArray<T>* result = nullptr;
+
+    result = loss->power(2);
+
+    T costResult = result->sum() / (2 * result->getCols());
 
     delete result;
 
@@ -41,11 +50,12 @@ double cost(flatArray* loss){
 
 
 
-flatArray *gradientCalculation(flatArray *X, flatArray *loss) {
+template <typename T>
+flatArray<T> *gradientCalculation(flatArray<T> *X, flatArray<T> *loss) {
 
-    flatArray *gradients = X->dot(loss);
+    flatArray<T>* gradients = X->dot(loss);
 
-    flatArray* result = gradients->divide(X->getCols());
+    flatArray<T>* result = gradients->divide(X->getCols());
 
     delete gradients;
 
@@ -53,7 +63,8 @@ flatArray *gradientCalculation(flatArray *X, flatArray *loss) {
 }
 
 
-void updateWeights(flatArray *theta, flatArray *gradients, double learningRate, int size) {
+template <typename T>
+void updateWeights(flatArray<T> *theta, flatArray<T> *gradients, double learningRate, int size) {
 
     for (int i = 0; i < size; ++i) {
         theta->setNElement(theta->getNElement(i) - gradients->getNElement(i) * learningRate,i);
@@ -61,10 +72,13 @@ void updateWeights(flatArray *theta, flatArray *gradients, double learningRate, 
 }
 
 
-double calculateCost(flatArray *X, flatArray *theta, flatArray *y, char *predType) {
+template <typename T>
+T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, char *predType) {
 
-    double result;
-    flatArray *prediction = predict(X, theta);
+    T result;
+    flatArray<T>* prediction = nullptr;
+
+    prediction = predict(X, theta);
 
     if (strcmp(predType, "logit") == 0) {
 
@@ -75,7 +89,7 @@ double calculateCost(flatArray *X, flatArray *theta, flatArray *y, char *predTyp
     else {
 
         // calculate initial cost and store result
-        flatArray *loss = prediction->subtract(y);
+        flatArray<T> *loss = prediction->subtract(y);
         result = cost(loss);
 
         delete loss;
@@ -88,15 +102,19 @@ double calculateCost(flatArray *X, flatArray *theta, flatArray *y, char *predTyp
 }
 
 
-int gradientDescent(flatArray *X, flatArray *y, flatArray *theta, int maxIteration, double epsilon, double learningRate, flatArray* costArray, char *predType) {
+template <typename T>
+int gradientDescent(flatArray<T> *X, flatArray<T> *y, flatArray<T> *theta, int maxIteration, double epsilon, double learningRate, flatArray<T>* costArray, char *predType) {
 
     // variable declaration
-    double JOld;
-    double JNew;
+    T JOld;
+    T JNew;
+
     int iteration = 0;
     double e = 1000;
+
     int m = X->getCols();
-    flatArray *XT;
+
+    flatArray<T> *XT = nullptr;
 
 
     // X pyTranspose (m by n matrix)
@@ -113,15 +131,15 @@ int gradientDescent(flatArray *X, flatArray *y, flatArray *theta, int maxIterati
         JOld = JNew;
 
         // calculate gradient
-        flatArray *h = predict(X, theta);
+        flatArray<T> *h = predict(X, theta);
 
         if (strcmp(predType, "logit") == 0) {
             sigmoid(h);
         }
 
-        flatArray *error = h->subtract(y);
+        flatArray<T> *error = h->subtract(y);
 
-        flatArray *gradients = gradientCalculation(XT, error);
+        flatArray<T> *gradients = gradientCalculation(XT, error);
 
         // update coefficients
         updateWeights(theta, gradients, learningRate, m);
