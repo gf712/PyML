@@ -35,15 +35,18 @@ Usage
 
 Changelog
 =========
-Version 0.2 (23/11/2017):
+Version 0.2.1 (30/11/2017):
 -------------------------
  - Major:
     - PCA implementation
+    - Major changes to flatArrays and C++ backend leading to speed improvements
 
  - Minor:
     - Eigendecomposition of symmetric matrices with Jacobi rotations
+    - Improved docs
     - Fixed memory leaks
-
+    - Additional methods for flatArrays (e.g. `diag`)
+    - flatArray initialisers
 
 Version 0.2 (16/11/2017):
 -------------------------
