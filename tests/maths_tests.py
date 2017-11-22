@@ -24,6 +24,36 @@ class MathsTest(unittest.TestCase):
         argsorted_array = argsort(array)
         self.assertEqual(argsorted_array, [0, 5, 4, 3, 1, 2])
 
+    def test_argmin(self):
+        array = [-5, 3, 10, 2, 1, -1]
+        argsorted_array = argmin(array)
+        self.assertEqual(argsorted_array, [0])
+
+    def test_argmin_2(self):
+        array = [[-5, 3, 10], [2, 1, -1]]
+        argsorted_array = argmin(array, axis=0)
+        self.assertEqual(argsorted_array, [0, 1, 1])
+
+    def test_argmin_3(self):
+        array = [[-5, 3, 10], [2, 1, -1]]
+        argsorted_array = argmin(array, axis=1)
+        self.assertEqual(argsorted_array, [0, 2])
+
+    def test_argmax(self):
+        array = [-5, 3, 10, 2, 1, -1]
+        argsorted_array = argmax(array)
+        self.assertEqual(argsorted_array, [2])
+
+    def test_argmax_2(self):
+        array = [[-5, 3, 10], [2, 1, -1]]
+        argsorted_array = argmax(array, axis=0)
+        self.assertEqual(argsorted_array, [1, 0, 0])
+
+    def test_argmax_3(self):
+        array = [[-5, 3, 10], [2, 1, -1]]
+        argsorted_array = argmax(array, axis=1)
+        self.assertEqual(argsorted_array, [2, 0])
+
     def test_mean(self):
         self.assertAlmostEqual(mean(self.A), 0.44745262883077663)
 
