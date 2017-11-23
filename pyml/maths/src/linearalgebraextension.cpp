@@ -79,7 +79,7 @@ static PyObject* power(PyObject* self, PyObject *args) {
     A = readFromPythonList<double>(pAArray);
 
     // calculate the power elementwise
-    flatArray *result = A->power(p);
+    result = A->power(p);
 
     // convert vector to python list
     PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
