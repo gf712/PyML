@@ -186,7 +186,7 @@ void flatArray<T>::setCol(T *column, int j) {
 template <class T>
 flatArray<T>* flatArray<T>::dot(flatArray* other) {
 
-    flatArray* result = nullptr;
+    flatArray<T>* result = nullptr;
 
     if (other->getRows() > 1) {
         // matrix matrix multiplication
@@ -225,7 +225,7 @@ flatArray<T>* flatArray<T>::dot(flatArray* other) {
     }
 
     else if (other->getRows() == 1) {
-        // matrix vector multiplication
+        // matrix/vector vector multiplication
         if (cols != other->getCols()){
             throw flatArrayDimensionMismatchException<T>(this, other);
         }
@@ -340,7 +340,7 @@ flatArray<T>* flatArray<T>::subtract(flatArray *other) {
 template <class T>
 flatArray<T>* flatArray<T>::power(int p) {
 
-    flatArray* result = nullptr;
+    flatArray<T>* result = nullptr;
 
     result = emptyArray<T>(rows, cols);
 
@@ -373,7 +373,7 @@ flatArray<T>* flatArray<T>::divide(double m) {
 template <class T>
 flatArray<T>* flatArray<T>::multiply(flatArray *other) {
 
-    flatArray* result = nullptr;
+    flatArray<T>* result = nullptr;
 
     result = emptyArray<T>(rows, cols);
 
@@ -387,7 +387,7 @@ flatArray<T>* flatArray<T>::multiply(flatArray *other) {
 template <class T>
 flatArray<T>* flatArray<T>::nlog(double base) {
 
-    flatArray* result = nullptr;
+    flatArray<T>* result = nullptr;
 
     result = emptyArray<T>(rows, cols);
 
@@ -401,7 +401,7 @@ flatArray<T>* flatArray<T>::nlog(double base) {
 template <class T>
 flatArray<T>* flatArray<T>::mean(int axis) {
 
-    flatArray* result = nullptr;
+    flatArray<T>* result = nullptr;
 
     if (rows == 1) {
         // vector

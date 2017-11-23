@@ -163,7 +163,7 @@ public:
 
         std::string stringAxis = std::to_string(axis);
 
-        std::string msg = "Axis " + stringAxis + " is greater than 1!";
+        std::string msg = "Got axis value of " + stringAxis + ", but expected value of 0 or 1!";
 
         flatArrayUnknownAxis::errorMsg = msg.c_str();
     };

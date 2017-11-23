@@ -11,6 +11,12 @@
 #include "../../utils/include/exceptionClasses.h"
 #include "arrayInitialisers.cpp"
 
+// Exceptions
+static PyObject *DimensionMismatchException;
+static PyObject *OutOfBoundsException;
+static PyObject *ZeroDivisionError;
+static PyObject *UnknownAxis;
+
 
 static PyObject* dot_product(PyObject* self, PyObject *args) {
 
@@ -36,10 +42,16 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
         result = A->dot(V);
     }
     catch (flatArrayDimensionMismatchException<double> &e) {
-        PyErr_SetString(PyExc_ValueError, e.what());
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
+    catch (flatArrayRowMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
     }
     catch (flatArrayColumnMismatchException<double> &e) {
-        PyErr_SetString(PyExc_ValueError, e.what());
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
     }
 
     // convert result to python list
@@ -124,17 +136,17 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
     }
 
     catch (flatArrayDimensionMismatchException<double> &e) {
-        PyErr_SetString(PyExc_ValueError, e.what());
+        PyErr_SetString(DimensionMismatchException, e.what());
         return nullptr;
     }
 
     catch (flatArrayColumnMismatchException<double> &e) {
-        PyErr_SetString(PyExc_ValueError, e.what());
+        PyErr_SetString(DimensionMismatchException, e.what());
         return nullptr;
     }
 
     catch (flatArrayRowMismatchException<double> &e) {
-        PyErr_SetString(PyExc_ValueError, e.what());
+        PyErr_SetString(DimensionMismatchException, e.what());
         return nullptr;
     }
 
@@ -178,7 +190,7 @@ static PyObject* divide(PyObject* self, PyObject *args) {
         result = A->divide(n);
     }
     catch (flatArrayZeroDivisionError &e) {
-        PyErr_SetString(PyExc_ValueError, e.what());
+        PyErr_SetString(ZeroDivisionError, e.what());
         return nullptr;
     }
 
@@ -329,7 +341,7 @@ static PyObject* mean(PyObject* self, PyObject *args) {
         result = X->mean(axis);
     }
     catch (flatArrayUnknownAxis &e) {
-        PyErr_SetString(PyExc_ValueError, e.what());
+        PyErr_SetString(UnknownAxis, e.what());
         return nullptr;
     }
 
@@ -556,7 +568,6 @@ static struct PyModuleDef linearAlgebraModule = {
 
 
 PyMODINIT_FUNC PyInit_Clinear_algebra(void) {
-    return PyModule_Create(&linearAlgebraModule);
 
     PyObject *m;
 
@@ -564,5 +575,21 @@ PyMODINIT_FUNC PyInit_Clinear_algebra(void) {
 
     if (m == nullptr)
         return nullptr;
+
+    DimensionMismatchException = PyErr_NewException("Clinear_algebra.DimensionMismatchException", nullptr, nullptr);
+    OutOfBoundsException = PyErr_NewException("Clinear_algebra.OutOfBoundsException", nullptr, nullptr);
+    ZeroDivisionError = PyErr_NewException("Clinear_algebra.ZeroDivisionError", nullptr, nullptr);
+    UnknownAxis = PyErr_NewException("Clinear_algebra.UnknownAxis", nullptr, nullptr);
+
+    Py_INCREF(DimensionMismatchException);
+    Py_INCREF(OutOfBoundsException);
+    Py_INCREF(ZeroDivisionError);
+    Py_INCREF(UnknownAxis);
+
+    PyModule_AddObject(m, "error", DimensionMismatchException);
+    PyModule_AddObject(m, "out_of_bounds_error", OutOfBoundsException);
+    PyModule_AddObject(m, "zero_error", ZeroDivisionError);
+    PyModule_AddObject(m, "axis_error", UnknownAxis);
+
     return m;
 }

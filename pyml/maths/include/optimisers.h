@@ -10,4 +10,4 @@ template <typename T>
 int gradientDescent(flatArray<T> *X, flatArray<T> *y, flatArray<T> *theta, int maxIteration, double epsilon, double learningRate, flatArray<T>* costArray, char *predType);
 
 
-#endif //PYML_DEV_GRADIENTDESCENT_H
+#endif //PYML_GRADIENTDESCENT_H
