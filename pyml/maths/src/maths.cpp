@@ -42,7 +42,7 @@ inline void permutations(double* array, double** result, int size) {
 
 
 template <typename T>
-int partition(T* array, int* order, int low, int high) {
+inline int partition(T* array, int* order, int low, int high) {
     double pivot = array[low];
     int i = low;
 
@@ -60,7 +60,7 @@ int partition(T* array, int* order, int low, int high) {
 
 
 template <typename T>
-void quicksort(T* array, int* order, int low, int high) {
+    void quicksort(T* array, int* order, int low, int high) {
     if (low < high) {
         int p = partition(array, order, low, high);
         quicksort(array, order, low, p);

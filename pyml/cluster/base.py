@@ -77,7 +77,7 @@ class ClusterBase(BaseLearner, Predictor):
         # calculate distance to each centroid
         distances = [calculate_distance(X, self._centroids[i], self.norm) for i in range(self.k)]
 
-        # minimum distance column wise 
+        # minimum distance column wise
         return argmin(distances, axis=0)
 
     def _changes(self):

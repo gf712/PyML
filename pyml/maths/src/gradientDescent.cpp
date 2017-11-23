@@ -8,7 +8,7 @@
 
 
 template <typename T>
-void sigmoid(flatArray<T> *scores) {
+inline void sigmoid(flatArray<T> *scores) {
     for (int i = 0; i < scores->getSize(); ++i) {
         scores->setNElement(1 / (1 + exp(-scores->getNElement(i))), i);
     }
@@ -16,14 +16,14 @@ void sigmoid(flatArray<T> *scores) {
 
 
 template <typename T>
-flatArray<T> *predict(flatArray<T> *X, flatArray<T> *w) {
+inline flatArray<T> *predict(flatArray<T> *X, flatArray<T> *w) {
 
     return X->dot(w);
 }
 
 
 template <typename T>
-T logLikelihood(flatArray<T> *scores, flatArray<T> *y) {
+inline T logLikelihood(flatArray<T> *scores, flatArray<T> *y) {
 
     T result = 0;
 
@@ -36,7 +36,7 @@ T logLikelihood(flatArray<T> *scores, flatArray<T> *y) {
 
 
 template <typename T>
-T cost(flatArray<T>* loss){
+inline T cost(flatArray<T>* loss){
     flatArray<T>* result = nullptr;
 
     result = loss->power(2);
@@ -51,7 +51,7 @@ T cost(flatArray<T>* loss){
 
 
 template <typename T>
-flatArray<T> *gradientCalculation(flatArray<T> *X, flatArray<T> *loss) {
+inline flatArray<T> *gradientCalculation(flatArray<T> *X, flatArray<T> *loss) {
 
     flatArray<T>* gradients = X->dot(loss);
 
@@ -64,7 +64,7 @@ flatArray<T> *gradientCalculation(flatArray<T> *X, flatArray<T> *loss) {
 
 
 template <typename T>
-void updateWeights(flatArray<T> *theta, flatArray<T> *gradients, double learningRate, int size) {
+inline void updateWeights(flatArray<T> *theta, flatArray<T> *gradients, double learningRate, int size) {
 
     for (int i = 0; i < size; ++i) {
         theta->setNElement(theta->getNElement(i) - gradients->getNElement(i) * learningRate,i);
@@ -73,7 +73,7 @@ void updateWeights(flatArray<T> *theta, flatArray<T> *gradients, double learning
 
 
 template <typename T>
-T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, char *predType) {
+inline T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, char *predType) {
 
     T result;
     flatArray<T>* prediction = nullptr;
