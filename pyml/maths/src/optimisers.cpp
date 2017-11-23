@@ -97,5 +97,13 @@ static struct PyModuleDef optimisersModule = {
 };
 
 PyMODINIT_FUNC PyInit_optimisers(void) {
-    return PyModule_Create(&optimisersModule);
+
+    PyObject *m;
+
+    m = PyModule_Create(&optimisersModule);
+
+    if (m == nullptr)
+        return nullptr;
+
+    return m;
 }
