@@ -79,7 +79,7 @@ static PyObject* power(PyObject* self, PyObject *args) {
     A = readFromPythonList<double>(pAArray);
 
     // calculate the power elementwise
-    result = A->power(p);
+    flatArray *result = A->power(p);
 
     // convert vector to python list
     PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
@@ -286,7 +286,9 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
     // memory allocation of theta
     auto theta = new double [X->getCols()];
 
+    // get theta estimate using least squares
     leastSquares<double>(X, y, theta);
+    
 
     result_py_list = Convert_1DArray(theta, X->getCols());
 
