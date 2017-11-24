@@ -30,7 +30,7 @@ inline void maximumSearch(double* vector, int size, int i, double* result) {
 
 
 template <typename T>
-void swapRows(flatArray<T> *A, int row1, int row2) {
+inline void swapRows(flatArray<T> *A, int row1, int row2) {
 
     T *aRow1 = A->getRow(row1);
     T *aRow2 = A->getRow(row2);
@@ -159,6 +159,7 @@ void leastSquares(flatArray<T> *X, flatArray<T> *y, T *theta) {
     delete right;
     delete A;
 }
+
 
 template <typename T>
 flatArray<T>* covariance(flatArray<T> *X) {

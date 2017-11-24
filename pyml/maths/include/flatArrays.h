@@ -82,7 +82,7 @@ public:
     T sum();
     flatArray *dot(flatArray *other);
     flatArray *subtract(flatArray *other);
-    flatArray *power(int p);
+    flatArray *power(double p);
     flatArray *divide(double m);
     flatArray *multiply(flatArray *other);
     flatArray *nlog(double base);

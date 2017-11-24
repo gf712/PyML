@@ -338,7 +338,7 @@ flatArray<T>* flatArray<T>::subtract(flatArray *other) {
 }
 
 template <class T>
-flatArray<T>* flatArray<T>::power(int p) {
+flatArray<T>* flatArray<T>::power(double p) {
 
     flatArray<T>* result = nullptr;
 

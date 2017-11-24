@@ -75,15 +75,15 @@ static PyObject* power(PyObject* self, PyObject *args) {
     // variable declaration
     flatArray<double>* A = nullptr;
     flatArray<double>* result = nullptr;
-    int p;
+    double p;
 
     // pointers to python lists
     PyObject * pAArray;
 
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pAArray, &p)) {
-        PyErr_SetString(PyExc_TypeError, "Expected a list and an integer!");
+    if(!PyArg_ParseTuple(args, "O!d", &PyList_Type, &pAArray, &p)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and a float!");
         return nullptr;
     }
 
