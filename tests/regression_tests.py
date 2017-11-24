@@ -89,3 +89,41 @@ class LogisticRegressionTest(unittest.TestCase):
 
     def test_log_seed(self):
         self.assertEqual(self.classifier.seed, 1970)
+
+
+class MultiClassLogisticRegressionTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.X, cls.y = X, y = gaussian(labels=3, sigma=0.2, seed=1970)
+        cls.X_train, cls.y_train, cls.X_test, cls.y_test = train_test_split(cls.X, cls.y,
+                                                                            train_split=0.8, seed=1970)
+        cls.classifier = LogisticRegression(seed=1970)
+        cls.classifier.train(X=cls.X_train, y=cls.y_train)
+
+    def test_log_iterations(self):
+        self.assertEqual(self.classifier.iterations[0], 3829)
+        self.assertEqual(self.classifier.iterations[1], 4778)
+        self.assertEqual(self.classifier.iterations[2], 3400)
+
+    def test_log_coefficients(self):
+        self.assertAlmostEqual(self.classifier.coefficients[0][-1], -2.504659172303325, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[1][-1], 0.9999686753579901, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[2][-1], 0.5430990877594853, delta=0.001)
+
+    def test_log_cost(self):
+        self.assertAlmostEqual(self.classifier.cost[0][-1], -79.29189774967327, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[1][-1], -110.83233940996249, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[2][-1], -77.52658972786226, delta=0.001)
+
+    def test_log_predict(self):
+        self.assertEqual(self.classifier.predict(self.X_test)[0], 1)
+
+    def test_log_predict_proba(self):
+        self.assertAlmostEqual(self.classifier.predict_proba(self.X_test)[0][0], 0.18176321188156466, delta=0.001)
+
+    def test_log_accuracy(self):
+        self.assertAlmostEqual(self.classifier.score(self.X_test, self.y_test), 0.9666666666666667, delta=0.001)
+
+    def test_log_seed(self):
+        self.assertEqual(self.classifier.seed, 1970)

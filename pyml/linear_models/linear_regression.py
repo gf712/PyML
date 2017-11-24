@@ -68,8 +68,8 @@ class LinearRegression(LinearBase):
         self._n_features = len(X[0])
 
         if self._solver == 'gradient_descent':
-            self._initiate_weights(bias=self.bias)
-            self._coefficients, self._cost, self._iterations = gradient_descent(self.X, self.coefficients, self.y,
+            theta = self._initiate_weights(bias=self.bias)
+            self._coefficients, self._cost, self._iterations = gradient_descent(self.X, theta, self.y,
                                                                                 self.max_iterations, self.epsilon,
                                                                                 self._learning_rate, 'rgrs')
         else:

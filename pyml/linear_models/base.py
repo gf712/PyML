@@ -23,10 +23,12 @@ class LinearBase(BaseLearner, Predictor):
         :type bias: bool
         :param bias: whether or not to include bias, and if so add a column of 1's
         :rtype: None
-        :return: directly interacts with child class
+        :return: returns init coefficients
         """
         if bias:
-            self._coefficients = [random.gauss(0, 1) for x in range(self._n_features + 1)]
+            coefficients = [random.gauss(0, 1) for x in range(self._n_features + 1)]
             self.X = [[1] + row for row in self.X]
+            return coefficients
         else:
-            self._coefficients = [random.gauss(0, 1) for x in range(self._n_features)]
+            coefficients = [random.gauss(0, 1) for x in range(self._n_features)]
+            return coefficients

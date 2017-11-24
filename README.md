@@ -36,6 +36,7 @@ Changelog
  - Major:
     - PCA implementation
     - Major changes to flatArrays and C++ backend leading to speed improvements
+    - Multiclass LogisticRegression
     
  - Minor:
     - Eigendecomposition of symmetric matrices with Jacobi rotations

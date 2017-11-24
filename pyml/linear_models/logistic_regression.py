@@ -1,9 +1,11 @@
 from pyml.linear_models.base import LinearBase
 from pyml.base import Classifier
-from pyml.maths import dot_product, sigmoid
+from pyml.maths import dot_product, sigmoid, power, argmax
 from pyml.maths.optimisers import gradient_descent
 from pyml.metrics.scores import accuracy
 from pyml.utils import set_seed
+import random
+import math
 
 
 class LogisticRegression(LinearBase, Classifier):
@@ -51,6 +53,7 @@ class LogisticRegression(LinearBase, Classifier):
         self.epsilon = epsilon
         self.max_iterations = max_iterations
         self._learning_rate = learning_rate
+        self._coefficients = list()
 
     def _train(self, X, y=None):
 
@@ -66,16 +69,44 @@ class LogisticRegression(LinearBase, Classifier):
         :rtype: object
         :return: self
         """
-
         self.X = X
         self.y = y
 
         self._n_features = len(X[0])
+        self._n_classes = len(set(y))
 
-        self._initiate_weights(bias=self.bias)
-        self._coefficients, self._cost, self._iterations = gradient_descent(self.X, self.coefficients, self.y,
-                                                                            self.max_iterations, self.epsilon,
-                                                                            self._learning_rate, 'logit')
+        if self._n_classes == 2:
+            theta = self._initiate_weights(bias=self.bias)
+            self._coefficients, self._cost, self._iterations = gradient_descent(self.X, theta, self.y,
+                                                                                self.max_iterations, self.epsilon,
+                                                                                self._learning_rate, 'logit')
+
+        else:
+
+            # multiclass prediction
+            # let's train individual binary classifiers
+            self._cost = []
+            self._iterations = []
+
+            first = True
+            for x in range(self._n_classes):
+                # relabel classes
+                y_i = [1 if y_ == x else 0 for y_ in self.y]
+
+                # initiate coefficients
+                if first:
+                    theta = self._initiate_weights(bias=self.bias)
+                    first = False
+                else:
+                    theta = [random.gauss(0, 1) for x in range(self._n_features + 1)]
+
+                _coefficients_i, cost_i, iterations_i = gradient_descent(self.X, theta, y_i, self.max_iterations,
+                                                                         self.epsilon, self._learning_rate, 'logit')
+
+                # keep coefficients of each model
+                self._coefficients.append(_coefficients_i)
+                self._cost.append(cost_i)
+                self._iterations.append(iterations_i)
 
     def _predict(self, X):
 
@@ -90,7 +121,11 @@ class LogisticRegression(LinearBase, Classifier):
         :return: list of predictions
         """
 
-        return [int(round(x)) for x in self.predict_proba(X)]
+        if self.n_classes > 2:
+            # class label corresponds to argmax of each row of scores
+            return argmax(self.predict_proba(X), axis=1)
+        else:
+            return [int(round(x)) for x in self.predict_proba(X)]
 
     def _predict_proba(self, X):
 
@@ -105,12 +140,24 @@ class LogisticRegression(LinearBase, Classifier):
         :return: list of prediction probabilities
         """
 
-        if self.bias and len(X[0]) == self._n_features + 1:
-            return sigmoid(dot_product(X, self.coefficients))
+        if (self.bias and len(X[0]) == self._n_features + 1) or not self.bias:
+
+            if self.n_classes > 2:
+                scores = [dot_product(X, coef) for coef in self.coefficients]
+                return [softmax([scores[i][x] for i in range(self.n_classes)]) for x in range(len(scores[0]))]
+
+            else:
+                return sigmoid(dot_product(X, self.coefficients))
+
         elif self.bias and len(X[0]) == self._n_features:
-            return sigmoid(dot_product([[1] + row for row in X], self._coefficients))
-        elif not self.bias:
-            return sigmoid(dot_product(X, self.coefficients))
+
+            if self.n_classes > 2:
+                scores = [dot_product([[1] + row for row in X], coef) for coef in self.coefficients]
+                return [softmax([scores[i][x] for i in range(self.n_classes)]) for x in range(len(scores[0]))]
+
+            else:
+                return sigmoid(dot_product([[1] + row for row in X], self.coefficients))
+
         else:
             raise ValueError("Something went wrong.")
 
@@ -170,3 +217,25 @@ class LogisticRegression(LinearBase, Classifier):
         :type: int
         """
         return self._iterations
+
+    @property
+    def n_classes(self):
+        """
+        Number of classes
+        :getter: returns the number of classes determined by the number of unique targets
+        :type: int
+        """
+        return self._n_classes
+
+
+def softmax(u):
+    """
+    Computes softmax of a vector u
+
+    :param u:
+    :return:
+    """
+
+    z_exp = [math.exp(u_i) for u_i in u]
+    sum_z_exp = sum(z_exp)
+    return [i / sum_z_exp for i in z_exp]
