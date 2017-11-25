@@ -60,6 +60,10 @@ void gaussianElimination(flatArray<T> *A, T *result) {
         // Search for maximum in this column
         maximumSearch(A->getRow(i), n, i, maxResult);
 
+        if (maxResult[0] == 0) {
+            throw singularMatrixException();
+        }
+
         // Swap maximum row with current row (column by column)
         swapRows(A, (int) maxResult[1], i);
 
@@ -133,6 +137,10 @@ void leastSquares(flatArray<T> *X, flatArray<T> *y, T *theta) {
     // so XTX is a m by m matrix
     XTX = XT->dot(X);
 
+    if (XTX->det() == 0) {
+        throw singularMatrixException();
+    }
+
     // XT is a m by n matrix
     // y is a n dimensional vector
     // the result is a m dimensional vector called right (since it fits to the right of the A matrix)
@@ -151,7 +159,12 @@ void leastSquares(flatArray<T> *X, flatArray<T> *y, T *theta) {
     }
 
     // now we can perform gaussian elimination to get an approximation of theta
-    gaussianElimination(A, theta);
+    try {
+        gaussianElimination(A, theta);
+    }
+    catch (singularMatrixException &e) {
+        throw;
+    }
 
     // and free up memory
     delete XTX;
@@ -398,4 +411,95 @@ flatArray<T>* jacobiEigenDecomposition(flatArray<T> *S, double tolerance, int ma
     delete [] maxValues;
 
     return result;
+}
+
+template <typename T>
+inline flatArray<T>* signChart(int rows, int cols) {
+
+    flatArray<T>* result = nullptr;
+
+    result = emptyArray<T>(rows, cols);
+
+    for (int i = 0; i < result->getSize(); ++i) {
+
+        if (i % 2 == 0) {
+            result->setNElement(1, i);
+        }
+
+        else {
+            result->setNElement(-1 , i);
+        }
+    }
+
+    return result;
+}
+
+
+template <typename T>
+double determinant(flatArray<T>* array) {
+
+    int rows = array->getRows();
+    int cols = array->getCols();
+    T determinantResult = 0;
+
+
+    if (rows == 2) {
+        // base case is the determinant of a 2 by 2 matrix
+        determinantResult = array->getNElement(0) * array->getNElement(3) - array->getNElement(1) * array->getNElement(2);
+    }
+
+    else {
+        flatArray<T>* M = nullptr;
+        flatArray<T>* C = nullptr;
+        flatArray<T>* signs = nullptr;
+
+        // find determinant of minors and store in matrix M
+        M = emptyArray<T>(rows, cols);
+
+        int m = 0;
+
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+
+                flatArray<T> *M_i = nullptr;
+
+                M_i = emptyArray<T>(rows - 1, cols - 1);
+
+                // populate M_i with all rows except i, and all cols except j
+                int n = 0;
+
+                for (int k = 0; k < rows; ++k) {
+                    for (int l = 0; l < cols; ++l) {
+
+                        if (k != i && l != j) {
+                            M_i->setNElement(array->getNElement(k * cols + l), n);
+                            n++;
+                        }
+                    }
+                }
+
+                M->setNElement(determinant(M_i), m);
+
+                m++;
+                delete M_i;
+            }
+        }
+
+        signs = signChart<T>(rows, cols);
+
+        C = M->multiply(signs);
+
+        T* row = array->getRow(0);
+
+        for (int i = 0; i < rows; ++i) {
+            determinantResult += row[i] * C->getNElement(i);
+        }
+
+        delete [] row;
+        delete signs;
+        delete M;
+        delete C;
+    }
+
+    return determinantResult;
 }

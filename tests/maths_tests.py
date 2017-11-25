@@ -153,3 +153,11 @@ class LinearAlgebraTest(unittest.TestCase):
         S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]
         self.assertAlmostEqual(eigen(S, sort=True, normalise=True)[0][0], 4)
         self.assertAlmostEqual(eigen(S, sort=True, normalise=True)[1][0][0], 1)
+
+    def test_determinant_1(self):
+        A = [[3, 1], [5, 2]]
+        self.assertAlmostEqual(determinant(A), 1)
+
+    def test_determinant_2(self):
+        A = [[1, 3, 2], [4, 1, 3], [2, 5, 2]]
+        self.assertAlmostEqual(determinant(A), 17)

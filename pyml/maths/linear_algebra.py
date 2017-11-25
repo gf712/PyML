@@ -129,7 +129,7 @@ def divide(A, n):
     :param n: scalar to perform division
 
     :rtype: list
-    :return: same shape as A (list or list of lists)
+    :return: matrix divided by constant n with the same shape as A (list or list of lists)
 
     Example:
     --------
@@ -140,6 +140,28 @@ def divide(A, n):
     [[0.0, -2.0, 2.0], [-1.5, -1.0, 0.0]]
     """
     return Clinear_algebra.divide(A, n)
+
+
+def determinant(A):
+    """
+    Calculates the determinant of matrix A
+
+    :type A: list
+
+    :param A: list of lists representing a square matrix
+
+    :rtype: float
+    :return: determinant of matrix A
+
+    Example:
+    --------
+
+    >>> from pyml.maths import determinant
+    >>> A = [[3, 1], [5, 2]]
+    >>> print(determinant(A))
+    1.0
+    """
+    return Clinear_algebra.determinant(A)
 
 
 def least_squares(X, y):

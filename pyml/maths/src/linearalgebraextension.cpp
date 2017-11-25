@@ -16,6 +16,7 @@ static PyObject *DimensionMismatchException;
 static PyObject *OutOfBoundsException;
 static PyObject *ZeroDivisionError;
 static PyObject *UnknownAxis;
+static PyObject *LinearAlgebraException;
 
 
 static PyObject* dot_product(PyObject* self, PyObject *args) {
@@ -231,6 +232,39 @@ static PyObject* sum(PyObject* self, PyObject *args) {
 
     PyObject *FinalResult = Py_BuildValue("d", result);
 
+    delete A;
+
+    return FinalResult;
+}
+
+
+static PyObject* det(PyObject* self, PyObject *args) {
+
+    // sum of all elements in a matrix/vector
+
+    // variable declaration
+    flatArray<double>* A = nullptr;
+    PyObject *pAArray;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!", &PyList_Type, &pAArray)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list!");
+        return nullptr;
+    }
+
+    // use PyList_Size to get size of vector
+    A = readFromPythonList<double>(pAArray);
+
+    if (A->getCols() != A->getRows()) {
+        PyErr_SetString(LinearAlgebraException, "Expected a square matrix!");
+    }
+
+    double result = A->det();
+
+    PyObject *FinalResult = Py_BuildValue("d", result);
+
+    delete A;
+
     return FinalResult;
 }
 
@@ -299,7 +333,13 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
     auto theta = new double [X->getCols()];
 
     // get theta estimate using least squares
-    leastSquares<double>(X, y, theta);
+    try {
+        leastSquares<double>(X, y, theta);
+    }
+    catch (singularMatrixException &e) {
+        PyErr_SetString(LinearAlgebraException, e.what());
+        return nullptr;
+    }
     
 
     result_py_list = Convert_1DArray(theta, X->getCols());
@@ -498,7 +538,6 @@ static PyObject* eigenSolve(PyObject* self, PyObject *args) {
     PyObject *eigV = nullptr;
     PyObject *eigE = nullptr;
 
-
     // return error if we don't get all the arguments
     if (!PyArg_ParseTuple(args, "O!di", &PyList_Type, &pX, &tolerance, &maxIterations)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list, a float and an integer!");
@@ -546,6 +585,7 @@ static PyMethodDef linearAlgebraMethods[] = {
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
         {"divide",        divide,                 METH_VARARGS,            "Calculate element wise division"},
         {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
+        {"determinant",   det,                    METH_VARARGS,            "Calculate the determinant of a square matrix"},
         {"transpose",     pyTranspose,            METH_VARARGS,            "Transpose a 2D matrix"},
         {"least_squares", least_squares,          METH_VARARGS,            "Perform least squares"},
         {"Cmean",         mean,                   METH_VARARGS,            "Numpy style array mean"},
@@ -580,16 +620,19 @@ PyMODINIT_FUNC PyInit_Clinear_algebra(void) {
     OutOfBoundsException = PyErr_NewException("Clinear_algebra.OutOfBoundsException", nullptr, nullptr);
     ZeroDivisionError = PyErr_NewException("Clinear_algebra.ZeroDivisionError", nullptr, nullptr);
     UnknownAxis = PyErr_NewException("Clinear_algebra.UnknownAxis", nullptr, nullptr);
+    LinearAlgebraException = PyErr_NewException("Clinear_algebra.LinearAlgebraException", nullptr, nullptr);
 
     Py_INCREF(DimensionMismatchException);
     Py_INCREF(OutOfBoundsException);
     Py_INCREF(ZeroDivisionError);
     Py_INCREF(UnknownAxis);
+    Py_INCREF(LinearAlgebraException);
 
     PyModule_AddObject(m, "error", DimensionMismatchException);
     PyModule_AddObject(m, "out_of_bounds_error", OutOfBoundsException);
     PyModule_AddObject(m, "zero_error", ZeroDivisionError);
     PyModule_AddObject(m, "axis_error", UnknownAxis);
+    PyModule_AddObject(m, "linear_algebra_error", LinearAlgebraException);
 
     return m;
 }

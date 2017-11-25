@@ -1,5 +1,4 @@
-/**
- *  @file    flatArrays.cpp
+/**  @file    flatArrays.cpp
  *  @author  Gil Ferreira Hoben (gf712)
  *  @date    10/11/2017
  *  @version 0.1
@@ -15,8 +14,7 @@
  */
 #include "pythonconverters.h"
 #include "../../utils/include/exceptionClasses.h"
-#include "arrayInitialisers.h"
-
+#include "linearalgebramodule.h"
 
 template <class T>
 int flatArray<T>::getRows() {
@@ -673,4 +671,9 @@ T* flatArray<T>::diagonal() {
     }
 
     return result;
+}
+
+template <typename T>
+double flatArray<T>::det() {
+    return determinant(this);
 }

@@ -90,6 +90,7 @@ public:
     flatArray *std(int degreesOfFreedom, int axis);
     flatArray *var(int degreesOfFreedom, int axis);
     T *diagonal();
+    double det();
 };
 
 
