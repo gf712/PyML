@@ -2,8 +2,8 @@
 // Created by gil on 21/11/17.
 //
 
-#ifndef PYML_DEV_EXCEPTIONCLASSES_H
-#define PYML_DEV_EXCEPTIONCLASSES_H
+#ifndef PYML_EXCEPTIONCLASSES_H
+#define PYML_EXCEPTIONCLASSES_H
 
 #include <string>
 #include <exception>
@@ -182,7 +182,7 @@ public:
 };
 
 
-class arrayOutOfBoundsException: public flatArrayException {
+class arrayOutOfBoundsException: public arrayException {
     std::string errorMsg;
 public:
     arrayOutOfBoundsException(int size, int n) {
@@ -202,4 +202,27 @@ public:
 };
 
 
-#endif //PYML_DEV_EXCEPTIONCLASSES_H
+class linearAlgebraException: public std::exception {
+public:
+    const char* what() const throw() override {
+        return "Linear Algebra Exception";
+    }
+};
+
+class singularMatrixException: public linearAlgebraException {
+    std::string errorMsg;
+public:
+    singularMatrixException() {
+
+
+        std::string msg = "Singular matrix!";
+
+        singularMatrixException::errorMsg = msg.c_str();
+    };
+
+    const char* what() const throw() override {
+        return errorMsg.c_str();
+    }
+};
+
+#endif //PYML_EXCEPTIONCLASSES_H

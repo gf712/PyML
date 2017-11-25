@@ -59,7 +59,7 @@ setup(
                  'License :: OSI Approved :: MIT License',
                  'Natural Language :: English',
                  'Programming Language :: Python :: 3 :: Only',
-                 'Programming Language :: Python :: Implementation :: CPython'
+                 'Programming Language :: Python :: Implementation :: CPython',
                  'Programming Language :: C++',
                  'Programming Language :: C',
                  'Topic :: Scientific/Engineering :: Artificial Intelligence'],

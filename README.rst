@@ -40,7 +40,7 @@ Version 0.2.1 (30/11/2017):
  - Major:
     - PCA implementation
     - Major changes to flatArrays and C++ backend leading to speed improvements
-    - Multiclass LogisticRegression 
+    - Multiclass LogisticRegression
 
  - Minor:
     - Eigendecomposition of symmetric matrices with Jacobi rotations
