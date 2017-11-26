@@ -129,7 +129,7 @@ public:
         std::string sizeString = std::to_string(A->getCols());
 
         std::string msg = "Accessing an element that is out of bounds! Attempting to access column "
-                          + nString + " in an array with " + sizeString + " rows!";
+                          + nString + " in an array with " + sizeString + " columns!";
 
         flatArrayOutOfBoundsColumnException::errorMsg = msg.c_str();
     };
