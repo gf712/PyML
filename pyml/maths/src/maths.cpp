@@ -2,6 +2,41 @@
 // Created by Gil Ferreira Hoben on 07/11/17.
 //
 #include "maths.h"
+#include <random>
+
+template <typename T>
+inline T MIN(T a, T b) {
+    if (a < b) {
+        return a;
+    }
+    return b;
+}
+
+
+template <typename T>
+inline T MAX(T a, T b) {
+    if (a > b) {
+        return a;
+    }
+    return b;
+}
+
+
+inline void shuffle(int* rNums, int size) {
+    // Fisher–Yates shuffle
+
+    int j, i;
+
+    i = size - 1;
+
+    while (i > 0)
+    {
+        j = static_cast<int>(random() % (size - i + 1));
+        swap<int>(rNums[i], rNums[j]);
+        i--;
+    }
+}
+
 
 template <typename T>
 inline void swap(T& a, T& b)

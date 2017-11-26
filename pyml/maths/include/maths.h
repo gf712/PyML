@@ -5,6 +5,16 @@
 #ifndef MATHS_MATHS_H
 #define MATHS_MATHS_H
 
+template <typename T>
+inline T MIN(T a, T b);
+
+template <typename T>
+inline T MAX(T a, T b);
+
+inline void shuffle(int* rNums, int size);
+
+template <typename T>
+inline void swap(T& a, T& b);
 
 void permutations(double* array, double** result, int size);
 
