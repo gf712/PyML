@@ -11,7 +11,7 @@
 static PyObject *gradient_descent(PyObject *self, PyObject *args) {
 
     // variable declaration
-    int m, n, maxIterations, iterations;
+    int m, n, maxIterations, iterations, batchSize, seed;
     double epsilon, learningRate, alpha;
     flatArray<double>* costArray = nullptr;
     flatArray<double>* X = nullptr;
@@ -26,8 +26,8 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     PyObject* pyTheta;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!O!iddds", &PyList_Type, &pX, &PyList_Type, &ptheta, &PyList_Type, &py,
-                         &maxIterations, &epsilon, &learningRate, &alpha, &predType)) {
+    if(!PyArg_ParseTuple(args, "O!O!O!iidddsi", &PyList_Type, &pX, &PyList_Type, &ptheta, &PyList_Type, &py, &batchSize,
+                         &maxIterations, &epsilon, &learningRate, &alpha, &predType, &seed)) {
         PyErr_SetString(PyExc_TypeError, "Check arguments!");
         return nullptr;
     }
@@ -50,14 +50,45 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
         return nullptr;
     }
 
+
     // memory allocation
-    costArray = emptyArray<double>(1, maxIterations);
+    if (batchSize > 0 && batchSize < n) {
+        auto batchIterations = static_cast<int>(std::floor(n / batchSize));
+
+        if (n % batchSize == 0) {
+            costArray = emptyArray<double>(1, maxIterations * batchIterations);
+        }
+
+        else {
+            costArray = emptyArray<double>(1, maxIterations * (batchIterations + 1));
+        }
+    }
+
+    else {
+        costArray = emptyArray<double>(1, maxIterations);
+    }
 
     // gradient descent
-    iterations = gradientDescent(X, y, theta, maxIterations, epsilon, learningRate, alpha, costArray, predType);
+    iterations = gradientDescent(X, y, theta, maxIterations, epsilon, learningRate, alpha, costArray, predType,
+                                 batchSize, seed);
 
     // costArray only needs #iterations columns
-    costArray->setCols(iterations);
+    if (batchSize > 0 && batchSize < n) {
+        auto batchIterations = static_cast<int>(std::floor(n / batchSize));
+
+        if (n % batchSize == 0) {
+            costArray->setCols(iterations * batchIterations);
+        }
+
+        else {
+            costArray->setCols(iterations * (batchIterations + 1));
+        }
+    }
+
+    else {
+        costArray->setCols(iterations);
+    }
+
 
     // convert cost array and theta to lists
     pyCostArray = ConvertFlatArray_PyList(costArray, "float");
