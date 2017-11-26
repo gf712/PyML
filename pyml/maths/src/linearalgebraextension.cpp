@@ -109,6 +109,62 @@ static PyObject* power(PyObject* self, PyObject *args) {
 }
 
 
+static PyObject* add(PyObject* self, PyObject *args) {
+
+    // variable instantiation
+    flatArray<double>* A = nullptr;
+    flatArray<double>* B = nullptr;
+    flatArray<double>* result = nullptr;
+
+    PyObject *pA;
+    PyObject *pB;
+    PyObject *result_py_list;
+    PyObject *FinalResult;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pA, &PyList_Type, &pB)) {
+        PyErr_SetString(PyExc_TypeError, "Expected two lists!");
+        return nullptr;
+    }
+
+    // get python lists
+    A = readFromPythonList<double>(pA);
+    B = readFromPythonList<double>(pB);
+
+    // subtraction
+    try {
+        result = A->add(B);
+    }
+
+    catch (flatArrayDimensionMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
+
+    catch (flatArrayColumnMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
+
+    catch (flatArrayRowMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
+
+    result_py_list = ConvertFlatArray_PyList(result, "float");
+    FinalResult = Py_BuildValue("O", result_py_list);
+
+    // memory deallocation
+    delete result;
+    delete A;
+    delete B;
+
+    Py_DECREF(result_py_list);
+
+    return FinalResult;
+}
+
+
 static PyObject* subtract(PyObject* self, PyObject *args) {
 
     // variable instantiation
@@ -154,12 +210,52 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
     result_py_list = ConvertFlatArray_PyList(result, "float");
     FinalResult = Py_BuildValue("O", result_py_list);
 
-//    FinalResult = Py_BuildValue("i", 0);
 
     // memory deallocation
     delete result;
     delete A;
     delete B;
+
+    Py_DECREF(result_py_list);
+
+    return FinalResult;
+}
+
+
+static PyObject* multiply(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    flatArray<double>* A = nullptr;
+    flatArray<double>* result = nullptr;
+    flatArray<double>* B = nullptr;
+
+    // pointers to python lists
+    PyObject* pAArray = nullptr;
+    PyObject* pBArray = nullptr;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pAArray, &PyList_Type, &pBArray)) {
+        PyErr_SetString(PyExc_TypeError, "Expected two lists!");
+        return nullptr;
+    }
+
+    // read in python list
+    A = readFromPythonList<double>(pAArray);
+    B = readFromPythonList<double>(pBArray);
+
+    // calculate elementwise multiplication with B
+    result = A->multiply(B);
+
+    // convert vector to python list
+    PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
+
+    // build python object
+    PyObject* FinalResult = Py_BuildValue("O", result_py_list);
+
+    // deallocate memory
+    delete A;
+    delete B;
+    delete result;
 
     Py_DECREF(result_py_list);
 
@@ -582,7 +678,9 @@ static PyMethodDef linearAlgebraMethods[] = {
         // Python name    C function              argument representation  description
         {"dot_product",   dot_product,            METH_VARARGS,            "Calculate the dot product of two vectors"},
         {"power",         power,                  METH_VARARGS,            "Calculate element wise power"},
+        {"add",           add,                    METH_VARARGS,            "Calculate element wise addition"},
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
+        {"multiply",      multiply,               METH_VARARGS,            "Calculate element wise multiplication"},
         {"divide",        divide,                 METH_VARARGS,            "Calculate element wise division"},
         {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
         {"determinant",   det,                    METH_VARARGS,            "Calculate the determinant of a square matrix"},

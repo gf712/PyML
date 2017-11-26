@@ -78,19 +78,21 @@ public:
     T *getColSlice(int j, int start, int end);
 
     // MATRIX MANIPULATION/LINEAR ALGEBRA
-    flatArray* transpose();
+    flatArray<T>* transpose();
     T sum();
-    flatArray *dot(flatArray *other);
-    flatArray *subtract(flatArray *other);
-    flatArray *power(double p);
-    flatArray *divide(double m);
-    flatArray *multiply(flatArray *other);
-    flatArray *nlog(double base);
-    flatArray *mean(int axis);
-    flatArray *std(int degreesOfFreedom, int axis);
-    flatArray *var(int degreesOfFreedom, int axis);
-    T *diagonal();
+    flatArray<T>* dot(flatArray *other);
+    flatArray<T>* subtract(flatArray *other);
+    flatArray<T>* add(flatArray *other);
+    flatArray<T>* power(double p);
+    flatArray<T>* divide(double m);
+    flatArray<T>* multiply(flatArray *other);
+    flatArray<T>* nlog(double base);
+    flatArray<T>* mean(int axis);
+    flatArray<T>* std(int degreesOfFreedom, int axis);
+    flatArray<T>* var(int degreesOfFreedom, int axis);
+    T* diagonal();
     double det();
+    flatArray<T>* invertSign();
 };
 
 

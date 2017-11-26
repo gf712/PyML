@@ -249,6 +249,94 @@ flatArray<T>* flatArray<T>::dot(flatArray* other) {
     }
 }
 
+
+template <class T>
+flatArray<T>* flatArray<T>::add(flatArray *other) {
+
+    flatArray* result = nullptr;
+
+    result = emptyArray<T>(rows, cols);
+
+    if (other->getRows() == 1 && rows > 1) {
+        // other is a vector and this is a matrix
+
+        // if square matrix will prioritise column wise subtraction (consider transposing matrix
+        // if this is not what you want)
+        if (other->getCols() == rows) {
+            // number of rows match number of dimensions of vector
+
+            T *B = other->getRow(0);
+
+            int n = 0;
+            for (int i = 0; i < rows; ++i) {
+
+                for (int j = 0; j < cols; ++j) {
+
+                    // add each row by the ith element of other vector
+                    result->setNElement(array[n] + B[i], n);
+
+                    n++;
+                }
+            }
+
+            delete [] B;
+        }
+
+        else if (other->getCols() == cols){
+            T *B = other->getRow(0);
+
+            int n = 0;
+            for (int i = 0; i < rows; ++i) {
+
+                for (int j = 0; j < cols; ++j) {
+
+                    // add each column by the ith element of other vector
+                    result->setNElement(array[n] + B[j], n);
+
+                    n++;
+                }
+            }
+
+            delete [] B;
+        }
+
+        else {
+            throw flatArrayDimensionMismatchException<T>(this, other);
+        }
+    }
+
+    else if (other->getRows() == 1 && other->getCols() == 1) {
+        // other is a scalar represented as an array
+        T B = other->getNElement(0);
+
+        for (int i = 0; i < size; ++i) {
+            result->setNElement(array[i] + B, i);
+        }
+
+    }
+
+    else if (other->getSize() == size) {
+        // both are matrices or vectors (with same size)
+
+        if (rows != other->getRows() || cols != other->getCols()) {
+            throw flatArrayDimensionMismatchException<T>(this, other);
+        }
+
+        T *B = other->getArray();
+
+        for (int n = 0; n < size; ++n) {
+            result->setNElement(array[n] + B[n], n);
+        }
+    }
+
+    else {
+        throw flatArrayDimensionMismatchException<T>(this, other);
+    }
+
+    return result;
+}
+
+
 template <class T>
 flatArray<T>* flatArray<T>::subtract(flatArray *other) {
 
@@ -332,6 +420,14 @@ flatArray<T>* flatArray<T>::subtract(flatArray *other) {
         throw flatArrayDimensionMismatchException<T>(this, other);
     }
 
+//    flatArray<T>* invS = nullptr;
+//    flatArray<T>* result = nullptr;
+//
+//    invS = other->invertSign();
+//    result = this->add(invS);
+//
+//    delete invS;
+
     return result;
 }
 
@@ -375,8 +471,22 @@ flatArray<T>* flatArray<T>::multiply(flatArray *other) {
 
     result = emptyArray<T>(rows, cols);
 
-    for (int n = 0; n < size; ++n) {
-        result->setNElement(array[n] * other->getNElement(n), n);
+
+    if (other->getSize() == 1) {
+        // if other represent a scalar
+        // get constant k from other
+        T k = other->getNElement(0);
+
+        for (int n = 0; n < size; ++n) {
+            result->setNElement(array[n] * k, n);
+        }
+    }
+
+    else {
+
+        for (int n = 0; n < size; ++n) {
+            result->setNElement(array[n] * other->getNElement(n), n);
+        }
     }
 
     return result;
@@ -676,4 +786,21 @@ T* flatArray<T>::diagonal() {
 template <typename T>
 double flatArray<T>::det() {
     return determinant(this);
+}
+
+
+template <typename T>
+flatArray<T>* flatArray<T>::invertSign() {
+
+    auto newArray = new double [size];
+
+    for (int i = 0; i < size; ++i) {
+        newArray[i] = -array[i];
+    }
+
+    auto result = new flatArray<T>(newArray, rows, cols);
+
+    delete newArray;
+
+    return result;
 }
