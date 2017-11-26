@@ -128,11 +128,20 @@ class LinearAlgebraTest(unittest.TestCase):
     def test_dot_product(self):
         self.assertAlmostEqual(dot_product(self.A[0], transpose(self.B)[0])[0], 0.691239893627)
 
+    def test_add(self):
+        self.assertAlmostEqual(add(self.A, transpose(self.B))[0][-1], 0.16094185221109958)
+
     def test_subtract(self):
         self.assertAlmostEqual(subtract(self.A, transpose(self.B))[0][3], 0.6442101271237023)
 
     def test_power(self):
         self.assertAlmostEqual(power(self.A, 2)[0][5], 0.9336806492618525)
+
+    def test_multiply_1(self):
+        self.assertAlmostEqual(multiply(self.A, 2)[0][0], 0.2792398429743861)
+
+    def test_multiply_2(self):
+        self.assertAlmostEqual(multiply(self.A, self.B)[0][0], 0.04580368872627444)
 
     def test_divide(self):
         self.assertAlmostEqual(divide(self.A[0], 0.5)[0], 0.2792398429743861)

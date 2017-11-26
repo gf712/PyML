@@ -56,13 +56,9 @@ def transpose(A):
     return Clinear_algebra.transpose(A)
 
 
-def broadcast(u, n):
-    return [u for i in range(n)]
-
-
 def add(A, B):
     """
-    Calculates elementwise difference of each element in a list (vector) or list of lists (matrix)
+    Calculates elementwise sum of each element in a list (vector) or list of lists (matrix)
     If matrix has the same number of columns or rows as the vector the vector is automatically broadcast to fit the matrix
 
     :type A: list

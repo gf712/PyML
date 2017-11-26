@@ -31,8 +31,15 @@ class LinearRegressionGradientDescentTest(unittest.TestCase):
     def test_mse(self):
         self.assertAlmostEqual(self.regressor.score(self.X_test, self.y_test), 1.3280324597827904, delta=0.001)
 
+    def test_mae(self):
+        self.assertAlmostEqual(self.regressor.score(self.X_test, self.y_test, scorer='mae'),
+                               0.9126392424298799, delta=0.001)
+
     def test_seed(self):
         self.assertEqual(self.regressor.seed, 1970)
+
+    def test_solver_error(self):
+        self.assertRaises(ValueError, LinearRegression, 1970, True, 'adadelta')
 
 
 class LinearRegressionOLSTest(unittest.TestCase):
