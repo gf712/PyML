@@ -12,7 +12,7 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
 
     // variable declaration
     int m, n, maxIterations, iterations;
-    double epsilon, learningRate;
+    double epsilon, learningRate, alpha;
     flatArray<double>* costArray = nullptr;
     flatArray<double>* X = nullptr;
     flatArray<double>* y = nullptr;
@@ -26,7 +26,8 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     PyObject* pyTheta;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!O!idds", &PyList_Type, &pX, &PyList_Type, &ptheta, &PyList_Type, &py, &maxIterations, &epsilon, &learningRate, &predType)) {
+    if(!PyArg_ParseTuple(args, "O!O!O!iddds", &PyList_Type, &pX, &PyList_Type, &ptheta, &PyList_Type, &py,
+                         &maxIterations, &epsilon, &learningRate, &alpha, &predType)) {
         PyErr_SetString(PyExc_TypeError, "Check arguments!");
         return nullptr;
     }
@@ -53,7 +54,7 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     costArray = emptyArray<double>(1, maxIterations);
 
     // gradient descent
-    iterations = gradientDescent(X, y, theta, maxIterations, epsilon, learningRate, costArray, predType);
+    iterations = gradientDescent(X, y, theta, maxIterations, epsilon, learningRate, alpha, costArray, predType);
 
     // costArray only needs #iterations columns
     costArray->setCols(iterations);
@@ -77,7 +78,7 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
 }
 
 static PyObject* version(PyObject* self) {
-    return Py_BuildValue("s", "Version 0.1");
+    return Py_BuildValue("s", "Version 0.2.1");
 }
 
 static PyMethodDef optimisersMethods[] = {

@@ -60,6 +60,39 @@ def broadcast(u, n):
     return [u for i in range(n)]
 
 
+def add(A, B):
+    """
+    Calculates elementwise difference of each element in a list (vector) or list of lists (matrix)
+    If matrix has the same number of columns or rows as the vector the vector is automatically broadcast to fit the matrix
+
+    :type A: list
+    :type B: list
+
+    :param A: either a list or a list of lists representing a vector or matrix, respectively
+    :param B: either a list or a list of lists representing a vector or matrix, respectively
+
+    :rtype: list
+    :return: same format as A (list or list of lists)
+
+    Example:
+    --------
+
+    >>> from pyml.maths import add
+    >>> A = [[0, -4, 4], [-3, -2, 0]]
+    >>> B = [0, 1, 2]
+    >>> print(add(A, B))
+    [[0.0, -3.0, 6.0], [-3.0, -1.0, 2.0]]
+    >>> C = [0, 1]
+    >>> print(add(A, C))
+    [[0.0, -4.0, 4.0], [-2.0, -1.0, 1.0]]
+    >>> D = [[1, 5, 11], [-5, -7, 10]]
+    >>> print(add(A, D))
+    [[1.0, 1.0, 15.0], [-8.0, -9.0, 10.0]]
+    """
+    # TODO: write exceptions to help user with errors from the backend
+    return Clinear_algebra.add(A, B)
+
+
 def subtract(A, B):
     """
     Calculates elementwise difference of each element in a list (vector) or list of lists (matrix)
@@ -116,6 +149,34 @@ def power(A, n):
     """
     # TODO: write exceptions to help user with errors from the backend
     return Clinear_algebra.power(A, n)
+
+
+def multiply(A, B):
+    """
+    Calculates elementwise multiplication of a list (vector) or list of lists (matrix) with another vector or matrix
+    and automatic broadcasting if needed
+
+    :type A: list
+    :type B: float or list
+
+    :param A: either a list (vector) or a list of lists (matrix)
+    :param B: either a list (vector) or a list of lists (matrix) or a constant
+
+    :rtype: list
+    :return: matrix divided by constant n with the same shape as A (list or list of lists)
+
+    Example:
+    --------
+
+    >>> from pyml.maths import multiply
+    >>> A = [[0, -4, 4], [-3, -2, 0]]
+    >>> print(multiply(A, 2))
+    [[0.0, -8.0, 8.0], [-6.0, -4.0, 0.0]]
+    """
+    if isinstance(B, (float, int)):
+        B = [B]
+
+    return Clinear_algebra.multiply(A, B)
 
 
 def divide(A, n):
@@ -205,8 +266,13 @@ def eigen(array, tolerance=1.0e-9, max_iterations=0, sort=True, normalise=True):
 
     >>> from pyml.maths import eigen
     >>> S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]
-    >>> print(eigen(S))
-    ([4.0, 3.0, 1.0], [[1.0, 1.0, 1.0], [-1.0, -3.7e-10, 2.0], [1.0, -1.0, 1.0]])
+    >>> w, v = eigen(S)
+    >>> v = [[round(x, 1) for x in row] for row in v]
+    >>> w = [round(x, 1) for x in w]
+    >>> print(v)
+    [[1.0, 1.0, 1.0], [-1.0, -0.0, 2.0], [1.0, -1.0, 1.0]]
+    >>> print(w)
+    [4.0, 3.0, 1.0]
 
     """
 

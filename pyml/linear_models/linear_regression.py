@@ -7,7 +7,7 @@ from pyml.utils import set_seed
 
 class LinearRegression(LinearBase):
     def __init__(self, seed=None, bias=True, solver='OLS', learning_rate=0.01,
-                 epsilon=0.01, max_iterations=10000):
+                 epsilon=0.01, max_iterations=10000, alpha=0.0):
         """
         Linear regression implementation
 
@@ -17,6 +17,7 @@ class LinearRegression(LinearBase):
         :type learning_rate: float
         :type epsilon: float
         :type max_iterations: int
+        :type alpha: float
 
         :param seed: random seed
         :param bias: whether or not to add a bias (column of 1s) if it isn't already present
@@ -24,6 +25,7 @@ class LinearRegression(LinearBase):
         :param learning_rate: learning rate for gradient descent
         :param epsilon: early stopping parameter for gradient descent
         :param max_iterations: early stopping parameter for gradient descent
+        :param alpha: momentum parameter for gradient descent
 
 
         Example:
@@ -46,6 +48,10 @@ class LinearRegression(LinearBase):
         self._learning_rate = learning_rate
         if solver in ['OLS', 'gradient_descent']:
             self._solver = solver
+        else:
+            raise ValueError("Unknown solver!")
+
+        self.alpha = alpha
 
     def _train(self, X, y=None):
 
@@ -71,7 +77,7 @@ class LinearRegression(LinearBase):
             theta = self._initiate_weights(bias=self.bias)
             self._coefficients, self._cost, self._iterations = gradient_descent(self.X, theta, self.y,
                                                                                 self.max_iterations, self.epsilon,
-                                                                                self._learning_rate, 'rgrs')
+                                                                                self._learning_rate, self.alpha, 'rgrs')
         else:
             if self.bias:
                 self.X = [[1] + row for row in self.X]
