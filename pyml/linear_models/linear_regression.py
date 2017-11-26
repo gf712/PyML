@@ -122,10 +122,12 @@ class LinearRegression(LinearBase):
         :rtype float
         :return: score
         """
-        if scorer == 'mean_squared_error':
+        if scorer == 'mean_squared_error' or scorer == 'mse':
             return mean_squared_error(self.predict(X), y_true)
-        elif scorer == 'mean_absolute_error':
+        elif scorer == 'mean_absolute_error' or scorer == 'mae':
             return mean_absolute_error(self.predict(X), y_true)
+        else:
+            raise ValueError("Unknown scorer!")
 
     @property
     def seed(self):

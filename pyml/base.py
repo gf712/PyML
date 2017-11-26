@@ -16,8 +16,8 @@ class Predictor:
     def predict(self, X):
         return self._predict(X)
 
-    def score(self, X, y_true):
-        return self._score(X, y_true)
+    def score(self, X, y_true, *args, **kwargs):
+        return self._score(X, y_true, *args, **kwargs)
 
 
 class Classifier:
