@@ -23,3 +23,6 @@ class PCATest(unittest.TestCase):
 
     def test_PCA_transform(self):
         self.assertAlmostEqual(self.decomposer.transform(self.X)[1][2], 0.203521425006)
+
+    def test_PCA_fit_transform(self):
+        self.assertAlmostEqual(self.decomposer.train_transform(self.X)[1][2], 0.203521425006)

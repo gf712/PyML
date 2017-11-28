@@ -28,6 +28,10 @@ class LinearRegressionGradientDescentTest(unittest.TestCase):
     def test_LinR_predict(self):
         self.assertAlmostEqual(self.regressor.predict(self.X_test)[0], 3.8176098320897065, delta=0.001)
 
+    def test_LinR_train_predict(self):
+        self.assertAlmostEqual(self.regressor.train_predict(self.X_train, self.y_train)[0], 9.770956237446251,
+                               delta=0.001)
+
     def test_LinR_mse(self):
         self.assertAlmostEqual(self.regressor.score(self.X_test, self.y_test), 1.3280324597827904, delta=0.001)
 

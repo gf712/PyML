@@ -13,8 +13,8 @@ class LinearBase(BaseLearner, Predictor):
         """
         Inherits methods from BaseLearner
         """
-
-        pass
+        BaseLearner.__init__(self)
+        Predictor.__init__(self)
 
     def _initiate_weights(self, bias):
         """

@@ -8,13 +8,13 @@ class BaseLearner:
 
 
 class Predictor:
-    
-    def train_predict(self, X, y=None):
-        self.train(X, y)
-        return self.predict(X)
 
     def predict(self, X):
         return self._predict(X)
+
+    def train_predict(self, X, y=None):
+        self.train(X, y)
+        return self.predict(X)
 
     def score(self, X, y_true, *args, **kwargs):
         return self._score(X, y_true, *args, **kwargs)
@@ -38,4 +38,4 @@ class Transformer:
 
     def train_transform(self, X):
         self.train(X)
-        self.transform(X)
+        return self.transform(X)
