@@ -20,9 +20,18 @@ inline void sigmoid(flatArray<T> *scores) {
 
 
 template <typename T>
-inline flatArray<T> *predict(flatArray<T> *X, flatArray<T> *w) {
+inline flatArray<T> *predict(flatArray<T> *X, flatArray<T> *w, char predType[10]) {
 
-    return X->dot(w);
+    flatArray<T>* h;
+
+    h = X->dot(w);
+
+    // if using classification, calculate sigmoid(h)
+    if (strcmp(predType, "logit") == 0) {
+        sigmoid(h);
+    }
+
+    return h;
 }
 
 
@@ -58,8 +67,9 @@ inline T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, ch
 
     T result;
     flatArray<T>* prediction = nullptr;
+    char empty[0];
 
-    prediction = predict(X, theta);
+    prediction = predict(X, theta, empty);
 
     if (strcmp(predType, "logit") == 0) {
         result = logLikelihood(prediction, y);
@@ -72,7 +82,6 @@ inline T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, ch
         result = cost(loss);
 
         delete loss;
-
     }
 
     delete prediction;
@@ -85,53 +94,70 @@ template <typename T>
 inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta, flatArray<T>* XT, flatArray<T>* nu,
                           double gamma, double learningRate, int m, int n, char predType[10], char method[10]) {
 
+    // variable declaration
     flatArray<T>* error = nullptr;
     flatArray<T>* gradients = nullptr;
     flatArray<T>* updateTerm = nullptr;
-    flatArray<T>* h = predict<T>(X, theta);
+    flatArray<T>* h = nullptr;
 
-    if (strcmp(predType, "logit") == 0) {
-        sigmoid(h);
-    }
-
-
-
-    // update coefficients
     if (strcmp(method, "normal") == 0) {
-        // calculate the gradient
+
+    // #######################################################
+    //                 Vanilla gradient term
+    // #######################################################
+    //
+    //                   updateTerm = ∇J(θ)
+    //
+        // get predictions for this step
+        h = predict<T>(X, theta, predType);
+
         error = h->subtract(y);
         gradients = XT->dot(error);
         updateTerm = gradients->divide(n);
     }
 
     else if (strcmp(method, "nesterov") == 0) {
-        // calculate the gradient for current iteration
 
-        // copy array
+    // #######################################################
+    //                 Nesterov gradient term
+    // #######################################################
+    //
+    //             updateTerm = ∇J(θ − γ · v[t-1])
+    //
+
+        // copy theta
         flatArray<T>* tempTheta = theta;
 
-        // approximate next position of parameters
-        for (int j = 0; j < m; ++j) {
-            tempTheta->setNElement(theta->getNElement(j) - nu->getNElement(j) * gamma, j);
+        // approximate next position of parameters (θ − γ · v[t-1])
+        for (int i = 0; i < m; ++i) {
+            T nu_i = nu->getNElement(i) * gamma;
+            tempTheta->setNElement(theta->getNElement(i) - nu_i, i);
         }
 
-        // calculate the gradient of next step
+        // calculate the gradient with new theta
+        h = predict<T>(X, tempTheta, predType);
         error = h->subtract(y);
         gradients = XT->dot(error);
         updateTerm = gradients->divide(n);
-
-
-        // calculate the gradient for the next iteration
-        for (int i = 0; i < m; ++i) {
-            T nu_i = nu->getNElement(i) * gamma;
-            theta->setNElement(theta->getNElement(i) - nu_i, i);
-            nu->setNElement(nu_i, i);
-        }
-
     }
 
     else {
         PyErr_SetString(PyExc_ValueError, method);
+        return;
+    }
+
+
+    // #######################################################
+    //             Update theta with updateTerm (v)
+    // #######################################################
+    //
+    //            v[t] = γ · v[t-1] + η · updateTerm
+    //
+    //                  θ[t] = θ[t-1] − v[t]
+    //
+
+    if (updateTerm == nullptr) {
+        PyErr_SetString(PyExc_ValueError, "ERROR");
         return;
     }
 

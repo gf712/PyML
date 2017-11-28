@@ -226,25 +226,25 @@ class MultiClassLogisticRegressionNesterovOpt(unittest.TestCase):
         cls.classifier.train(X=cls.X_train, y=cls.y_train)
 
     def test_MLogRNesOpt_iterations(self):
-        self.assertEqual(self.classifier.iterations[0], 1422)
-        self.assertEqual(self.classifier.iterations[1], 1387)
-        self.assertEqual(self.classifier.iterations[2], 1314)
+        self.assertEqual(self.classifier.iterations[0], 1274)
+        self.assertEqual(self.classifier.iterations[1], 1210)
+        self.assertEqual(self.classifier.iterations[2], 1175)
 
     def test_MLogRNesOpt_coefficients(self):
-        self.assertAlmostEqual(self.classifier.coefficients[0][-1], -6.846074732365178, delta=0.001)
-        self.assertAlmostEqual(self.classifier.coefficients[1][-1], 4.338360404846728, delta=0.001)
-        self.assertAlmostEqual(self.classifier.coefficients[2][-1], 1.588970918397227, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[0][-1], -7.298649513828892, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[1][-1], 4.610707704248638, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[2][-1], 1.690684230026362, delta=0.001)
 
     def test_MLogRNesOpt_cost(self):
-        self.assertAlmostEqual(self.classifier.cost[0][-1], -35.33543976524454, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[1][-1], -68.23222953962204, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[2][-1], -36.25581980480585, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[0][-1], -33.32798686899964, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[1][-1], -66.63780970485656, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[2][-1], -34.41686105857577, delta=0.001)
 
     def test_MLogRNesOpt_predict(self):
         self.assertEqual(self.classifier.predict(self.X_test)[0], 1)
 
     def test_MLogRNesOpt_predict_proba(self):
-        self.assertAlmostEqual(self.classifier.predict_proba(self.X_test)[0][0], 0.03540159849097916, delta=0.001)
+        self.assertAlmostEqual(self.classifier.predict_proba(self.X_test)[0][0], 0.02931216446502055, delta=0.001)
 
     def test_MLogRNesOpt_accuracy(self):
         self.assertAlmostEqual(self.classifier.score(self.X_test, self.y_test), 0.9833333333333333, delta=0.001)
