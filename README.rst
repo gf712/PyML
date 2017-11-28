@@ -41,7 +41,9 @@ Version 0.2.1 (30/11/2017):
     - PCA implementation
     - Major changes to flatArrays and C++ backend leading to speed improvements
     - Multiclass LogisticRegression
+    - Mini batch gradient descent
     - Gradient descent with momentum
+    - Nesterov optimisation
 
  - Minor:
     - Eigendecomposition of symmetric matrices with Jacobi rotations
