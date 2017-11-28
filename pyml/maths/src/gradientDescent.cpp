@@ -8,6 +8,7 @@
 #include "optimisers.h"
 #include "maths.h"
 #include "maths.cpp"
+#include <string>
 
 
 template <typename T>
@@ -53,7 +54,7 @@ inline T cost(flatArray<T>* loss){
 
 
 template <typename T>
-inline T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, char *predType) {
+inline T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, char predType[10]) {
 
     T result;
     flatArray<T>* prediction = nullptr;
@@ -82,24 +83,60 @@ inline T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, ch
 
 template <typename T>
 inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta, flatArray<T>* XT, flatArray<T>* nu,
-                          double alpha, double learningRate, int m, int n, char* predType) {
+                          double gamma, double learningRate, int m, int n, char predType[10], char method[10]) {
 
+    flatArray<T>* error = nullptr;
+    flatArray<T>* gradients = nullptr;
+    flatArray<T>* updateTerm = nullptr;
     flatArray<T>* h = predict<T>(X, theta);
 
     if (strcmp(predType, "logit") == 0) {
         sigmoid(h);
     }
 
-    // calculate the gradient
-    flatArray<T>* error = h->subtract(y);
 
-    flatArray<T>* result = XT->dot(error);
-
-    flatArray<T>* gradients = result->divide(n);
 
     // update coefficients
+    if (strcmp(method, "normal") == 0) {
+        // calculate the gradient
+        error = h->subtract(y);
+        gradients = XT->dot(error);
+        updateTerm = gradients->divide(n);
+    }
+
+    else if (strcmp(method, "nesterov") == 0) {
+        // calculate the gradient for current iteration
+
+        // copy array
+        flatArray<T>* tempTheta = theta;
+
+        // approximate next position of parameters
+        for (int j = 0; j < m; ++j) {
+            tempTheta->setNElement(theta->getNElement(j) - nu->getNElement(j) * gamma, j);
+        }
+
+        // calculate the gradient of next step
+        error = h->subtract(y);
+        gradients = XT->dot(error);
+        updateTerm = gradients->divide(n);
+
+
+        // calculate the gradient for the next iteration
+        for (int i = 0; i < m; ++i) {
+            T nu_i = nu->getNElement(i) * gamma;
+            theta->setNElement(theta->getNElement(i) - nu_i, i);
+            nu->setNElement(nu_i, i);
+        }
+
+    }
+
+    else {
+        PyErr_SetString(PyExc_ValueError, method);
+        return;
+    }
+
     for (int i = 0; i < m; ++i) {
-        T nu_i = nu->getNElement(i) * alpha + gradients->getNElement(i) * learningRate;
+        T nu_i = nu->getNElement(i) * gamma + updateTerm->getNElement(i) * learningRate;
         theta->setNElement(theta->getNElement(i) - nu_i, i);
         nu->setNElement(nu_i, i);
     }
@@ -107,15 +144,15 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
     delete error;
     delete gradients;
     delete h;
-    delete result;
+    delete updateTerm;
 }
 
 
 template <typename T>
 void batchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta, flatArray<T>* XT,
                           flatArray<T>* costArray, flatArray<T>* nu, double e, double epsilon,
-                          int maxIteration, char* predType, double alpha,
-                          double learningRate, int m, int n, int& iteration) {
+                          int maxIteration, char predType[10], double alpha,
+                          double learningRate, int m, int n, int& iteration, char method[10]) {
 
     // calculate gradient using the whole dataset
     T JOld;
@@ -131,7 +168,7 @@ void batchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
         JOld = JNew;
 
         // update weights
-        updateWeights<T>(X, y, theta, XT, nu, alpha, learningRate, m, n, predType);
+        updateWeights<T>(X, y, theta, XT, nu, alpha, learningRate, m, n, predType, method);
 
         // calculate cost for new weights
         JNew = calculateCost<T>(X, theta, y, predType);
@@ -168,8 +205,8 @@ void getBatches(flatArray<T>* X, flatArray<T>* y, flatArray<T>* XT, flatArray<T>
 template <typename T>
 void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta, flatArray<T>* XT,
                               flatArray<T>* costArray, flatArray<T>* nu, double e, double epsilon,
-                              int maxIteration, char* predType, double alpha,
-                              double learningRate, int m, int n, int batchSize, int& iteration) {
+                              int maxIteration, char predType[10], double alpha,
+                              double learningRate, int m, int n, int batchSize, int& iteration, char method[10]) {
 
     // calculate gradient using mini batch (where 1 <= batch_size < m)
     T JOld;
@@ -210,7 +247,7 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
             getBatches<T>(X, y, XT, XNew, yNew, XTNew, rNums, batchSize, batchNumber, n);
 
             // update weights using this batch
-            updateWeights<T>(XNew, yNew, theta, XTNew, nu, alpha, learningRate, m, n, predType);
+            updateWeights<T>(XNew, yNew, theta, XTNew, nu, alpha, learningRate, m, n, predType, method);
 
             // calculate overall cost
             JNew = calculateCost<T>(X, theta, y, predType);
@@ -239,7 +276,7 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
             getBatches<T>(X, y, XT, XNewi, yNewi, XTNewi, rNums, batchSize, batchNumber, n);
 
             // update weights using this batch
-            updateWeights<T>(XNewi, yNewi, theta, XTNewi, nu, alpha, learningRate, m, n, predType);
+            updateWeights<T>(XNewi, yNewi, theta, XTNewi, nu, alpha, learningRate, m, n, predType, method);
 
             // calculate overall cost
             JNew = calculateCost<T>(X, theta, y, predType);
@@ -261,8 +298,8 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
 
 template <typename T>
 int gradientDescent(flatArray<T> *X, flatArray<T> *y, flatArray<T> *theta, int maxIteration, double epsilon,
-                    double learningRate, double alpha, flatArray<T>* costArray, char *predType, int batchSize,
-                    int seed) {
+                    double learningRate, double alpha, flatArray<T>* costArray, char predType[10], int batchSize,
+                    int seed, char method[10]) {
 
     // set random variables
     srand(static_cast<unsigned int>(seed));
@@ -288,19 +325,19 @@ int gradientDescent(flatArray<T> *X, flatArray<T> *y, flatArray<T> *theta, int m
     if (batchSize <= 0) {
         // batch gradient descent
         batchGradientDescent(X, y, theta, XT, costArray, nu, e, epsilon, maxIteration,
-                             predType, alpha, learningRate, m, n, iteration);
+                             predType, alpha, learningRate, m, n, iteration, method);
     }
 
     else if (batchSize > 0 && batchSize < X->getRows()) {
         // mini batch gradient descent (if batch size = 1 it's the equivalent of stochastic gradient descent)
         minibatchGradientDescent(X, y, theta, XT, costArray, nu, e, epsilon, maxIteration, predType,
-                                 alpha, learningRate, m, n, batchSize, iteration);
+                                 alpha, learningRate, m, n, batchSize, iteration, method);
     }
 
     else if (batchSize >= X->getRows()) {
         // batch_size > number of examples, default to batch gradient descent
         batchGradientDescent(X, y, theta, XT, costArray, nu, e, epsilon, maxIteration,
-                             predType, alpha, learningRate, m, n, iteration);
+                             predType, alpha, learningRate, m, n, iteration, method);
     }
 
     else {

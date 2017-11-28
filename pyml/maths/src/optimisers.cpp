@@ -17,7 +17,8 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     flatArray<double>* X = nullptr;
     flatArray<double>* y = nullptr;
     flatArray<double>* theta = nullptr;
-    char *predType;
+    char* predType;
+    char* method;
 
     PyObject* ptheta;
     PyObject* pX;
@@ -26,8 +27,8 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     PyObject* pyTheta;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!O!iidddsi", &PyList_Type, &pX, &PyList_Type, &ptheta, &PyList_Type, &py, &batchSize,
-                         &maxIterations, &epsilon, &learningRate, &alpha, &predType, &seed)) {
+    if(!PyArg_ParseTuple(args, "O!O!O!iidddssi", &PyList_Type, &pX, &PyList_Type, &ptheta, &PyList_Type, &py,
+                         &batchSize, &maxIterations, &epsilon, &learningRate, &alpha, &predType, &method, &seed)) {
         PyErr_SetString(PyExc_TypeError, "Check arguments!");
         return nullptr;
     }
@@ -70,7 +71,7 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
 
     // gradient descent
     iterations = gradientDescent(X, y, theta, maxIterations, epsilon, learningRate, alpha, costArray, predType,
-                                 batchSize, seed);
+                                 batchSize, seed, method);
 
     // costArray only needs #iterations columns
     if (batchSize > 0 && batchSize < n) {

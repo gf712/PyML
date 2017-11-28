@@ -137,9 +137,9 @@ void leastSquares(flatArray<T> *X, flatArray<T> *y, T *theta) {
     // so XTX is a m by m matrix
     XTX = XT->dot(X);
 
-    if (XTX->det() == 0) {
-        throw singularMatrixException();
-    }
+//    if (XTX->det() == 0) {
+//        throw singularMatrixException();
+//    }
 
     // XT is a m by n matrix
     // y is a n dimensional vector

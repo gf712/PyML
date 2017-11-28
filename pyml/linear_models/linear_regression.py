@@ -7,7 +7,8 @@ from pyml.utils import set_seed
 
 class LinearRegression(LinearBase):
     def __init__(self, seed=None, bias=True, solver='OLS', learning_rate=0.01,
-                 epsilon=0.01, max_iterations=10000, alpha=0.0, batch_size=0):
+                 epsilon=0.01, max_iterations=10000, alpha=0.0, batch_size=0,
+                 method='normal'):
         """
         Linear regression implementation
 
@@ -19,6 +20,7 @@ class LinearRegression(LinearBase):
         :type max_iterations: int
         :type alpha: float
         :type batch_size: int
+        :type method: str
 
         :param seed: random seed
         :param bias: whether or not to add a bias (column of 1s) if it isn't already present
@@ -29,6 +31,9 @@ class LinearRegression(LinearBase):
         :param alpha: momentum parameter for gradient descent
         :param batch_size: batch size, if it is set to zero or a number larger than training examples it will
                            default to batch gradient descent
+        :param method: method to run gradient descent.
+                        - "normal": vanilla gradient descent
+                        - "nesterov": nesterov method for gradient descent
 
 
         Example:
@@ -57,6 +62,11 @@ class LinearRegression(LinearBase):
         self.alpha = alpha
         self._batch_size = batch_size
 
+        if method in ['normal', 'nesterov']:
+            self._method = method
+        else:
+            raise ValueError("Unknown GD method")
+
     def _train(self, X, y=None):
 
         """
@@ -81,8 +91,8 @@ class LinearRegression(LinearBase):
             theta = self._initiate_weights(bias=self.bias)
             self._coefficients, self._cost, self._iterations = gradient_descent(self.X, theta, self.y, self._batch_size,
                                                                                 self.max_iterations, self.epsilon,
-                                                                                self._learning_rate, self.alpha, 'rgrs',
-                                                                                self.seed)
+                                                                                self._learning_rate, self.alpha,
+                                                                                'rgrs', self._method, self.seed)
         else:
             if self.bias:
                 self.X = [[1] + row for row in self.X]

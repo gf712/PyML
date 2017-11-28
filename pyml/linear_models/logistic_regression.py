@@ -11,7 +11,7 @@ import math
 class LogisticRegression(LinearBase, Classifier):
     def __init__(self, seed=None, bias=True, learning_rate=0.01,
                  epsilon=0.01, max_iterations=10000, alpha=0.0,
-                 batch_size=0):
+                 batch_size=0, method='normal'):
         """
         Logistic regression implementation
 
@@ -22,6 +22,7 @@ class LogisticRegression(LinearBase, Classifier):
         :type max_iterations: int
         :type alpha: float
         :type batch_size: int
+        :type method: str
 
         :param seed: random seed
         :param bias: whether or not to add a bias (column of 1s) if it isn't already present
@@ -31,6 +32,9 @@ class LogisticRegression(LinearBase, Classifier):
         :param alpha: momentum parameter for gradient descent
         :param batch_size: batch size, if it is set to zero or a number larger than training examples it will
                            default to batch gradient descent
+        :param method: method to run gradient descent.
+                        - "normal": vanilla gradient descent
+                        - "nesterov": nesterov method for gradient descent
 
         Example:
         --------
@@ -64,6 +68,11 @@ class LogisticRegression(LinearBase, Classifier):
         self._alpha = alpha
         self._batch_size = batch_size
 
+        if method in ['normal', 'nesterov']:
+            self._method = method
+        else:
+            raise ValueError("Unknown GD method")
+
     def _train(self, X, y=None):
 
         """
@@ -89,7 +98,7 @@ class LogisticRegression(LinearBase, Classifier):
             self._coefficients, self._cost, self._iterations = gradient_descent(self.X, theta, self.y, self._batch_size,
                                                                                 self.max_iterations, self.epsilon,
                                                                                 self._learning_rate, self._alpha,
-                                                                                'logit', self.seed)
+                                                                                'logit', self._method, self.seed)
 
         else:
 
@@ -113,7 +122,7 @@ class LogisticRegression(LinearBase, Classifier):
                 _coefficients_i, cost_i, iterations_i = gradient_descent(self.X, theta, y_i, self._batch_size,
                                                                          self.max_iterations, self.epsilon,
                                                                          self._learning_rate, self._alpha, 'logit',
-                                                                         self.seed)
+                                                                         self._method, self.seed)
 
                 # keep coefficients of each model
                 self._coefficients.append(_coefficients_i)
