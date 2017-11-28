@@ -1,5 +1,6 @@
 import unittest
 from pyml.linear_models import LinearRegression, LogisticRegression
+from pyml.linear_models.base import LinearBase
 from pyml.datasets import regression, gaussian
 from pyml.preprocessing import train_test_split
 
@@ -43,7 +44,13 @@ class LinearRegressionGradientDescentTest(unittest.TestCase):
         self.assertEqual(self.regressor.seed, 1970)
 
     def test_LinR_solver_error(self):
-        self.assertRaises(ValueError, LinearRegression, 1970, True, 'adadelta')
+        self.assertRaises(ValueError, LinearRegression, 1970, True, 'unknown_solver')
+
+
+class GradientDescentTest(unittest.TestCase):
+
+    def test_GD_opt_InitError(self):
+        self.assertRaises(ValueError, LinearBase, 0.01, 0.01, 10, 0.9, 64, 'amazing_optimiser_algo', None, 'regressor')
 
 
 class LinearRegressionOLSTest(unittest.TestCase):

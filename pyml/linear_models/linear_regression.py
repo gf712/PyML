@@ -1,8 +1,6 @@
 from pyml.linear_models.base import LinearBase
 from pyml.maths import dot_product, least_squares
-from pyml.maths.optimisers import gradient_descent
 from pyml.metrics.scores import mean_squared_error, mean_absolute_error
-from pyml.utils import set_seed
 
 
 class LinearRegression(LinearBase):
@@ -47,25 +45,14 @@ class LinearRegression(LinearBase):
         [0.3011617891659273, 0.9428803588636959]
         """
 
-        LinearBase.__init__(self)
+        LinearBase.__init__(self, learning_rate=learning_rate, epsilon=epsilon, max_iterations=max_iterations,
+                            alpha=alpha, batch_size=batch_size, method=method, seed=seed, _type='regressor')
 
-        self._seed = set_seed(seed)
         self.bias = bias
-        self.epsilon = epsilon
-        self.max_iterations = max_iterations
-        self._learning_rate = learning_rate
         if solver in ['OLS', 'gradient_descent']:
             self._solver = solver
         else:
             raise ValueError("Unknown solver!")
-
-        self.alpha = alpha
-        self._batch_size = batch_size
-
-        if method in ['normal', 'nesterov']:
-            self._method = method
-        else:
-            raise ValueError("Unknown GD method")
 
     def _train(self, X, y=None):
 
@@ -89,10 +76,7 @@ class LinearRegression(LinearBase):
 
         if self._solver == 'gradient_descent':
             theta = self._initiate_weights(bias=self.bias)
-            self._coefficients, self._cost, self._iterations = gradient_descent(self.X, theta, self.y, self._batch_size,
-                                                                                self.max_iterations, self.epsilon,
-                                                                                self._learning_rate, self.alpha,
-                                                                                'rgrs', self._method, self.seed)
+            self._coefficients, self._cost, self._iterations = self._gradient_descent(self.X, self.y, theta=theta)
         else:
             if self.bias:
                 self.X = [[1] + row for row in self.X]

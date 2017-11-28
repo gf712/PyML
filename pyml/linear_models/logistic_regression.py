@@ -1,9 +1,7 @@
 from pyml.linear_models.base import LinearBase
 from pyml.base import Classifier
 from pyml.maths import dot_product, sigmoid, power, argmax
-from pyml.maths.optimisers import gradient_descent
 from pyml.metrics.scores import accuracy
-from pyml.utils import set_seed
 import random
 import math
 
@@ -56,22 +54,12 @@ class LogisticRegression(LinearBase, Classifier):
         0.975
         """
 
-        LinearBase.__init__(self)
+        LinearBase.__init__(self, learning_rate=learning_rate, epsilon=epsilon, max_iterations=max_iterations,
+                            alpha=alpha, batch_size=batch_size, method=method, seed=seed, _type='logit')
         Classifier.__init__(self)
 
-        self._seed = set_seed(seed)
-        self.bias = bias
-        self.epsilon = epsilon
-        self.max_iterations = max_iterations
-        self._learning_rate = learning_rate
+        self._bias = bias
         self._coefficients = list()
-        self._alpha = alpha
-        self._batch_size = batch_size
-
-        if method in ['normal', 'nesterov']:
-            self._method = method
-        else:
-            raise ValueError("Unknown GD method")
 
     def _train(self, X, y=None):
 
@@ -94,11 +82,8 @@ class LogisticRegression(LinearBase, Classifier):
         self._n_classes = len(set(y))
 
         if self._n_classes == 2:
-            theta = self._initiate_weights(bias=self.bias)
-            self._coefficients, self._cost, self._iterations = gradient_descent(self.X, theta, self.y, self._batch_size,
-                                                                                self.max_iterations, self.epsilon,
-                                                                                self._learning_rate, self._alpha,
-                                                                                'logit', self._method, self.seed)
+            theta = self._initiate_weights(bias=self._bias)
+            self._coefficients, self._cost, self._iterations = self._gradient_descent(self.X, self.y, theta=theta)
 
         else:
 
@@ -114,15 +99,12 @@ class LogisticRegression(LinearBase, Classifier):
 
                 # initiate coefficients
                 if first:
-                    theta = self._initiate_weights(bias=self.bias)
+                    theta = self._initiate_weights(bias=self._bias)
                     first = False
                 else:
                     theta = [random.gauss(0, 1) for x in range(self._n_features + 1)]
 
-                _coefficients_i, cost_i, iterations_i = gradient_descent(self.X, theta, y_i, self._batch_size,
-                                                                         self.max_iterations, self.epsilon,
-                                                                         self._learning_rate, self._alpha, 'logit',
-                                                                         self._method, self.seed)
+                _coefficients_i, cost_i, iterations_i = self._gradient_descent(self.X, y_i, theta=theta)
 
                 # keep coefficients of each model
                 self._coefficients.append(_coefficients_i)
@@ -161,7 +143,7 @@ class LogisticRegression(LinearBase, Classifier):
         :return: list of prediction probabilities
         """
 
-        if (self.bias and len(X[0]) == self._n_features + 1) or not self.bias:
+        if (self._bias and len(X[0]) == self._n_features + 1) or not self._bias:
 
             if self.n_classes > 2:
                 scores = [dot_product(X, coef) for coef in self.coefficients]
@@ -170,7 +152,7 @@ class LogisticRegression(LinearBase, Classifier):
             else:
                 return sigmoid(dot_product(X, self.coefficients))
 
-        elif self.bias and len(X[0]) == self._n_features:
+        elif self._bias and len(X[0]) == self._n_features:
 
             if self.n_classes > 2:
                 scores = [dot_product([[1] + row for row in X], coef) for coef in self.coefficients]
