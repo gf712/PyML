@@ -13,7 +13,7 @@
  *
  */
 #include "pythonconverters.h"
-#include "../../utils/include/exceptionClasses.h"
+#include "exceptionClasses.h"
 #include "linearalgebramodule.h"
 
 template <class T>
@@ -252,15 +252,12 @@ flatArray<T>* flatArray<T>::dot(flatArray* other) {
 
 // this is a template for elementwise operations
 template <typename T>
-flatArray<T>* elementwiseTemplate(flatArray<T>* self, flatArray<T>* other, T (f(T,T))) {
+void elementwiseTemplate(flatArray<T>* self, flatArray<T>* other, T (f(T,T)), T* result) {
 
-    flatArray<T>* result = nullptr;
     int rows = self->getRows();
     int cols = self->getCols();
     int size = self->getSize();
     T* array = self->getArray();
-
-    result = emptyArray<T>(rows, cols);
 
     if (other->getCols() > 1 && other->getRows() == 1 && rows > 1) {
         // other is a vector and self is a matrix
@@ -271,14 +268,13 @@ flatArray<T>* elementwiseTemplate(flatArray<T>* self, flatArray<T>* other, T (f(
 
             // number of rows match number of dimensions of vector
             T *B = other->getRow(0);
-
             int n = 0;
             for (int i = 0; i < rows; ++i) {
 
                 for (int j = 0; j < cols; ++j) {
 
                     // operation f on each row by the ith element of other vector
-                    result->setNElement(f(array[n], B[i]), n);
+                    result[n] = f(array[n], B[i]);
 
                     n++;
                 }
@@ -298,7 +294,7 @@ flatArray<T>* elementwiseTemplate(flatArray<T>* self, flatArray<T>* other, T (f(
                 for (int j = 0; j < cols; ++j) {
 
                     // operation f on each each column by the ith element of other vector
-                    result->setNElement(f(array[n], B[j]), n);
+                    result[n] = f(array[n], B[j]);
 
                     n++;
                 }
@@ -322,7 +318,7 @@ flatArray<T>* elementwiseTemplate(flatArray<T>* self, flatArray<T>* other, T (f(
         T *B = other->getArray();
 
         for (int n = 0; n < size; ++n) {
-            result->setNElement(f(array[n], B[n]), n);
+            result[n] = f(array[n], B[n]);
         }
     }
 
@@ -331,8 +327,8 @@ flatArray<T>* elementwiseTemplate(flatArray<T>* self, flatArray<T>* other, T (f(
 
         T B = other->getNElement(0);
 
-        for (int i = 0; i < size; ++i) {
-            result->setNElement(f(array[i], B), i);
+        for (int n = 0; n < size; ++n) {
+            result[n] = f(array[n], B);
         }
 
     }
@@ -340,68 +336,99 @@ flatArray<T>* elementwiseTemplate(flatArray<T>* self, flatArray<T>* other, T (f(
     else {
         throw flatArrayDimensionMismatchException<T>(self, other);
     }
-
-
-    return result;
 }
 
 
-template <class T>
-flatArray<T>* flatArray<T>::add(flatArray *other) {
-
-    T (*f)(T, T)=[](T a, T b) { return (a + b); };
-
-    flatArray<T>* result = elementwiseTemplate<T>(this, other, f);
-
-    return result;
-
-}
-
-
-template <class T>
-flatArray<T>* flatArray<T>::subtract(flatArray *other) {
-
-    T (*f)(T, T)=[](T a, T b) { return (a - b); };
-
-    flatArray<T>* result = elementwiseTemplate<T>(this, other, f);
-
-    return result;
-}
-
-template <class T>
-flatArray<T>* flatArray<T>::power(double p) {
+template <typename T>
+flatArray<T>* elementwiseHelper(flatArray<T>* self, flatArray<T>* other, T (f(T,T)), int replace) {
 
     flatArray<T>* result = nullptr;
 
-    result = emptyArray<T>(rows, cols);
+    if (replace == 0) {
 
-    for (int n = 0; n < size; ++n) {
-        result->setNElement(pow(array[n], p), n);
+        int rows = self->getRows();
+        int cols = self->getCols();
+        auto* newArray = new T[rows * cols];
+
+        elementwiseTemplate<T>(self, other, f, newArray);
+
+        result = new flatArray<T>(newArray, rows, cols);
+
+        delete newArray;
+
+        return result;
     }
 
-    return result;
+    else {
+        elementwiseTemplate<T>(self, other, f, self->getArray());
+        return self;
+    }
 }
 
+
 template <class T>
-flatArray<T>* flatArray<T>::divide(flatArray<T>* other) {
+flatArray<T>* flatArray<T>::add(flatArray *other, int replace) {
+
+    T (*f)(T, T)=[](T a, T b) { return (a + b); };
+
+    return elementwiseHelper<T>(this, other, f, replace);
+}
+
+
+template <class T>
+flatArray<T>* flatArray<T>::subtract(flatArray *other, int replace) {
+
+    T (*f)(T, T)=[](T a, T b) { return (a - b); };
+
+    return elementwiseHelper<T>(this, other, f, replace);
+}
+
+
+template <class T>
+flatArray<T>* flatArray<T>::divide(flatArray<T>* other, int replace) {
 
     T (*f)(T, T)=[](T a, T b) { if (b != 0) {return (a / b);} else {throw flatArrayZeroDivisionError();} };
 
-    flatArray<T>* result = elementwiseTemplate<T>(this, other, f);
-
-    return result;
-
+    return elementwiseHelper<T>(this, other, f, replace);
 }
 
+
 template <class T>
-flatArray<T>* flatArray<T>::multiply(flatArray *other) {
+flatArray<T>* flatArray<T>::multiply(flatArray *other, int replace) {
 
     T (*f)(T, T)=[](T a, T b) { return (a * b); };
 
-    flatArray<T>* result = elementwiseTemplate<T>(this, other, f);
+    return elementwiseHelper<T>(this, other, f, replace);
 
-    return result;
 }
+
+
+template <class T>
+flatArray<T>* flatArray<T>::power(double p, int replace) {
+
+    flatArray<T>* result = nullptr;
+
+    if (replace == 0) {
+
+        result = emptyArray<T>(rows, cols);
+
+        for (int n = 0; n < size; ++n) {
+            result->setNElement(pow(array[n], p), n);
+        }
+
+        return result;
+    }
+
+    else {
+
+        for (int n = 0; n < size; ++n) {
+            array[n] = pow(array[n], p);
+        }
+
+        return this;
+    }
+}
+
 
 template <class T>
 flatArray<T>* flatArray<T>::nlog(double base) {

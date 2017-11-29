@@ -81,11 +81,11 @@ public:
     flatArray<T>* transpose();
     T sum();
     flatArray<T>* dot(flatArray *other);
-    flatArray<T>* subtract(flatArray *other);
-    flatArray<T>* add(flatArray *other);
-    flatArray<T>* power(double p);
-    flatArray<T>* divide(flatArray *other);
-    flatArray<T>* multiply(flatArray *other);
+    flatArray<T>* subtract(flatArray *other, int replace=0);
+    flatArray<T>* add(flatArray *other, int replace=0);
+    flatArray<T>* power(double p, int replace=0);
+    flatArray<T>* divide(flatArray *other, int replace=0);
+    flatArray<T>* multiply(flatArray *other, int replace=0);
     flatArray<T>* nlog(double base);
     flatArray<T>* mean(int axis);
     flatArray<T>* std(int degreesOfFreedom, int axis);

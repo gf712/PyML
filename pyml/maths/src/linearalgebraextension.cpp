@@ -75,7 +75,6 @@ static PyObject* power(PyObject* self, PyObject *args) {
 
     // variable declaration
     flatArray<double>* A = nullptr;
-    flatArray<double>* result = nullptr;
     double p;
 
     // pointers to python lists
@@ -92,10 +91,10 @@ static PyObject* power(PyObject* self, PyObject *args) {
     A = readFromPythonList<double>(pAArray);
 
     // calculate the power elementwise
-    result = A->power(p);
+    A->power(p, 1);
 
     // convert vector to python list
-    PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
+    PyObject* result_py_list = ConvertFlatArray_PyList(A, "float");
 
     // build python object
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
@@ -114,7 +113,6 @@ static PyObject* add(PyObject* self, PyObject *args) {
     // variable instantiation
     flatArray<double>* A = nullptr;
     flatArray<double>* B = nullptr;
-    flatArray<double>* result = nullptr;
 
     PyObject *pA;
     PyObject *pB;
@@ -133,7 +131,7 @@ static PyObject* add(PyObject* self, PyObject *args) {
 
     // subtraction
     try {
-        result = A->add(B);
+        A->add(B, 1);
     }
 
     catch (flatArrayDimensionMismatchException<double> &e) {
@@ -151,11 +149,10 @@ static PyObject* add(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    result_py_list = ConvertFlatArray_PyList(result, "float");
+    result_py_list = ConvertFlatArray_PyList(A, "float");
     FinalResult = Py_BuildValue("O", result_py_list);
 
     // memory deallocation
-    delete result;
     delete A;
     delete B;
 
@@ -170,7 +167,6 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
     // variable instantiation
     flatArray<double>* A = nullptr;
     flatArray<double>* B = nullptr;
-    flatArray<double>* result = nullptr;
 
     PyObject *pA;
     PyObject *pB;
@@ -189,7 +185,7 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
 
     // subtraction
     try {
-        result = A->subtract(B);
+        A->subtract(B, 1);
     }
 
     catch (flatArrayDimensionMismatchException<double> &e) {
@@ -207,12 +203,11 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    result_py_list = ConvertFlatArray_PyList(result, "float");
+    result_py_list = ConvertFlatArray_PyList(A, "float");
     FinalResult = Py_BuildValue("O", result_py_list);
 
 
     // memory deallocation
-    delete result;
     delete A;
     delete B;
 
@@ -226,7 +221,6 @@ static PyObject* multiply(PyObject* self, PyObject *args) {
 
     // variable declaration
     flatArray<double>* A = nullptr;
-    flatArray<double>* result = nullptr;
     flatArray<double>* B = nullptr;
 
     // pointers to python lists
@@ -244,10 +238,10 @@ static PyObject* multiply(PyObject* self, PyObject *args) {
     B = readFromPythonList<double>(pBArray);
 
     // calculate elementwise multiplication with B
-    result = A->multiply(B);
+    A->multiply(B, 1);
 
     // convert vector to python list
-    PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
+    PyObject* result_py_list = ConvertFlatArray_PyList(A, "float");
 
     // build python object
     PyObject* FinalResult = Py_BuildValue("O", result_py_list);
@@ -255,7 +249,6 @@ static PyObject* multiply(PyObject* self, PyObject *args) {
     // deallocate memory
     delete A;
     delete B;
-    delete result;
 
     Py_DECREF(result_py_list);
 
@@ -268,7 +261,6 @@ static PyObject* divide(PyObject* self, PyObject *args) {
     // variable declaration
     flatArray<double>* A = nullptr;
     flatArray<double>* B = nullptr;
-    flatArray<double>* result = nullptr;
     double n;
 
     // pointers to python lists
@@ -287,7 +279,7 @@ static PyObject* divide(PyObject* self, PyObject *args) {
 
     // calculate elementwise division by n
     try {
-        result = A->divide(B);
+        A->divide(B, 1);
     }
     catch (flatArrayZeroDivisionError &e) {
         PyErr_SetString(ZeroDivisionError, e.what());
@@ -295,14 +287,13 @@ static PyObject* divide(PyObject* self, PyObject *args) {
     }
 
     // convert vector to python list
-    PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
+    PyObject* result_py_list = ConvertFlatArray_PyList(A, "float");
 
     // build python object
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
 
     // deallocate memory
     delete A;
-    delete result;
 
     Py_DECREF(result_py_list);
 
