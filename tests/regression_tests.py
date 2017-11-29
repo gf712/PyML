@@ -284,3 +284,39 @@ class MultiClassLogisticRegressionAdagradOpt(unittest.TestCase):
 
     def test_MLogRAdagradOpt_accuracy(self):
         self.assertAlmostEqual(self.classifier.score(self.X_test, self.y_test), 0.9833333333333333, delta=0.001)
+
+
+class MultiClassLogisticRegressionAdadeltaOpt(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.X, cls.y = gaussian(labels=3, sigma=0.2, seed=1970)
+        cls.X_train, cls.y_train, cls.X_test, cls.y_test = train_test_split(cls .X, cls.y,
+                                                                            train_split=0.8, seed=1970)
+        cls.classifier = LogisticRegression(seed=1970, learning_rate=1, alpha=0.9, method='adadelta')
+        cls.classifier.train(X=cls.X_train, y=cls.y_train)
+
+    def test_MLogRAdagradOpt_iterations(self):
+        self.assertEqual(self.classifier.iterations[0], 20)
+        self.assertEqual(self.classifier.iterations[1], 50)
+        self.assertEqual(self.classifier.iterations[2], 129)
+
+    def test_MLogRAdagradOpt_coefficients(self):
+        self.assertAlmostEqual(self.classifier.coefficients[0][-1], -8.359845175725027, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[1][-1], 7.956748000261714, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[2][-1], 3.333400361333907, delta=0.001)
+
+    def test_MLogRAdagradOpt_cost(self):
+        self.assertAlmostEqual(self.classifier.cost[0][-1], -31.66865412047897, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[1][-1], -58.41403733911508, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[2][-1], -22.67980065062773, delta=0.001)
+
+    def test_MLogRAdagradOpt_predict(self):
+        self.assertEqual(self.classifier.predict(self.X_test)[0], 1)
+
+    def test_MLogRAdagradOpt_predict_proba(self):
+        self.assertAlmostEqual(self.classifier.predict_proba(self.X_test)[0][0], 0.006281680718833279, delta=0.001)
+
+    def test_MLogRAdagradOpt_accuracy(self):
+        self.assertAlmostEqual(self.classifier.score(self.X_test, self.y_test), 0.9833333333333333, delta=0.001)
+

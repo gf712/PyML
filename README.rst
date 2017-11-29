@@ -46,6 +46,7 @@ Version 0.2.1 (30/11/2017):
        - Gradient descent with momentum
        - Nesterov optimisation
        - Adagrad optimisation
+       - Adadelta optimisation
     - Backend:
        - Major changes to flatArrays and C++ backend leading to speed improvements
 

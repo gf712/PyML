@@ -26,7 +26,7 @@ class LinearBase(BaseLearner, Predictor):
         self._alpha = alpha
         self._batch_size = batch_size
 
-        if method in ['normal', 'nesterov', 'adagrad']:
+        if method in ['normal', 'nesterov', 'adagrad', 'adadelta']:
             self._method = method
 
         else:
@@ -35,10 +35,14 @@ class LinearBase(BaseLearner, Predictor):
         self._seed = set_seed(seed)
         self._type = _type
 
-        if self._method == 'adagrad':
+        if self._method == 'adagrad' or self._method == 'adadelta' or self._method == 'adadelta':
             if fudge_factor == 0:
-                warnings.warn("Fudge factor for Adagrad optimisation is 0, it will be set to 10e-8 by default")
+                warnings.warn("Fudge factor for Adagrad optimisation is 0, it will be set to 10e-8 for your own safety")
                 fudge_factor = 10e-8
+
+        if self._method == 'adadelta' and self._learning_rate != 1:
+            warnings.warn("Adadelta does not use a learning rate, setting this value to 1!")
+            self._learning_rate = 1
 
         self._fudge_factor = fudge_factor
 

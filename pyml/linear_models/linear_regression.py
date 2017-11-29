@@ -31,10 +31,11 @@ class LinearRegression(LinearBase):
         :param batch_size: batch size, if it is set to zero or a number larger than training examples it will
                            default to batch gradient descent
         :param method: method to run gradient descent.
-                        - "normal": vanilla gradient descent
-                        - "nesterov": nesterov method for gradient descent
-                        - "adagrad": adagrad method for gradient descent
-        :param fudge_factor: fudge factor for Adagrad to avoid zero divisions
+                        - "normal": vanilla GD (gradient descent)
+                        - "nesterov": nesterov method for GD
+                        - "adagrad": adagrad method for GD
+                        - "adadelta": adadelta method for GD
+        :param fudge_factor: fudge factor for Adagrad and Adadelta to avoid zero divisions
 
 
         Example:

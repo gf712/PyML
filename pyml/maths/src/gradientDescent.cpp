@@ -87,7 +87,7 @@ inline T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, ch
 template <typename T>
 inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta, flatArray<T>* XT, flatArray<T>* nu,
                           double gamma, double learningRate, int m, flatArray<T>* n, char predType[10], char method[10],
-                          flatArray<T>* epsilon, flatArray<T>* G) {
+                          flatArray<T>* epsilon, flatArray<T>* G, int iteration) {
 
     // variable declaration
     flatArray<T>* error = nullptr;
@@ -169,7 +169,56 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
     }
 
     else if (strcmp(method, "adadelta") == 0) {
+    // #######################################################
+    //                 Adadelta gradient term
+    // #######################################################
+    //
+    //            RMS[∆θ][t] = (E[∆θ**2] + e) ** .5
+    //
+    //          ∆θt= (-RMS[∆θ[t-1]] / RMS[g[t]]) * g[t]
+    //
+    // Note: In this implementation the negative sign is ignored,
+    // since all update terms are subtracted from theta anyway
+    //
 
+        flatArray<T>* g = nullptr;
+        flatArray<T>* g_2 = nullptr;
+        flatArray<T>* E_prev = nullptr;
+        flatArray<T>* E_i = nullptr;
+
+        // previous mean
+        // (E[g[t-1]**2] + e) ** .5
+        E_prev = G->add(epsilon, 0);
+        E_prev->power(0.5, 1);
+
+        // get predictions for this step
+        error = predict<T>(X, theta, predType)->subtract(y, 1);
+
+        g = XT->dot(error)->divide(n, 1); // g = ∇J(θ[t])
+
+        g_2 = g->power(2, 0); // g_2 = g[t] ** 2
+
+        // online mean:
+        //
+        // delta = (x - mean) / n
+        // mean += delta
+
+        // new mean
+        auto* temp = new T[1];
+        temp[0] = g_2->subtract(G, 1)->getNElement(0) / static_cast<T>(iteration + 2);
+
+        auto* delta = new flatArray<double>(temp, 1, 1);
+        G->add(delta, 1); // G += E[∆θ**2]
+
+        E_i = G->add(epsilon, 0);
+        E_i->power(0.5, 1); // RMS[g[t]]
+
+        updateTerm = g->multiply(E_prev->divide(E_i, 1), 0); // g[t] * (RMS[∆θ[t-1]] / RMS[g[t]])
+
+        delete g;
+        delete g_2;
+        delete E_prev;
+        delete E_i;
     }
 
     else {
@@ -178,12 +227,12 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
     }
 
     // #######################################################
-    //             Update theta with updateTerm (v)
+    //             Update theta with updateTerm
     // #######################################################
     //
-    //            v[t] = γ · v[t-1] + η · updateTerm
+    //          v[t] = γ · v[t-1] + η · updateTerm
     //
-    //                  θ[t] = θ[t-1] − v[t]
+    //                 θ[t] = θ[t-1] − v[t]
     //
 
     if (updateTerm == nullptr) {
@@ -192,6 +241,8 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
     }
 
     for (int i = 0; i < m; ++i) {
+        // to switch off momentum set gamma to 1
+        // to switch off learning rate set learningRate to 1
         T nu_i = nu->getNElement(i) * gamma + updateTerm->getNElement(i) * learningRate;
         theta->setNElement(theta->getNElement(i) - nu_i, i);
         nu->setNElement(nu_i, i);
@@ -224,7 +275,7 @@ void batchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
         JOld = JNew;
 
         // update weights
-        updateWeights<T>(X, y, theta, XT, nu, alpha, learningRate, m, n, predType, method, fudgeFactor, G);
+        updateWeights<T>(X, y, theta, XT, nu, alpha, learningRate, m, n, predType, method, fudgeFactor, G, iteration);
 
         // calculate cost for new weights
         JNew = calculateCost<T>(X, theta, y, predType);
@@ -308,7 +359,8 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
             getBatches<T>(X, y, XT, XNew, yNew, XTNew, rNums, batchSize, batchNumber, nScalar);
 
             // update weights using this batch
-            updateWeights<T>(XNew, yNew, theta, XTNew, nu, alpha, learningRate, m, n, predType, method, fudgeFactor, G);
+            updateWeights<T>(XNew, yNew, theta, XTNew, nu, alpha, learningRate, m, n, predType, method, fudgeFactor, G,
+                             iteration);
 
             // calculate overall cost
             JNew = calculateCost<T>(X, theta, y, predType);
@@ -337,7 +389,8 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
             getBatches<T>(X, y, XT, XNewi, yNewi, XTNewi, rNums, batchSize, batchNumber, nScalar);
 
             // update weights using this batch
-            updateWeights<T>(XNewi, yNewi, theta, XTNewi, nu, alpha, learningRate, m, n, predType, method, fudgeFactor, G);
+            updateWeights<T>(XNewi, yNewi, theta, XTNewi, nu, alpha, learningRate, m, n, predType, method, fudgeFactor,
+                             G, iteration);
 
             // calculate overall cost
             JNew = calculateCost<T>(X, theta, y, predType);
