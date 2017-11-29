@@ -728,19 +728,27 @@ double flatArray<T>::det() {
 
 
 template <typename T>
-flatArray<T>* flatArray<T>::invertSign() {
+flatArray<T>* flatArray<T>::invertSign(int replace) {
 
-    auto newArray = new double [size];
+    if (replace == 0) {
+        auto newArray = new double[size];
 
-    for (int i = 0; i < size; ++i) {
-        newArray[i] = -array[i];
+        for (int i = 0; i < size; ++i) {
+            newArray[i] = -array[i];
+        }
+
+        auto result = new flatArray<T>(newArray, rows, cols);
+
+        delete newArray;
+
+        return result;
     }
-
-    auto result = new flatArray<T>(newArray, rows, cols);
-
-    delete newArray;
-
-    return result;
+    else {
+        for (int i = 0; i < size; ++i) {
+            array[i] = -array[i];
+        }
+        return this;
+    }
 }
 
 

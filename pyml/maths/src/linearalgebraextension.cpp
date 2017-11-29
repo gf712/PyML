@@ -261,7 +261,6 @@ static PyObject* divide(PyObject* self, PyObject *args) {
     // variable declaration
     flatArray<double>* A = nullptr;
     flatArray<double>* B = nullptr;
-    double n;
 
     // pointers to python lists
     PyObject * pAArray;

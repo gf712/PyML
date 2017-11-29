@@ -92,7 +92,7 @@ public:
     flatArray<T>* var(int degreesOfFreedom, int axis);
     T* diagonal();
     double det();
-    flatArray<T>* invertSign();
+    flatArray<T>* invertSign(int replace=0);
 };
 
 
