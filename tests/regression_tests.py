@@ -24,7 +24,7 @@ class LinearRegressionGradientDescentTest(unittest.TestCase):
 
     def test_LinR_cost(self):
         self.assertAlmostEqual(self.regressor.cost[0], 3.5181936893597365, delta=0.001)
-        self.assertAlmostEqual(self.regressor.cost[-1], 0.49247697691721576, delta=0.001)
+        self.assertAlmostEqual(self.regressor.cost[-1], 0.4868770157376261, delta=0.001)
 
     def test_LinR_predict(self):
         self.assertAlmostEqual(self.regressor.predict(self.X_test)[0], 3.8176098320897065, delta=0.001)
@@ -95,7 +95,7 @@ class LogisticRegressionTest(unittest.TestCase):
 
     def test_LogR_cost(self):
         self.assertAlmostEqual(self.classifier.cost[0], -106.11158912690777, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[-1], -61.16035391042087, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[-1], -61.15035744417768, delta=0.001)
 
     def test_LogR_predict(self):
         self.assertEqual(self.classifier.predict(self.X_test)[0], 1)
@@ -131,9 +131,9 @@ class MultiClassLogisticRegressionTest(unittest.TestCase):
         self.assertAlmostEqual(self.classifier.coefficients[2][-1], 0.5430990877594853, delta=0.001)
 
     def test_MLogR_cost(self):
-        self.assertAlmostEqual(self.classifier.cost[0][-1], -79.29189774967327, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[1][-1], -110.83233940996249, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[2][-1], -77.52658972786226, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[0][-1], -79.28190020206335, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[1][-1], -110.82234100438215, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[2][-1], -77.51659078552537, delta=0.001)
 
     def test_MLogR_predict(self):
         self.assertEqual(self.classifier.predict(self.X_test)[0], 1)
@@ -169,9 +169,9 @@ class MultiClassLogisticRegressionwithMomentumTest(unittest.TestCase):
         self.assertAlmostEqual(self.classifier.coefficients[2][-1], 1.4391187417309603, delta=0.001)
 
     def test_MLogRMom_cost(self):
-        self.assertAlmostEqual(self.classifier.cost[0][-1], -38.81551959630421, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[1][-1], -71.12677749190144, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[2][-1], -39.45585327706164, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[0][-1], -38.80552082812185, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[1][-1], -71.11678230563942, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[2][-1], -39.44585417456268, delta=0.001)
 
     def test_MLogRMom_predict(self):
         self.assertEqual(self.classifier.predict(self.X_test)[0], 1)
@@ -237,9 +237,9 @@ class MultiClassLogisticRegressionNesterovOpt(unittest.TestCase):
         self.assertAlmostEqual(self.classifier.coefficients[2][-1], 1.690684230026362, delta=0.001)
 
     def test_MLogRNesOpt_cost(self):
-        self.assertAlmostEqual(self.classifier.cost[0][-1], -33.32798686899964, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[1][-1], -66.63780970485656, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[2][-1], -34.41686105857577, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[0][-1], -33.318000415091454, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[1][-1], -66.62781511851581, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[2][-1], -34.40686777527874, delta=0.001)
 
     def test_MLogRNesOpt_predict(self):
         self.assertEqual(self.classifier.predict(self.X_test)[0], 1)
@@ -272,9 +272,9 @@ class MultiClassLogisticRegressionAdagradOpt(unittest.TestCase):
         self.assertAlmostEqual(self.classifier.coefficients[2][-1], 3.2839577904188673, delta=0.001)
 
     def test_MLogRAdagradOpt_cost(self):
-        self.assertAlmostEqual(self.classifier.cost[0][-1], -33.093253127772456, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[1][-1], -60.51140413468329, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[2][-1], -26.88953190063318, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[0][-1], -33.083261965268775, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[1][-1], -60.5014103879351, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[2][-1], -26.87955154897393, delta=0.001)
 
     def test_MLogRAdagradOpt_predict(self):
         self.assertEqual(self.classifier.predict(self.X_test)[0], 1)

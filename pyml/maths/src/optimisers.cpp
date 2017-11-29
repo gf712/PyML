@@ -53,7 +53,7 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     }
 
 
-    // memory allocation
+    // memory allocation of costArray
     if (batchSize > 0 && batchSize < n) {
         auto batchIterations = static_cast<int>(std::floor(n / batchSize));
 
@@ -88,7 +88,7 @@ static PyObject *gradient_descent(PyObject *self, PyObject *args) {
     }
 
     else {
-        costArray->setCols(iterations);
+        costArray->setCols(iterations + 1);
     }
 
 
