@@ -9,7 +9,7 @@ import math
 class LogisticRegression(LinearBase, Classifier):
     def __init__(self, seed=None, bias=True, learning_rate=0.01,
                  epsilon=0.01, max_iterations=10000, alpha=0.0,
-                 batch_size=0, method='normal'):
+                 batch_size=0, method='normal', fudge_factor=10e-8):
         """
         Logistic regression implementation
 
@@ -21,18 +21,21 @@ class LogisticRegression(LinearBase, Classifier):
         :type alpha: float
         :type batch_size: int
         :type method: str
+        :type fudge_factor: float
 
         :param seed: random seed
         :param bias: whether or not to add a bias (column of 1s) if it isn't already present
         :param learning_rate: learning rate for gradient descent
-        :param epsilon: early stopping parameter of gradient descent
-        :param max_iterations: early stopping parameter of gradient descent
+        :param epsilon: early stopping parameter for gradient descent
+        :param max_iterations: early stopping parameter for gradient descent
         :param alpha: momentum parameter for gradient descent
         :param batch_size: batch size, if it is set to zero or a number larger than training examples it will
                            default to batch gradient descent
         :param method: method to run gradient descent.
                         - "normal": vanilla gradient descent
                         - "nesterov": nesterov method for gradient descent
+                        - "adagrad": adagrad method for gradient descent
+        :param fudge_factor: fudge factor for Adagrad to avoid zero divisions
 
         Example:
         --------
@@ -55,7 +58,8 @@ class LogisticRegression(LinearBase, Classifier):
         """
 
         LinearBase.__init__(self, learning_rate=learning_rate, epsilon=epsilon, max_iterations=max_iterations,
-                            alpha=alpha, batch_size=batch_size, method=method, seed=seed, _type='logit')
+                            alpha=alpha, batch_size=batch_size, method=method, seed=seed, _type='logit',
+                            fudge_factor=fudge_factor)
         Classifier.__init__(self)
 
         self._bias = bias

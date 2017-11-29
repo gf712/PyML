@@ -6,7 +6,7 @@ from pyml.metrics.scores import mean_squared_error, mean_absolute_error
 class LinearRegression(LinearBase):
     def __init__(self, seed=None, bias=True, solver='OLS', learning_rate=0.01,
                  epsilon=0.01, max_iterations=10000, alpha=0.0, batch_size=0,
-                 method='normal'):
+                 method='normal', fudge_factor=10e-8):
         """
         Linear regression implementation
 
@@ -19,6 +19,7 @@ class LinearRegression(LinearBase):
         :type alpha: float
         :type batch_size: int
         :type method: str
+        :type fudge_factor: float
 
         :param seed: random seed
         :param bias: whether or not to add a bias (column of 1s) if it isn't already present
@@ -32,6 +33,8 @@ class LinearRegression(LinearBase):
         :param method: method to run gradient descent.
                         - "normal": vanilla gradient descent
                         - "nesterov": nesterov method for gradient descent
+                        - "adagrad": adagrad method for gradient descent
+        :param fudge_factor: fudge factor for Adagrad to avoid zero divisions
 
 
         Example:
@@ -46,7 +49,8 @@ class LinearRegression(LinearBase):
         """
 
         LinearBase.__init__(self, learning_rate=learning_rate, epsilon=epsilon, max_iterations=max_iterations,
-                            alpha=alpha, batch_size=batch_size, method=method, seed=seed, _type='regressor')
+                            alpha=alpha, batch_size=batch_size, method=method, seed=seed, _type='regressor',
+                            fudge_factor=fudge_factor)
 
         self.bias = bias
         if solver in ['OLS', 'gradient_descent']:

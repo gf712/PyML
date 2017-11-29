@@ -1,6 +1,7 @@
 import unittest
 from pyml.maths.math_utils import *
 from pyml.maths.linear_algebra import *
+from pyml.maths import Clinear_algebra
 from pyml.utils import set_seed
 import random
 
@@ -141,10 +142,13 @@ class LinearAlgebraTest(unittest.TestCase):
         self.assertAlmostEqual(multiply(self.A, 2)[0][0], 0.2792398429743861)
 
     def test_multiply_2(self):
-        self.assertAlmostEqual(multiply(self.A, self.B)[0][0], 0.04580368872627444)
+        self.assertAlmostEqual(multiply(self.A, transpose(self.B))[0][0], 0.04580368872627444)
 
     def test_divide(self):
         self.assertAlmostEqual(divide(self.A[0], 0.5)[0], 0.2792398429743861)
+
+    def test_divide_ZeroDivisionError(self):
+        self.assertRaises(ZeroDivisionError, divide, self.A[0], 0)
 
     def test_cov_matrix(self):
         self.assertAlmostEqual(covariance(self.A)[1][7], 0.015228530607877794)

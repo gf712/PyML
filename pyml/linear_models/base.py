@@ -3,6 +3,7 @@ from pyml.base import Predictor
 import random
 from pyml.maths.optimisers import gradient_descent
 from pyml.utils import set_seed
+import warnings
 
 
 class LinearBase(BaseLearner, Predictor):
@@ -11,7 +12,7 @@ class LinearBase(BaseLearner, Predictor):
     Base class for linear models
     """
 
-    def __init__(self, learning_rate, epsilon, max_iterations, alpha, batch_size, method, seed, _type):
+    def __init__(self, learning_rate, epsilon, max_iterations, alpha, fudge_factor, batch_size, method, seed, _type):
         """
         Inherits methods from BaseLearner
         """
@@ -25,13 +26,21 @@ class LinearBase(BaseLearner, Predictor):
         self._alpha = alpha
         self._batch_size = batch_size
 
-        if method in ['normal', 'nesterov']:
+        if method in ['normal', 'nesterov', 'adagrad']:
             self._method = method
+
         else:
             raise ValueError("Unknown GD method")
 
         self._seed = set_seed(seed)
         self._type = _type
+
+        if self._method == 'adagrad':
+            if fudge_factor == 0:
+                warnings.warn("Fudge factor for Adagrad optimisation is 0, it will be set to 10e-8 by default")
+                fudge_factor = 10e-8
+
+        self._fudge_factor = fudge_factor
 
     def _initiate_weights(self, bias):
         """
@@ -53,4 +62,4 @@ class LinearBase(BaseLearner, Predictor):
     def _gradient_descent(self, X, y, theta):
 
         return gradient_descent(X, theta, y, self._batch_size, self._max_iterations, self._epsilon, self._learning_rate,
-                                self._alpha, self._type, self._method, self._seed)
+                                self._alpha, self._type, self._method, self._seed, self._fudge_factor)
