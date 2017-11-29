@@ -50,13 +50,10 @@ inline T logLikelihood(flatArray<T> *scores, flatArray<T> *y) {
 
 template <typename T>
 inline T cost(flatArray<T>* loss){
-    flatArray<T>* result = nullptr;
 
-    result = loss->power(2);
+    loss->power(2, 1);
 
-    T costResult = result->sum() / (2 * result->getCols());
-
-    delete result;
+    T costResult = loss->sum() / (2 * loss->getCols());
 
     return costResult;
 }
@@ -78,10 +75,8 @@ inline T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, ch
     else {
 
         // calculate initial cost and store result
-        flatArray<T> *loss = prediction->subtract(y);
-        result = cost(loss);
-
-        delete loss;
+        prediction->subtract(y, 1);
+        result = cost(prediction);
     }
 
     delete prediction;
@@ -97,9 +92,7 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
 
     // variable declaration
     flatArray<T>* error = nullptr;
-    flatArray<T>* gradients = nullptr;
     flatArray<T>* updateTerm = nullptr;
-    flatArray<T>* h = nullptr;
 
     if (strcmp(method, "normal") == 0) {
 
@@ -109,12 +102,11 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
     //
     //                   updateTerm = ∇J(θ)
     //
-        // get predictions for this step
-        h = predict<T>(X, theta, predType);
+        // get error for this step
+        error = predict<T>(X, theta, predType)->subtract(y, 1);
 
-        error = h->subtract(y);
-        gradients = XT->dot(error);
-        updateTerm = gradients->divide(n);
+        // calculate updateTerm = gradient
+        updateTerm = XT->dot(error)->divide(n, 1);
     }
 
     else if (strcmp(method, "nesterov") == 0) {
@@ -136,10 +128,10 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
         }
 
         // calculate the gradient with new theta
-        h = predict<T>(X, tempTheta, predType);
-        error = h->subtract(y);
-        gradients = XT->dot(error);
-        updateTerm = gradients->divide(n);
+        error = predict<T>(X, tempTheta, predType)->subtract(y, 1);
+
+        updateTerm = XT->dot(error)->divide(n, 1);
+
     }
 
     else if (strcmp(method, "adagrad") == 0) {
@@ -152,30 +144,24 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
     //
     //                  G[t] = g[t] ** 2
     //
-    //      θ[t+1] = θ[t] - η / ((G[t]+e) ** 0.5) · g[t]
+    //         updateTerm = g[t] / ((G[t]+e) ** 0.5)
     //
         flatArray<T>* g = nullptr;
         flatArray<T>* g_2 = nullptr;
-        flatArray<T>* g_2_root = nullptr;
-        flatArray<T>* g_2_in_root = nullptr;
 
         // get predictions for this step
-        h = predict<T>(X, theta, predType);
+        error = predict<T>(X, theta, predType)->subtract(y, 1);
 
-        error = h->subtract(y);
-        gradients = XT->dot(error);
-        g = gradients->divide(n);
+        g = XT->dot(error)->divide(n, 1);
 
         g_2 = g->power(2);
-        g_2_in_root = g_2->add(epsilon);
-        g_2_root = g_2_in_root->power(0.5);
+        g_2->add(epsilon, 1);
+        g_2->power(0.5, 1);
 
-        updateTerm =  g->divide(g_2_root);
+        updateTerm = g->divide(g_2);
 
         delete g;
         delete g_2;
-        delete g_2_root;
-        delete g_2_in_root;
     }
 
     else if (strcmp(method, "adadelta") == 0) {
@@ -209,8 +195,6 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
     }
 
     delete error;
-    delete gradients;
-    delete h;
     delete updateTerm;
 }
 
