@@ -267,24 +267,27 @@ static PyObject* divide(PyObject* self, PyObject *args) {
 
     // variable declaration
     flatArray<double>* A = nullptr;
+    flatArray<double>* B = nullptr;
     flatArray<double>* result = nullptr;
     double n;
 
     // pointers to python lists
     PyObject * pAArray;
+    PyObject * pBArray;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!d", &PyList_Type, &pAArray, &n)) {
-        PyErr_SetString(PyExc_TypeError, "Expected a list and a float!");
+    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pAArray, &PyList_Type, &pBArray)) {
+        PyErr_SetString(PyExc_TypeError, "Expected two lists!");
         return nullptr;
     }
 
     // read in python list
     A = readFromPythonList<double>(pAArray);
+    B = readFromPythonList<double>(pBArray);
 
     // calculate elementwise division by n
     try {
-        result = A->divide(n);
+        result = A->divide(B);
     }
     catch (flatArrayZeroDivisionError &e) {
         PyErr_SetString(ZeroDivisionError, e.what());
