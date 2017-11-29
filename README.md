@@ -41,6 +41,7 @@ Changelog
         - Mini batch gradient descent
         - Gradient descent with momentum
         - Nesterov optimisation
+        - Adagrad optimisation
     - Backend:
         - Major changes to flatArrays and C++ backend leading to speed improvements
     

@@ -8,7 +8,6 @@
 #include "optimisers.h"
 #include "maths.h"
 #include "maths.cpp"
-#include <string>
 
 
 template <typename T>
@@ -88,7 +87,7 @@ inline T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, ch
 template <typename T>
 inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta, flatArray<T>* XT, flatArray<T>* nu,
                           double gamma, double learningRate, int m, flatArray<T>* n, char predType[10], char method[10],
-                          flatArray<T>* epsilon) {
+                          flatArray<T>* epsilon, flatArray<T>* G) {
 
     // variable declaration
     flatArray<T>* error = nullptr;
@@ -142,25 +141,30 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
     //
     //                   g[t] = ∇J(θ[t])
     //
-    //                  G[t] = g[t] ** 2
+    //                  G[t] = G[t - 1] + g[t] ** 2
     //
-    //         updateTerm = g[t] / ((G[t]+e) ** 0.5)
+    //         updateTerm = g[t] / ((G[t] ** 0.5 + e)
     //
         flatArray<T>* g = nullptr;
         flatArray<T>* g_2 = nullptr;
+        flatArray<T>* G_i = nullptr;
 
         // get predictions for this step
         error = predict<T>(X, theta, predType)->subtract(y, 1);
 
-        g = XT->dot(error)->divide(n, 1);
+        g = XT->dot(error)->divide(n, 1); // g = ∇J(θ[t])
 
-        g_2 = g->power(2);
-        g_2->add(epsilon, 1);
-        g_2->power(0.5, 1);
+        g_2 = g->power(2, 0); // g_2 = g[t] ** 2
 
-        updateTerm = g->divide(g_2);
+        G->add(g_2, 1); // G += g_2
+
+        G_i = G->power(0.5, 0); // G_i = G ** 0.5
+        G_i->add(epsilon, 1); // G_i += e
+
+        updateTerm = g->divide(G_i, 0); // updateTerm = g / G_i
 
         delete g;
+        delete G_i;
         delete g_2;
     }
 
@@ -172,7 +176,6 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
         PyErr_SetString(PyExc_ValueError, method);
         return;
     }
-
 
     // #######################################################
     //             Update theta with updateTerm (v)
@@ -209,6 +212,7 @@ void batchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
     // calculate gradient using the whole dataset
     T JOld;
     T JNew;
+    auto* G = zeroArray<T>(1, m);
 
     JNew = calculateCost(X, theta, y, predType);
     costArray->setNElement(JNew, iteration);
@@ -220,7 +224,7 @@ void batchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
         JOld = JNew;
 
         // update weights
-        updateWeights<T>(X, y, theta, XT, nu, alpha, learningRate, m, n, predType, method, fudgeFactor);
+        updateWeights<T>(X, y, theta, XT, nu, alpha, learningRate, m, n, predType, method, fudgeFactor, G);
 
         // calculate cost for new weights
         JNew = calculateCost<T>(X, theta, y, predType);
@@ -231,6 +235,8 @@ void batchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
 
         iteration++;
     }
+
+    delete G;
 }
 
 
@@ -266,6 +272,7 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
     T JOld;
     T JNew;
     auto nScalar = static_cast<int>(n->getNElement(0));
+    auto* G = zeroArray<T>(1, m);
 
     JNew = calculateCost(X, theta, y, predType);
     costArray->setNElement(JNew, iteration);
@@ -301,7 +308,7 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
             getBatches<T>(X, y, XT, XNew, yNew, XTNew, rNums, batchSize, batchNumber, nScalar);
 
             // update weights using this batch
-            updateWeights<T>(XNew, yNew, theta, XTNew, nu, alpha, learningRate, m, n, predType, method, fudgeFactor);
+            updateWeights<T>(XNew, yNew, theta, XTNew, nu, alpha, learningRate, m, n, predType, method, fudgeFactor, G);
 
             // calculate overall cost
             JNew = calculateCost<T>(X, theta, y, predType);
@@ -330,7 +337,7 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
             getBatches<T>(X, y, XT, XNewi, yNewi, XTNewi, rNums, batchSize, batchNumber, nScalar);
 
             // update weights using this batch
-            updateWeights<T>(XNewi, yNewi, theta, XTNewi, nu, alpha, learningRate, m, n, predType, method, fudgeFactor);
+            updateWeights<T>(XNewi, yNewi, theta, XTNewi, nu, alpha, learningRate, m, n, predType, method, fudgeFactor, G);
 
             // calculate overall cost
             JNew = calculateCost<T>(X, theta, y, predType);
@@ -347,6 +354,8 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
 
         iteration++;
     }
+
+    delete G;
 }
 
 
