@@ -62,7 +62,7 @@ def add(A, B):
     If matrix has the same number of columns or rows as the vector the vector is automatically broadcast to fit the matrix
 
     :type A: list
-    :type B: list
+    :type B: scalar or list
 
     :param A: either a list or a list of lists representing a vector or matrix, respectively
     :param B: either a list or a list of lists representing a vector or matrix, respectively
@@ -86,6 +86,9 @@ def add(A, B):
     [[1.0, 1.0, 15.0], [-8.0, -9.0, 10.0]]
     """
     # TODO: write exceptions to help user with errors from the backend
+    if isinstance(B, (float, int)):
+        B = [B]
+
     return Clinear_algebra.add(A, B)
 
 
@@ -95,7 +98,7 @@ def subtract(A, B):
     If matrix has the same number of columns or rows as the vector the vector is automatically broadcast to fit the matrix
 
     :type A: list
-    :type B: list
+    :type B: scalar or list
 
     :param A: either a list or a list of lists representing a vector or matrix, respectively
     :param B: either a list or a list of lists representing a vector or matrix, respectively
@@ -119,6 +122,9 @@ def subtract(A, B):
     [[-1.0, -9.0, -7.0], [2.0, 5.0, -10.0]]
     """
     # TODO: write exceptions to help user with errors from the backend
+    if isinstance(B, (float, int)):
+        B = [B]
+
     return Clinear_algebra.subtract(A, B)
 
 
@@ -153,7 +159,7 @@ def multiply(A, B):
     and automatic broadcasting if needed
 
     :type A: list
-    :type B: float or list
+    :type B: scalar or list
 
     :param A: either a list (vector) or a list of lists (matrix)
     :param B: either a list (vector) or a list of lists (matrix) or a constant
@@ -175,15 +181,15 @@ def multiply(A, B):
     return Clinear_algebra.multiply(A, B)
 
 
-def divide(A, n):
+def divide(A, B):
     """
     Calculates elementwise division of a list (vector) or list of lists (matrix)
 
     :type A: list
-    :type n: float
+    :type B: scalar or list
 
     :param A: either a list or a list of lists
-    :param n: scalar to perform division
+    :param B: scalar to perform division
 
     :rtype: list
     :return: matrix divided by constant n with the same shape as A (list or list of lists)
@@ -196,7 +202,12 @@ def divide(A, n):
     >>> print(divide(A, 2))
     [[0.0, -2.0, 2.0], [-1.5, -1.0, 0.0]]
     """
-    return Clinear_algebra.divide(A, n)
+    if isinstance(B, (float, int)):
+        B = [B]
+    try:
+        return Clinear_algebra.divide(A, B)
+    except:
+        raise ZeroDivisionError
 
 
 def determinant(A):
