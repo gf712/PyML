@@ -84,7 +84,7 @@ public:
     flatArray<T>* subtract(flatArray *other);
     flatArray<T>* add(flatArray *other);
     flatArray<T>* power(double p);
-    flatArray<T>* divide(double m);
+    flatArray<T>* divide(flatArray *other);
     flatArray<T>* multiply(flatArray *other);
     flatArray<T>* nlog(double base);
     flatArray<T>* mean(int axis);

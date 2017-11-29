@@ -250,21 +250,26 @@ flatArray<T>* flatArray<T>::dot(flatArray* other) {
 }
 
 
-template <class T>
-flatArray<T>* flatArray<T>::add(flatArray *other) {
+// this is a template for elementwise operations
+template <typename T>
+flatArray<T>* elementwiseTemplate(flatArray<T>* self, flatArray<T>* other, T (f(T,T))) {
 
-    flatArray* result = nullptr;
+    flatArray<T>* result = nullptr;
+    int rows = self->getRows();
+    int cols = self->getCols();
+    int size = self->getSize();
+    T* array = self->getArray();
 
     result = emptyArray<T>(rows, cols);
 
-    if (other->getRows() == 1 && rows > 1) {
-        // other is a vector and this is a matrix
+    if (other->getCols() > 1 && other->getRows() == 1 && rows > 1) {
+        // other is a vector and self is a matrix
 
-        // if square matrix will prioritise column wise subtraction (consider transposing matrix
+        // if square matrix will prioritise column wise operation f (consider transposing matrix
         // if this is not what you want)
-        if (other->getCols() == rows) {
-            // number of rows match number of dimensions of vector
+        if (rows == other->getCols()) {
 
+            // number of rows match number of dimensions of vector
             T *B = other->getRow(0);
 
             int n = 0;
@@ -272,8 +277,8 @@ flatArray<T>* flatArray<T>::add(flatArray *other) {
 
                 for (int j = 0; j < cols; ++j) {
 
-                    // add each row by the ith element of other vector
-                    result->setNElement(array[n] + B[i], n);
+                    // operation f on each row by the ith element of other vector
+                    result->setNElement(f(array[n], B[i]), n);
 
                     n++;
                 }
@@ -282,7 +287,9 @@ flatArray<T>* flatArray<T>::add(flatArray *other) {
             delete [] B;
         }
 
-        else if (other->getCols() == cols){
+        else if (cols == other->getCols()){
+
+            // number of columns of self match number of dimensions of vector
             T *B = other->getRow(0);
 
             int n = 0;
@@ -290,8 +297,8 @@ flatArray<T>* flatArray<T>::add(flatArray *other) {
 
                 for (int j = 0; j < cols; ++j) {
 
-                    // add each column by the ith element of other vector
-                    result->setNElement(array[n] + B[j], n);
+                    // operation f on each each column by the ith element of other vector
+                    result->setNElement(f(array[n], B[j]), n);
 
                     n++;
                 }
@@ -301,132 +308,62 @@ flatArray<T>* flatArray<T>::add(flatArray *other) {
         }
 
         else {
-            throw flatArrayDimensionMismatchException<T>(this, other);
+            throw flatArrayDimensionMismatchException<T>(self, other);
         }
-    }
-
-    else if (other->getRows() == 1 && other->getCols() == 1) {
-        // other is a scalar represented as an array
-        T B = other->getNElement(0);
-
-        for (int i = 0; i < size; ++i) {
-            result->setNElement(array[i] + B, i);
-        }
-
     }
 
     else if (other->getSize() == size) {
         // both are matrices or vectors (with same size)
 
         if (rows != other->getRows() || cols != other->getCols()) {
-            throw flatArrayDimensionMismatchException<T>(this, other);
+            throw flatArrayDimensionMismatchException<T>(self, other);
         }
 
         T *B = other->getArray();
 
         for (int n = 0; n < size; ++n) {
-            result->setNElement(array[n] + B[n], n);
+            result->setNElement(f(array[n], B[n]), n);
         }
     }
 
-    else {
-        throw flatArrayDimensionMismatchException<T>(this, other);
+    else if (other->getCols() == 1) {
+        // other is a scalar represented as an array
+
+        T B = other->getNElement(0);
+
+        for (int i = 0; i < size; ++i) {
+            result->setNElement(f(array[i], B), i);
+        }
+
     }
+
+    else {
+        throw flatArrayDimensionMismatchException<T>(self, other);
+    }
+
 
     return result;
 }
 
 
 template <class T>
+flatArray<T>* flatArray<T>::add(flatArray *other) {
+
+    T (*f)(T, T)=[](T a, T b) { return (a + b); };
+
+    flatArray<T>* result = elementwiseTemplate<T>(this, other, f);
+
+    return result;
+
+}
+
+
+template <class T>
 flatArray<T>* flatArray<T>::subtract(flatArray *other) {
 
-    flatArray* result = nullptr;
+    T (*f)(T, T)=[](T a, T b) { return (a - b); };
 
-    result = emptyArray<T>(rows, cols);
-
-    if (other->getRows() == 1 && rows > 1) {
-        // other is a vector and this is a matrix
-
-        // if square matrix will prioritise column wise subtraction (consider transposing matrix
-        // if this is not what you want)
-        if (other->getCols() == rows) {
-            // number of rows match number of dimensions of vector
-
-            T *B = other->getRow(0);
-
-            int n = 0;
-            for (int i = 0; i < rows; ++i) {
-
-                for (int j = 0; j < cols; ++j) {
-
-                    // subtract each row by the ith element of other vector
-                    result->setNElement(array[n] - B[i], n);
-
-                    n++;
-                }
-            }
-
-            delete [] B;
-        }
-
-        else if (other->getCols() == cols){
-            T *B = other->getRow(0);
-
-            int n = 0;
-            for (int i = 0; i < rows; ++i) {
-
-                for (int j = 0; j < cols; ++j) {
-
-                    // subtract each column by the ith element of other vector
-                    result->setNElement(array[n] - B[j], n);
-
-                    n++;
-                }
-            }
-
-            delete [] B;
-        }
-
-        else {
-            throw flatArrayDimensionMismatchException<T>(this, other);
-        }
-    }
-
-    else if (other->getRows() == 1 && other->getCols() == 1) {
-        // other is a scalar represented as an array
-        T B = other->getNElement(0);
-
-        for (int i = 0; i < size; ++i) {
-            result->setNElement(array[i] - B, i);
-        }
-
-    }
-
-    else if (other->getSize() == size) {
-        // both are matrices or vectors (with same size)
-
-        if (rows != other->getRows() || cols != other->getCols()) {
-            throw flatArrayDimensionMismatchException<T>(this, other);
-        }
-
-        T *B = other->getArray();
-
-        for (int n = 0; n < size; ++n) {
-            result->setNElement(array[n] - B[n], n);
-        }
-    }
-
-    else {
-        throw flatArrayDimensionMismatchException<T>(this, other);
-    }
-
-//    flatArray<T>* invS = nullptr;
-//    flatArray<T>* result = nullptr;
-//
-//    invS = other->invertSign();
-//    result = this->add(invS);
-//
-//    delete invS;
+    flatArray<T>* result = elementwiseTemplate<T>(this, other, f);
 
     return result;
 }
@@ -446,48 +383,22 @@ flatArray<T>* flatArray<T>::power(double p) {
 }
 
 template <class T>
-flatArray<T>* flatArray<T>::divide(double m) {
+flatArray<T>* flatArray<T>::divide(flatArray<T>* other) {
 
-    if (m == 0) {
-        throw flatArrayZeroDivisionError();
-    }
+    T (*f)(T, T)=[](T a, T b) { if (b != 0) {return (a / b);} else {throw flatArrayZeroDivisionError();} };
 
-    flatArray* result = nullptr;
-
-    result = emptyArray<T>(rows, cols);
-
-    for (int n = 0; n < size; ++n) {
-
-        result->setNElement(array[n] / m, n);
-    }
+    flatArray<T>* result = elementwiseTemplate<T>(this, other, f);
 
     return result;
+
 }
 
 template <class T>
 flatArray<T>* flatArray<T>::multiply(flatArray *other) {
 
-    flatArray<T>* result = nullptr;
+    T (*f)(T, T)=[](T a, T b) { return (a * b); };
 
-    result = emptyArray<T>(rows, cols);
-
-
-    if (other->getSize() == 1) {
-        // if other represent a scalar
-        // get constant k from other
-        T k = other->getNElement(0);
-
-        for (int n = 0; n < size; ++n) {
-            result->setNElement(array[n] * k, n);
-        }
-    }
-
-    else {
-
-        for (int n = 0; n < size; ++n) {
-            result->setNElement(array[n] * other->getNElement(n), n);
-        }
-    }
+    flatArray<T>* result = elementwiseTemplate<T>(this, other, f);
 
     return result;
 }
@@ -804,3 +715,5 @@ flatArray<T>* flatArray<T>::invertSign() {
 
     return result;
 }
+
+
