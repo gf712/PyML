@@ -227,25 +227,25 @@ class MultiClassLogisticRegressionNesterovOpt(unittest.TestCase):
         cls.classifier.train(X=cls.X_train, y=cls.y_train)
 
     def test_MLogRNesOpt_iterations(self):
-        self.assertEqual(self.classifier.iterations[0], 1274)
-        self.assertEqual(self.classifier.iterations[1], 1210)
-        self.assertEqual(self.classifier.iterations[2], 1175)
+        self.assertEqual(self.classifier.iterations[0], 1673)
+        self.assertEqual(self.classifier.iterations[1], 1692)
+        self.assertEqual(self.classifier.iterations[2], 1548)
 
     def test_MLogRNesOpt_coefficients(self):
-        self.assertAlmostEqual(self.classifier.coefficients[0][-1], -7.298649513828892, delta=0.001)
-        self.assertAlmostEqual(self.classifier.coefficients[1][-1], 4.610707704248638, delta=0.001)
-        self.assertAlmostEqual(self.classifier.coefficients[2][-1], 1.690684230026362, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[0][-1], -6.180431021808369, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[1][-1], 3.914247513063426, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[2][-1], 1.4391579779616654, delta=0.001)
 
     def test_MLogRNesOpt_cost(self):
-        self.assertAlmostEqual(self.classifier.cost[0][-1], -33.318000415091454, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[1][-1], -66.62781511851581, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[2][-1], -34.40686777527874, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[0][-1], -38.80233474838201, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[1][-1], -71.1246527942097, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[2][-1], -39.44375056521835, delta=0.001)
 
     def test_MLogRNesOpt_predict(self):
         self.assertEqual(self.classifier.predict(self.X_test)[0], 1)
 
     def test_MLogRNesOpt_predict_proba(self):
-        self.assertAlmostEqual(self.classifier.predict_proba(self.X_test)[0][0], 0.02931216446502055, delta=0.001)
+        self.assertAlmostEqual(self.classifier.predict_proba(self.X_test)[0][0], 0.046812477405301665, delta=0.001)
 
     def test_MLogRNesOpt_accuracy(self):
         self.assertAlmostEqual(self.classifier.score(self.X_test, self.y_test), 0.9833333333333333, delta=0.001)
@@ -293,30 +293,64 @@ class MultiClassLogisticRegressionAdadeltaOpt(unittest.TestCase):
         cls.X, cls.y = gaussian(labels=3, sigma=0.2, seed=1970)
         cls.X_train, cls.y_train, cls.X_test, cls.y_test = train_test_split(cls .X, cls.y,
                                                                             train_split=0.8, seed=1970)
-        cls.classifier = LogisticRegression(seed=1970, learning_rate=1, alpha=0.9, method='adadelta')
+        cls.classifier = LogisticRegression(seed=1970, learning_rate=1, alpha=0.93, method='adadelta')
         cls.classifier.train(X=cls.X_train, y=cls.y_train)
 
     def test_MLogRAdagradOpt_iterations(self):
-        self.assertEqual(self.classifier.iterations[0], 20)
-        self.assertEqual(self.classifier.iterations[1], 50)
-        self.assertEqual(self.classifier.iterations[2], 129)
+        self.assertEqual(self.classifier.iterations[0], 50)
+        self.assertEqual(self.classifier.iterations[1], 31)
+        self.assertEqual(self.classifier.iterations[2], 59)
 
     def test_MLogRAdagradOpt_coefficients(self):
-        self.assertAlmostEqual(self.classifier.coefficients[0][-1], -8.359845175725027, delta=0.001)
-        self.assertAlmostEqual(self.classifier.coefficients[1][-1], 7.956748000261714, delta=0.001)
-        self.assertAlmostEqual(self.classifier.coefficients[2][-1], 3.333400361333907, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[0][-1], -17.69287148773692, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[1][-1], 8.833657315503745, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[2][-1], 3.612736014955706, delta=0.001)
 
     def test_MLogRAdagradOpt_cost(self):
-        self.assertAlmostEqual(self.classifier.cost[0][-1], -31.66865412047897, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[1][-1], -58.41403733911508, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[2][-1], -22.67980065062773, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[0][-1], -19.461391357431822, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[1][-1], -58.89195462566389, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[2][-1], -22.090057493027633, delta=0.001)
 
     def test_MLogRAdagradOpt_predict(self):
         self.assertEqual(self.classifier.predict(self.X_test)[0], 1)
 
     def test_MLogRAdagradOpt_predict_proba(self):
-        self.assertAlmostEqual(self.classifier.predict_proba(self.X_test)[0][0], 0.006281680718833279, delta=0.001)
+        self.assertAlmostEqual(self.classifier.predict_proba(self.X_test)[0][0], 0.0008593472329257797, delta=0.001)
 
     def test_MLogRAdagradOpt_accuracy(self):
         self.assertAlmostEqual(self.classifier.score(self.X_test, self.y_test), 0.9833333333333333, delta=0.001)
 
+
+class MultiClassLogisticRegressionRMSpropOpt(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.X, cls.y = gaussian(labels=3, sigma=0.2, seed=1970)
+        cls.X_train, cls.y_train, cls.X_test, cls.y_test = train_test_split(cls .X, cls.y,
+                                                                            train_split=0.8, seed=1970)
+        cls.classifier = LogisticRegression(seed=1970, learning_rate=1, alpha=0.99, method='rmsprop')
+        cls.classifier.train(X=cls.X_train, y=cls.y_train)
+
+    def test_MLogRAdagradOpt_iterations(self):
+        self.assertEqual(self.classifier.iterations[0], 212)
+        self.assertEqual(self.classifier.iterations[1], 32)
+        self.assertEqual(self.classifier.iterations[2], 71)
+
+    def test_MLogRAdagradOpt_coefficients(self):
+        self.assertAlmostEqual(self.classifier.coefficients[0][-1], -15.450318804509942, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[1][-1], 9.072690798494117, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[2][-1], 4.915283731375461, delta=0.001)
+
+    def test_MLogRAdagradOpt_cost(self):
+        self.assertAlmostEqual(self.classifier.cost[0][-1], -19.841625448780448, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[1][-1], -58.50817514694194, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[2][-1], -21.77574545155869, delta=0.001)
+
+    def test_MLogRAdagradOpt_predict(self):
+        self.assertEqual(self.classifier.predict(self.X_test)[0], 1)
+
+    def test_MLogRAdagradOpt_predict_proba(self):
+        self.assertAlmostEqual(self.classifier.predict_proba(self.X_test)[0][0], 0.0009482861157384186, delta=0.001)
+
+    def test_MLogRAdagradOpt_accuracy(self):
+        self.assertAlmostEqual(self.classifier.score(self.X_test, self.y_test), 0.9833333333333333, delta=0.001)

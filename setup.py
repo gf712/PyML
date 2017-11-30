@@ -25,7 +25,7 @@ linear_algebra_module = Extension('pyml.maths.Clinear_algebra',
 
 optimisers_module = Extension('pyml.maths.optimisers',
                               sources=['pyml/maths/src/optimisers.cpp',
-                                       'pyml/maths/src/gradientDescent.cpp',
+                                       'pyml/maths/src/optimisersExtension.cpp',
                                        'pyml/maths/src/flatArrays.cpp'],
                               extra_compile_args=['-std=c++11'],
                               # extra_link_args=['-lgomp'],

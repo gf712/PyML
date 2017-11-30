@@ -23,13 +23,14 @@
 template <class T>
 class flatArray {
 private:
-    T* array;
+    T* array = nullptr;
     int rows;
     int cols;
     int size;
 
 public:
 
+    // constructor
     flatArray(T* array, int rows, int cols) {
         flatArray::rows = rows;
         flatArray::cols = cols;
@@ -41,8 +42,31 @@ public:
         }
     }
 
+    // destructor
     ~flatArray() {
         delete [] array;
+    };
+
+    // Copy constructor
+    flatArray(const flatArray& source) {
+
+        // because row, cols and size are not pointers, we can shallow copy
+        rows = source.rows;
+        cols = source.cols;
+        size = source.size;
+
+        // array is a pointer, so we need to deep copy it if it is non-null
+        // allocate memory for our copy
+        array = new T[size];
+
+        // do the copy
+        if (source.array != nullptr) {
+            for (int i=0; i < size; ++i)
+                array[i] = source.array[i];
+        }
+        else {
+            array = nullptr;
+        }
     };
 
     // GETTERS/SETTERS

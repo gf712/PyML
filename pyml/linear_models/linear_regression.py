@@ -35,7 +35,8 @@ class LinearRegression(LinearBase):
                         - "nesterov": nesterov method for GD
                         - "adagrad": adagrad method for GD
                         - "adadelta": adadelta method for GD
-        :param fudge_factor: fudge factor for Adagrad and Adadelta to avoid zero divisions
+                        - "rmsprop": rmsprop method for GD
+        :param fudge_factor: fudge factor for Adagrad/Adadelta/RMSprop to avoid zero divisions
 
 
         Example:
