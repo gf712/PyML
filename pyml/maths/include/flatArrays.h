@@ -67,7 +67,44 @@ public:
         else {
             array = nullptr;
         }
-    };
+    }
+
+    // overloading +, -, / and * operators
+    flatArray<T>* operator+(const flatArray<T>& other) {return add(other);}
+    flatArray<T>* operator+(const T other) {return add(other);}
+
+    flatArray<T>* operator-(const flatArray<T>& other) {return subtract(other);}
+    flatArray<T>* operator-(const T other) {return subtract(other);}
+
+    flatArray<T>* operator*(const flatArray<T>& other) {return multiply(other);}
+    flatArray<T>* operator*(const T other) {return multiply(other);}
+
+    flatArray<T>* operator/(const flatArray<T>& other) {return divide(other);}
+    flatArray<T>* operator/(const T other) {return divide(other);}
+
+    // overloading compound +, -, / and * operators
+    flatArray<T>& operator+=(const flatArray<T>& other) {return *add(other, 1);}
+    flatArray<T>& operator+=(const T other) {return *add(other, 1);}
+
+    flatArray<T>& operator-=(const flatArray<T>& other) {return *subtract(other, 1);}
+    flatArray<T>& operator-=(const T other) {return *subtract(other, 1);}
+
+    flatArray<T>& operator*=(const flatArray<T>& other) {return *multiply(other, 1);}
+    flatArray<T>& operator*=(const T other) {return *multiply(other, 1);}
+
+    flatArray<T>& operator/=(const flatArray<T>& other) {return *divide(other, 1);}
+    flatArray<T>& operator/=(const T other) {return *divide(other, 1);}
+
+    // overloading of -> operator to vectorise operations
+    // each function must have format f(other, inplace
+//    void operator->(T (f(T, int)));
+
+    // function to run vectorised operations
+//    flatArray<T>* run();
+
+    // simplifying element getters and setters with [] operator
+    T& operator[](int n) {return array[n];}
+    const T&operator[](int n) const { return array[n];}
 
     // GETTERS/SETTERS
     // column and row size
