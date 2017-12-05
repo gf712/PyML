@@ -39,3 +39,6 @@ class Transformer:
     def train_transform(self, X):
         self.train(X)
         return self.transform(X)
+
+    def inverse(self, X):
+        return self._inverse(X)

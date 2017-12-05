@@ -1,5 +1,5 @@
 from pyml.base import BaseLearner, Transformer
-from pyml.maths import covariance, eigen, mean, dot_product, transpose, subtract
+from pyml.maths import covariance, eigen, mean, dot_product, transpose, subtract, add
 
 
 class PCA(BaseLearner, Transformer):
@@ -66,7 +66,8 @@ class PCA(BaseLearner, Transformer):
 
         :return:
         """
-        return dot_product(transpose(self._feat_vect), X) + self._X_means
+
+        return add(dot_product(X, transpose(self.eigenvectors)), self._X_means)
 
     @property
     def m(self):
