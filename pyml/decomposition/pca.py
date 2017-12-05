@@ -26,11 +26,11 @@ class PCA(BaseLearner, Transformer):
         self._n = len(X)
         self._m = len(X[0])
 
-        if self.m > 20:
+        if self._m > 20:
             raise NotImplementedError("Jacobi decomposition can be unstable with N>20 symmetric matrices!")
 
         if isinstance(self._n_components, float):
-            self._n_components = int(round(self._n_components * self.m))
+            self._n_components = int(round(self._n_components * self._m))
 
         # get the mean of each column
         self._X_means = mean(self._X, axis=0)
@@ -45,7 +45,7 @@ class PCA(BaseLearner, Transformer):
         self._v, self._w = eigen(cov, self.tolerance, self.max_iterations, normalise=False, sort=True)
 
         # create feature vector
-        self._feat_vect = [[self._w[row][column] for column in range(self.n_components)] for row in range(self.m)]
+        self._feat_vect = [[self._w[row][column] for column in range(self.n_components)] for row in range(self._m)]
 
         return self
 
@@ -68,14 +68,6 @@ class PCA(BaseLearner, Transformer):
         """
 
         return add(dot_product(X, transpose(self.eigenvectors)), self._X_means)
-
-    @property
-    def m(self):
-        return self._m
-
-    @property
-    def n(self):
-        return self._n
 
     @property
     def tolerance(self):
