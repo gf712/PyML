@@ -110,7 +110,8 @@ class LinearRegression(LinearBase):
         elif not self.bias:
             return dot_product(X, self.coefficients)
         else:
-            raise ValueError("Something went wrong.")
+            raise NotImplementedError("This part of the code has not been explored yet, "
+                                      "returning to safety...")
 
     def _score(self, X, y_true, scorer='mean_squared_error'):
         """
@@ -132,7 +133,7 @@ class LinearRegression(LinearBase):
         elif scorer == 'mean_absolute_error' or scorer == 'mae':
             return mean_absolute_error(self.predict(X), y_true)
         else:
-            raise ValueError("Unknown scorer!")
+            raise NotImplementedError("Unknown scorer!")
 
     @property
     def seed(self):

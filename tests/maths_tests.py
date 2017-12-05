@@ -1,7 +1,6 @@
 import unittest
 from pyml.maths.math_utils import *
 from pyml.maths.linear_algebra import *
-from pyml.maths import Clinear_algebra
 from pyml.utils import set_seed
 import random
 
@@ -85,6 +84,9 @@ class MathsTest(unittest.TestCase):
     def test_std_1(self):
         self.assertAlmostEqual(std(self.A, axis=1)[2], 0.2554907272170312)
 
+    def test_std_vector(self):
+        self.assertAlmostEqual(std(self.A[0]), 0.34984279200476537)
+
     def test_std_TypeError(self):
         self.assertRaises(TypeError, std, (1, 2, 3))
 
@@ -99,6 +101,9 @@ class MathsTest(unittest.TestCase):
 
     def test_var_1(self):
         self.assertAlmostEqual(variance(self.A, axis=1)[2], 0.06527551169388744)
+
+    def test_var_vector(self):
+        self.assertAlmostEqual(variance(self.A[0]), 0.1223899791176895)
 
     def test_var_TypeError(self):
         self.assertRaises(TypeError, variance, (1, 2, 3))
@@ -129,11 +134,17 @@ class LinearAlgebraTest(unittest.TestCase):
     def test_dot_product(self):
         self.assertAlmostEqual(dot_product(self.A[0], transpose(self.B)[0])[0], 0.691239893627)
 
-    def test_add(self):
+    def test_add_matrix(self):
         self.assertAlmostEqual(add(self.A, transpose(self.B))[0][-1], 0.16094185221109958)
 
-    def test_subtract(self):
+    def test_add_scalar(self):
+        self.assertAlmostEqual(add(self.A, transpose(self.B)[0][-1])[0][-1], 0.16094185221109958)
+
+    def test_subtract_matrix(self):
         self.assertAlmostEqual(subtract(self.A, transpose(self.B))[0][3], 0.6442101271237023)
+
+    def test_subtract_scalar(self):
+        self.assertAlmostEqual(subtract(self.A, transpose(self.B)[0][3])[0][3], 0.6442101271237023)
 
     def test_power(self):
         self.assertAlmostEqual(power(self.A, 2)[0][5], 0.9336806492618525)

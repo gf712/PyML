@@ -1,5 +1,6 @@
 from pyml.cluster.base import ClusterBase
 from pyml.utils import set_seed
+import warnings
 
 
 class KMeans(ClusterBase):
@@ -101,8 +102,8 @@ class KMeans(ClusterBase):
             change = self._changes()
 
         if change > self._min_change:
-            print("Failed to converge within {} iterations, consider increasing max_iterations".format(
-                self.max_iterations))
+            warnings.warn("Failed to converge within {} iterations, consider increasing max_iterations".
+                          format(self.max_iterations))
 
     def _predict(self, X):
         """

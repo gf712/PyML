@@ -46,3 +46,7 @@ class DistancesTest(unittest.TestCase):
     def test_mae(self):
         self.assertAlmostEqual(mean_absolute_error(self.regressor.predict(self.X_test), self.y_test),
                                1.024567537840727)
+
+    def test_distance_error(self):
+        self.assertRaises(ValueError, calculate_distance, self.regressor.predict(self.X_test), self.y_test,
+                          "the_ultimate_norm")

@@ -168,7 +168,8 @@ class LogisticRegression(LinearBase, Classifier):
                 return sigmoid(dot_product([[1] + row for row in X], self.coefficients))
 
         else:
-            raise ValueError("Something went wrong.")
+            raise NotImplementedError("This part of the code has not been explored yet, "
+                                      "returning to safety...")
 
     def _score(self, X, y_true, scorer='accuracy'):
         """
@@ -189,7 +190,7 @@ class LogisticRegression(LinearBase, Classifier):
         if scorer == 'accuracy':
             return accuracy(self.predict(X), y_true)
         else:
-            raise ValueError("Unknown scorer")
+            raise NotImplementedError("Unknown scorer!")
 
     @property
     def seed(self):

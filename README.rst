@@ -35,7 +35,7 @@ Usage
 
 Changelog
 =========
-Version 0.2.1 (30/11/2017):
+Version 0.2.1 (05/12/2017):
 ---------------------------
  - Major:
     - Machine learning algorithms:
@@ -54,8 +54,7 @@ Version 0.2.1 (30/11/2017):
     - Eigendecomposition of symmetric matrices with Jacobi rotations
     - Improved docs
     - Fixed memory leaks
-    - Additional methods for flatArrays (e.g. `diag`)
-    - flatArray initialisers
+    - increased coverage
 
 Version 0.2 (16/11/2017):
 -------------------------

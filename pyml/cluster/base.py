@@ -44,8 +44,6 @@ class ClusterBase(BaseLearner, Predictor):
         elif self._initialisation == 'Random':
             self._centroids = [[random.random() for x in range(len(self._X[0]))] for x in range(self.k)]
 
-        else:
-            raise ValueError("Unknown initialisation.")
 
     def _get_cluster_mean(self, cluster_label=0):
         """

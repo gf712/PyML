@@ -32,6 +32,9 @@ class KMeansTest(unittest.TestCase):
     def test_KMeans_Init_Error(self):
         self.assertRaises(ValueError, KMeans, 1, 'foo')
 
+    def test_KMeans_Norm_Error(self):
+        self.assertRaises(ValueError, KMeans, 1, 'Forgy', 100, 1, None, 'amazing norm')
+
     def test_KMeans_MoreKThanN_Error(self):
         datapoints, labels = gaussian(n=5, d=2, labels=2, sigma=0.1, seed=1970)
         classifier = KMeans(k=11)
