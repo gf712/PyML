@@ -32,6 +32,9 @@ class KMeansTest(unittest.TestCase):
     def test_KMeans_Init_Error(self):
         self.assertRaises(ValueError, KMeans, 1, 'foo')
 
+    def test_KMeans_Norm_Error(self):
+        self.assertRaises(ValueError, KMeans, 1, 'Forgy', 100, 1, None, 'amazing norm')
+
     def test_KMeans_MoreKThanN_Error(self):
         datapoints, labels = gaussian(n=5, d=2, labels=2, sigma=0.1, seed=1970)
         classifier = KMeans(k=11)
@@ -42,5 +45,14 @@ class KMeansTest(unittest.TestCase):
         X_train, y_train, X_test, y_test = train_test_split(datapoints, labels,
                                                             train_split=0.95, seed=1970)
         classifier = KMeans(k=3, seed=1970, norm='l2')
+        classifier.train(X=X_train)
+        self.assertEqual(self.classifier.iterations, 7)
+
+
+    def test_KMeans_random_init(self):
+        datapoints, labels = gaussian(n=100, d=2, labels=3, sigma=0.1, seed=1970)
+        X_train, y_train, X_test, y_test = train_test_split(datapoints, labels,
+                                                            train_split=0.95, seed=1970)
+        classifier = KMeans(k=3, seed=1970, initialisation='Random')
         classifier.train(X=X_train)
         self.assertEqual(self.classifier.iterations, 7)

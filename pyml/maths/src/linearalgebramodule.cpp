@@ -3,16 +3,15 @@
 //
 
 #include <flatArrays.h>
+#include "flatArrays.cpp"
 #include "linearalgebramodule.h"
-#include "maths.h"
-#include <iostream>
-#include <Python.h>
+#include "exceptionClasses.h"
 
 // Handle errors
 // static PyObject *algebraError;
 
 
-void maximumSearch(double* vector, int size, int i, double* result) {
+inline void maximumSearch(double* vector, int size, int i, double* result) {
     // store result in result array
     // result[0] is the maximum value and result[1] is the position of the maximum value
     result[0] = vector[i];
@@ -31,10 +30,11 @@ void maximumSearch(double* vector, int size, int i, double* result) {
 }
 
 
-void swapRows(flatArray *A, int row1, int row2) {
+template <typename T>
+inline void swapRows(flatArray<T> *A, int row1, int row2) {
 
-    double *aRow1 = A->getRow(row1);
-    double *aRow2 = A->getRow(row2);
+    T *aRow1 = A->getRow(row1);
+    T *aRow2 = A->getRow(row2);
 
     A->setRow(aRow2, row1);
     A->setRow(aRow1, row2);
@@ -44,22 +44,26 @@ void swapRows(flatArray *A, int row1, int row2) {
 
 }
 
-
-void gaussianElimination(flatArray *A, double *result) {
+template <typename T>
+void gaussianElimination(flatArray<T> *A, T *result) {
 
     // based on https://martin-thoma.com/images/2013/05/Gaussian-elimination.png
 
     int n = A->getRows();
 
-    double *maxResult = nullptr;
-    maxResult = new double[2];
-    double c;
-    double *rowI = nullptr;
-    double *rowK = nullptr;
+    T *maxResult = nullptr;
+    maxResult = new T[2];
+    T c;
+    T *rowI = nullptr;
+    T *rowK = nullptr;
 
     for (int i = 0; i < n; ++i) {
         // Search for maximum in this column
         maximumSearch(A->getRow(i), n, i, maxResult);
+
+        if (maxResult[0] == 0) {
+            throw singularMatrixException();
+        }
 
         // Swap maximum row with current row (column by column)
         swapRows(A, (int) maxResult[1], i);
@@ -108,31 +112,40 @@ void gaussianElimination(flatArray *A, double *result) {
 }
 
 
-void leastSquares(flatArray *X, flatArray *y, double *theta) {
+template <typename T>
+void leastSquares(flatArray<T> &X, flatArray<T> &y, T *theta) {
 
     // variable declaration
-    auto A = new flatArray;
-    int m = X->getCols();
+    flatArray<T>* A = nullptr;
+    flatArray<T>* XT = nullptr;
+    flatArray<T>* XTX = nullptr;
+    flatArray<T>* right = nullptr;
+
+    int m = X.getCols();
     int n;
     int XTXn=0;
 
     // memory allocation
-    A->startEmptyArray(m, m+1);
+    A = emptyArray<T>(m, m+1);
 
     // start algorithm
 
     // first transpose X and get XT
-    flatArray *XT = X->transpose();
+    XT = X.transpose();
 
     // XT is a m by n matrix
     // an m by n matrix multiplied by a n by m matrix results in a m by m matrix
     // so XTX is a m by m matrix
-    flatArray *XTX = XT->dot(X);
+    XTX = XT->dot(X);
+
+//    if (XTX->det() == 0) {
+//        throw singularMatrixException();
+//    }
 
     // XT is a m by n matrix
     // y is a n dimensional vector
     // the result is a m dimensional vector called right (since it fits to the right of the A matrix)
-    flatArray *right = XT->dot(y);
+    right = XT->dot(y);
 
     // fill in A which is a m by m + 1 matrix
     n = 0;
@@ -147,7 +160,12 @@ void leastSquares(flatArray *X, flatArray *y, double *theta) {
     }
 
     // now we can perform gaussian elimination to get an approximation of theta
-    gaussianElimination(A, theta);
+    try {
+        gaussianElimination(A, theta);
+    }
+    catch (singularMatrixException &e) {
+        throw;
+    }
 
     // and free up memory
     delete XTX;
@@ -157,16 +175,17 @@ void leastSquares(flatArray *X, flatArray *y, double *theta) {
 }
 
 
-flatArray *covariance(flatArray *X) {
+template <typename T>
+flatArray<T>* covariance(flatArray<T> *X) {
 
     // variable declaration
-    auto covMatrix = new flatArray;
+    flatArray<T>* covMatrix = nullptr;
+    flatArray<T>* vecProd = nullptr;
+    flatArray<T>* XVar = nullptr;
+    flatArray<T>* XVecMean = nullptr;
+
     int cols, rows;
-    flatArray *XVar = nullptr;
-    double *XVecMean = nullptr;
-    double *Vec1 = nullptr;
-    double *Vec2 = nullptr;
-    auto vecProd = new flatArray;
+    T result;
 
     // get number of cols and rows (quicker than calling getter all the time)
     cols = X->getCols();
@@ -175,23 +194,28 @@ flatArray *covariance(flatArray *X) {
     // initialise covariance matrix
     // if X is a n by m matrix
     // the covariance matrix is m by m
-    covMatrix->startEmptyArray(cols, cols);
+    covMatrix = emptyArray<T>(cols, cols);
 
     // get mean and variance of each column
-    XVecMean = X->mean(0)->getArray();
+    XVecMean = X->mean(0);
     XVar = X->var(0, 0);
 
-    vecProd->startEmptyArray(1, rows);
+    vecProd = emptyArray<T>(1, rows);
 
     for (int i = 0; i < cols; ++i) {
         // the diagonal of the covariance matrix is the column wise variance of X
         covMatrix->setNElement(XVar->getNElement(i), i + i * cols);
+
+        T *Vec1 = nullptr;
 
         // get ith vector
         Vec1 = X->getCol(i);
 
         // only need to calculate the upper triangle
         for (int j = cols - 1; j > i; --j) {
+
+            T *Vec2 = nullptr;
+            flatArray<T>* vecProdMean = nullptr;
 
             // get jth vector
             Vec2 = X->getCol(j);
@@ -202,25 +226,31 @@ flatArray *covariance(flatArray *X) {
 
             // cov(X, Y) = E(X*Y) - E(X)*E(Y)
             // where X is the ith vector and Y the jth vector
-            double result = vecProd->mean(0)->getNElement(0) - XVecMean[i] * XVecMean[j];
+            vecProdMean = vecProd->mean(0);
+
+            result = vecProdMean->getNElement(0) - XVecMean->getNElement(i) * XVecMean->getNElement(j);
 
             // set S(i, j) = S(j, i) = cov(i, j)
             covMatrix->setNElement(result, i * cols + j);
             covMatrix->setNElement(result, j * cols + i);
+
+            delete [] Vec2;
+            delete vecProdMean;
         }
+
+        delete [] Vec1;
     }
 
     // memory dellocation
     delete XVecMean;
-    delete Vec1;
-    delete Vec2;
     delete XVar;
     delete vecProd;
 
     return covMatrix;
 }
 
-void *maxElementOffDiag(flatArray *S, double result[3]) {
+template <typename T>
+void *maxElementOffDiag(flatArray<T> *S, T result[3]) {
 
     int n = S->getCols();
 
@@ -230,7 +260,9 @@ void *maxElementOffDiag(flatArray *S, double result[3]) {
 
     for (int k = 0; k < n; ++k) {
 
-        double *row = S->getRowSlice(k, k + 1, n);
+        T *row = nullptr;
+
+        row = S->getRowSlice(k, k + 1, n);
 
         int j = 0;
         for (int i = k + 1; i < n; ++i) {
@@ -244,14 +276,13 @@ void *maxElementOffDiag(flatArray *S, double result[3]) {
         }
 
         delete [] row;
-
     }
 
     return result;
 }
 
-
-flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxIterations) {
+template <typename T>
+flatArray<T>* jacobiEigenDecomposition(flatArray<T> *S, double tolerance, int maxIterations) {
 
     // Implementation of the Jacobi rotation algorithm
     // https://en.wikipedia.org/wiki/Jacobi_eigenvalue_algorithm
@@ -263,30 +294,27 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
 
     int l, k;
     double s, c, t, y, temp, diff, phi;
-    double *maxValues = nullptr;
 
-    maxValues = new double[3];
-    auto E = new flatArray;
-    auto result = new flatArray;
+    flatArray<T>* E = nullptr;
+    flatArray<T>* result = nullptr;
+
+    T *maxValues = nullptr;
+    maxValues = new T[3];
 
     // number of rows
     int n = S->getRows();
 
     // set max iterations to 5 * n ** 2 if this value is not set
     if (maxIterations == 0) {
-        maxIterations = 5 * pow(n, 2);
+        maxIterations = static_cast<int>( 5 * pow(n, 2));
     }
 
     // initialise e, E, ind and changed
     // memory allocation
-    E->startEmptyArray(n, n);
-    result->startEmptyArray(n + 1, n);
-
+    result = emptyArray<T>(n + 1, n);
 
     // initialise values
-    for (int i = 0; i < n; ++i) {
-        E->setNElement(1, i * n + i);
-    }
+    E = identity<T>(n);
 
     int iteration = 0;
 
@@ -294,8 +322,8 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
 
         //  get max values off the diagonal
         maxElementOffDiag(S, maxValues);
-        k = (int) maxValues[1];
-        l = (int) maxValues[2];
+        k = static_cast<int>(maxValues[1]);
+        l = static_cast<int>(maxValues[2]);
 
         if (maxValues[0] < tolerance) {
             // found convergence
@@ -308,6 +336,7 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
         if (fabs(S->getNElement(k * n + l)) < fabs(diff) * 1.0e-40) {
             y = S->getNElement(k * n + l) / diff;
         }
+
         else {
             phi = diff / (2 * S->getNElement(k * n + l));
             y = 1.0 / (fabs(phi) + sqrt(pow(phi, 2) + 1.0));
@@ -315,7 +344,6 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
                 y = -y;
             }
         }
-
 
         c = 1.0 / sqrt(pow(y, 2) + 1);
         s = y * c;
@@ -326,7 +354,6 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
         S->setNElement(0, k * n + l);
         S->setNElement(S->getNElement(k * n + k) - y * temp, k * n + k);
         S->setNElement(S->getNElement(l * n + l) + y * temp, l * n + l);
-
 
         for (int i = 0; i < k; ++i) {
             // temp = a[i,k]
@@ -369,12 +396,13 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
     }
 
     // the diagonal of S has the eigenvalues
-    double* diag = S->diagonal();
+    auto diag = S->diagonal();
+
     result->setRow(diag, 0);
 
     for (int j = 1; j < n + 1; ++j) {
-        double *row = E->getRow(j -1);
-        result->setRow(row, j );
+        auto *row = E->getRow(j -1);
+        result->setRow(row, j);
         delete [] row;
     }
 
@@ -384,4 +412,95 @@ flatArray *jacobiEigenDecomposition(flatArray *S, double tolerance, int maxItera
     delete [] maxValues;
 
     return result;
+}
+
+template <typename T>
+inline flatArray<T>* signChart(int rows, int cols) {
+
+    flatArray<T>* result = nullptr;
+
+    result = emptyArray<T>(rows, cols);
+
+    for (int i = 0; i < result->getSize(); ++i) {
+
+        if (i % 2 == 0) {
+            result->setNElement(1, i);
+        }
+
+        else {
+            result->setNElement(-1 , i);
+        }
+    }
+
+    return result;
+}
+
+
+template <typename T>
+double determinant(flatArray<T>* array) {
+
+    int rows = array->getRows();
+    int cols = array->getCols();
+    T determinantResult = 0;
+
+
+    if (rows == 2) {
+        // base case is the determinant of a 2 by 2 matrix
+        determinantResult = array->getNElement(0) * array->getNElement(3) - array->getNElement(1) * array->getNElement(2);
+    }
+
+    else {
+        flatArray<T>* M = nullptr;
+        flatArray<T>* C = nullptr;
+        flatArray<T>* signs = nullptr;
+
+        // find determinant of minors and store in matrix M
+        M = emptyArray<T>(rows, cols);
+
+        int m = 0;
+
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+
+                flatArray<T> *M_i = nullptr;
+
+                M_i = emptyArray<T>(rows - 1, cols - 1);
+
+                // populate M_i with all rows except i, and all cols except j
+                int n = 0;
+
+                for (int k = 0; k < rows; ++k) {
+                    for (int l = 0; l < cols; ++l) {
+
+                        if (k != i && l != j) {
+                            M_i->setNElement(array->getNElement(k * cols + l), n);
+                            n++;
+                        }
+                    }
+                }
+
+                M->setNElement(determinant(M_i), m);
+
+                m++;
+                delete M_i;
+            }
+        }
+
+        signs = signChart<T>(rows, cols);
+
+        C = (*M) * (*signs);
+
+        T* row = array->getRow(0);
+
+        for (int i = 0; i < rows; ++i) {
+            determinantResult += row[i] * C->getNElement(i);
+        }
+
+        delete [] row;
+        delete signs;
+        delete M;
+        delete C;
+    }
+
+    return determinantResult;
 }

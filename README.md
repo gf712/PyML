@@ -32,13 +32,33 @@ Usage
 
 Changelog
 =========
+## Version 0.2.1 (05/12/2017):
+ - Major:
+    - Machine learning algorithms:
+        - PCA implementation
+        - Multiclass LogisticRegression
+    - Optimisation algorithms:
+        - Mini batch gradient descent
+        - Gradient descent with momentum
+        - Nesterov optimisation
+        - Adagrad optimisation
+        - Adadelta optimisation 
+
+    - Backend:
+        - Major changes to flatArrays and C++ backend leading to speed improvements
+    
+ - Minor:
+    - Eigendecomposition of symmetric matrices with Jacobi rotations
+    - Improved docs
+    - Fixed memory leaks
+    - increased coverage
+    
 ## Version 0.2 (16/11/2017):
  - Major:
     - KMeans implementation
     - Logistic regression implementation
     - New C++ class to represent 2D arrays more efficiently
 
-    
  - Minor:
     - Cleaned up C++ code
     - Norm is calculated with pure C++ (Python only used to provide `euclidean_distance` and `manhattan_distance` interface)

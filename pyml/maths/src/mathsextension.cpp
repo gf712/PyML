@@ -4,14 +4,16 @@
 #include <Python.h>
 #include "maths.h"
 #include "pythonconverters.h"
-#include "flatArrays.h"
-
+#include "arrayInitialisers.h"
+#include "flatArrays.cpp"
+#include "arrayInitialisers.cpp"
+#include "maths.cpp"
 
 static PyObject* quick_sort(PyObject* self, PyObject *args) {
 
     // variable instantiation
-    auto A = new flatArray;
-    auto order = new flatArray;
+    flatArray<double>* A = nullptr;
+    flatArray<int>* order = nullptr;
     int axis;
 
     // pointers to python lists
@@ -24,22 +26,23 @@ static PyObject* quick_sort(PyObject* self, PyObject *args) {
     }
 
     // read in Python list
-    A->readFromPythonList(pA);
+    A = readFromPythonList<double>(pA);
 
     if (A->getRows() == 1) {
 
-        order->startEmptyArray(A->getRows(), A->getCols());
+        order = emptyArray<int>(A->getRows(), A->getCols());
 
         // if A is a vector
-        auto *orderArray = new double[A->getSize()];
-        double *array = A->getRow(0);
+        int*orderArray = nullptr;
 
+        orderArray = new int[A->getSize()];
+        double *array = A->getRow(0);
 
         for (int i = 0; i < A->getSize(); ++i) {
             orderArray[i] = i;
         }
 
-        quicksort(array, orderArray, 0, A->getSize());
+        quicksort<double>(array, orderArray, 0, A->getSize());
 
         order->setRow(orderArray, 0);
         A->setRow(array, 0);
@@ -49,20 +52,19 @@ static PyObject* quick_sort(PyObject* self, PyObject *args) {
         // if A is a matrix
         if (axis == 1) {
 
-            order->startEmptyArray(A->getRows(), A->getCols());
-
+            order = emptyArray<int>(A->getRows(), A->getCols());
 
             // if axis is 1 return row wise argsort
             for (int i = 0; i < A->getRows(); ++i) {
 
-                auto *orderArray = new double[A->getCols()];
+                auto *orderArray = new int[A->getCols()];
                 double *array = A->getRow(i);
 
                 for (int j = 0; j < A->getCols(); ++j) {
                     orderArray[j] = j;
                 }
 
-                quicksort(array, orderArray, 0, A->getCols());
+                quicksort<double>(array, orderArray, 0, A->getCols());
 
                 order->setRow(orderArray, i);
                 A->setRow(array, i);
@@ -71,20 +73,20 @@ static PyObject* quick_sort(PyObject* self, PyObject *args) {
         }
         else if (axis == 0) {
 
-            order->startEmptyArray(A->getCols(), A->getRows());
+            order = emptyArray<int>(A->getCols(), A->getRows());
 
 
             // if axis is 0 return column wise argsort
             for (int i = 0; i < A->getCols(); ++i) {
 
-                auto *orderArray = new double[A->getRows()];
+                auto *orderArray = new int [A->getRows()];
                 double *array = A->getCol(i);
 
                 for (int j = 0; j < A->getRows(); ++j) {
                     orderArray[j] = j;
                 }
 
-                quicksort(array, orderArray, 0, A->getRows());
+                quicksort<double>(array, orderArray, 0, A->getRows());
 
                 order->setRow(orderArray, i);
                 A->setCol(array, i);
@@ -118,6 +120,190 @@ static PyObject* quick_sort(PyObject* self, PyObject *args) {
 }
 
 
+static PyObject* Cargmax(PyObject* self, PyObject *args) {
+
+    // variable instantiation
+    flatArray<double>* A = nullptr;
+    flatArray<double>* resultList = nullptr;
+    int axis;
+
+    // pointers to python lists
+    PyObject* pA;
+
+    // return error if we don't get all the arguments
+    if (!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pA, &axis)) {
+        PyErr_SetString(PyExc_TypeError, "Expected one lists and an integer!");
+        return nullptr;
+    }
+
+    // read in Python list
+    A = readFromPythonList<double>(pA);
+
+    if (A->getRows() == 1) {
+
+        // if A is a vector
+        double *array = A->getRow(0);
+
+        resultList = emptyArray<double>(1, 1);
+
+        resultList->setNElement(argmax(array, A->getCols()), 0);
+
+        delete [] array;
+    }
+
+    else {
+        // if A is a matrix
+        if (axis == 1) {
+
+            resultList = emptyArray<double>(1, A->getRows());
+
+            double *array = nullptr;
+
+            // if axis is 1 return row wise argmax
+            for (int i = 0; i < A->getRows(); ++i) {
+
+                array = A->getRow(i);
+
+                resultList->setNElement(argmax(array, A->getCols()), i);
+
+            }
+
+            delete [] array;
+
+        }
+        else if (axis == 0) {
+
+            resultList = emptyArray<double>(1, A->getCols());
+
+            double *array = nullptr;
+
+            // if axis is 1 return column wise argmax
+            for (int i = 0; i < A->getCols(); ++i) {
+
+                array = A->getCol(i);
+
+                resultList->setNElement(argmax(array, A->getRows()), i);
+
+            }
+
+            delete [] array;
+
+        }
+        else {
+            // ERROR
+            PyErr_SetString(PyExc_TypeError, "Expected axis value to be 0 or 1");
+            return nullptr;
+        }
+    }
+
+
+    // convert result to python list
+    PyObject* result_py_list = ConvertFlatArray_PyList(resultList, "int");
+
+    // build python object
+    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    // free up memory
+    delete A;
+
+    Py_DECREF(result_py_list);
+
+    return FinalResult;
+}
+
+
+static PyObject* Cargmin(PyObject* self, PyObject *args) {
+
+    // variable instantiation
+    flatArray<double>* A = nullptr;
+    flatArray<double>* resultList = nullptr;
+    int axis;
+
+    // pointers to python lists
+    PyObject* pA;
+
+    // return error if we don't get all the arguments
+    if (!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pA, &axis)) {
+        PyErr_SetString(PyExc_TypeError, "Expected one lists and an integer!");
+        return nullptr;
+    }
+
+    // read in Python list
+    A = readFromPythonList<double>(pA);
+
+    if (A->getRows() == 1) {
+
+        // if A is a vector
+        double *array = A->getRow(0);
+
+        resultList = emptyArray<double>(1, 1);
+
+        resultList->setNElement(argmin(array, A->getCols()), 0);
+
+        delete [] array;
+    }
+
+    else {
+        // if A is a matrix
+        if (axis == 1) {
+
+            resultList = emptyArray<double>(1, A->getRows());
+
+            double *array = nullptr;
+
+            // if axis is 1 return row wise argmax
+            for (int i = 0; i < A->getRows(); ++i) {
+
+                array = A->getRow(i);
+
+                resultList->setNElement(argmin(array, A->getCols()), i);
+
+            }
+
+            delete [] array;
+
+        }
+        else if (axis == 0) {
+
+            resultList = emptyArray<double>(1, A->getCols());
+
+            double *array = nullptr;
+
+            // if axis is 1 return column wise argmax
+            for (int i = 0; i < A->getCols(); ++i) {
+
+                array = A->getCol(i);
+
+                resultList->setNElement(argmin(array, A->getRows()), i);
+
+            }
+
+            delete [] array;
+
+        }
+        else {
+            // ERROR
+            PyErr_SetString(PyExc_TypeError, "Expected axis value to be 0 or 1");
+            return nullptr;
+        }
+    }
+
+
+    // convert result to python list
+    PyObject* result_py_list = ConvertFlatArray_PyList(resultList, "int");
+
+    // build python object
+    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    // free up memory
+    delete A;
+
+    Py_DECREF(result_py_list);
+
+    return FinalResult;
+}
+
+
 static PyObject* version(PyObject* self) {
     return Py_BuildValue("s", "Version 0.1");
 }
@@ -126,6 +312,8 @@ static PyObject* version(PyObject* self) {
 static PyMethodDef CMathsMethods[] = {
         // Python name    C function              argument representation  description
         {"quick_sort",    quick_sort,             METH_VARARGS,            "Quick sort algorithm"},
+        {"Cargmin",       Cargmin,                METH_VARARGS,            "Returns index of minimum value"},
+        {"Cargmax",       Cargmax,                METH_VARARGS,            "Returns index of maximum value"},
         {"version",       (PyCFunction)version,   METH_NOARGS,             "Returns version."},
         {nullptr, nullptr, 0, nullptr}
 };

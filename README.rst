@@ -1,3 +1,6 @@
+.. role:: bash(code)
+   :language: bash
+
 PyML
 ====
 .. image:: https://coveralls.io/repos/github/gf712/PyML/badge.svg?branch=master
@@ -32,6 +35,27 @@ Usage
 
 Changelog
 =========
+Version 0.2.1 (05/12/2017):
+---------------------------
+ - Major:
+    - Machine learning algorithms:
+       - PCA implementation
+       - Multiclass LogisticRegression
+    - Optimisation algorithms:
+       - Mini batch gradient descent
+       - Gradient descent with momentum
+       - Nesterov optimisation
+       - Adagrad optimisation
+       - Adadelta optimisation
+    - Backend:
+       - Major changes to flatArrays and C++ backend leading to speed improvements
+
+ - Minor:
+    - Eigendecomposition of symmetric matrices with Jacobi rotations
+    - Improved docs
+    - Fixed memory leaks
+    - increased coverage
+
 Version 0.2 (16/11/2017):
 -------------------------
  - Major:

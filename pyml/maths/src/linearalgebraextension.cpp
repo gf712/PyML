@@ -6,21 +6,28 @@
 
 
 #include <Python.h>
-#include <linearalgebramodule.h>
-#include "pythonconverters.h"
-#include <iostream>
+#include "linearalgebramodule.h"
+#include "linearalgebramodule.cpp"
+#include "exceptionClasses.h"
+#include "arrayInitialisers.cpp"
+
+// Exceptions
+static PyObject *DimensionMismatchException;
+static PyObject *OutOfBoundsException;
+static PyObject *ZeroDivisionError;
+static PyObject *UnknownAxis;
+static PyObject *LinearAlgebraException;
+
 
 static PyObject* dot_product(PyObject* self, PyObject *args) {
 
-    // variable instantiation
-    // A is a list of lists (matrix)
-    // V is a list (vector)
-    auto A = new flatArray;
-    auto V = new flatArray;
+    flatArray<double>* A = nullptr;
+    flatArray<double>* V = nullptr;
+    flatArray<double>* result = nullptr;
 
     // pointers to python lists
-    PyObject * pAArray;
-    PyObject * pVVector;
+    PyObject* pAArray;
+    PyObject* pVVector;
 
     // return error if we don't get all the arguments
     if (!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pAArray, &PyList_Type, &pVVector)) {
@@ -28,12 +35,25 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    A->readFromPythonList(pAArray);
-    V->readFromPythonList(pVVector);
-
+    A = readFromPythonList<double>(pAArray);
+    V = readFromPythonList<double>(pVVector);
 
     // calculate dot product
-    flatArray *result = A->dot(V);
+    try {
+        result = A->dot(*V);
+    }
+    catch (flatArrayDimensionMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
+    catch (flatArrayRowMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
+    catch (flatArrayColumnMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
 
     // convert result to python list
     PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
@@ -54,27 +74,27 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
 static PyObject* power(PyObject* self, PyObject *args) {
 
     // variable declaration
-    auto A = new flatArray;
-    int p;
+    flatArray<double>* A = nullptr;
+    double p;
 
     // pointers to python lists
     PyObject * pAArray;
 
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pAArray, &p)) {
-        PyErr_SetString(PyExc_TypeError, "Expected a list and an integer!");
+    if(!PyArg_ParseTuple(args, "O!d", &PyList_Type, &pAArray, &p)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list and a float!");
         return nullptr;
     }
 
     // read in python list
-    A->readFromPythonList(pAArray);
+    A = readFromPythonList<double>(pAArray);
 
     // calculate the power elementwise
-    flatArray *result = A->power(p);
+    A->power(p, 1);
 
     // convert vector to python list
-    PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
+    PyObject* result_py_list = ConvertFlatArray_PyList(A, "float");
 
     // build python object
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
@@ -88,15 +108,16 @@ static PyObject* power(PyObject* self, PyObject *args) {
 }
 
 
-static PyObject* subtract(PyObject* self, PyObject *args) {
+static PyObject* add(PyObject* self, PyObject *args) {
 
     // variable instantiation
-    auto A = new flatArray;
-    auto B = new flatArray;
+    flatArray<double>* A = nullptr;
+    flatArray<double>* B = nullptr;
 
     PyObject *pA;
     PyObject *pB;
     PyObject *result_py_list;
+    PyObject *FinalResult;
 
     // return error if we don't get all the arguments
     if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pA, &PyList_Type, &pB)) {
@@ -105,20 +126,173 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
     }
 
     // get python lists
-    A->readFromPythonList(pA);
-    B->readFromPythonList(pB);
+    A = readFromPythonList<double>(pA);
+    B = readFromPythonList<double>(pB);
 
     // subtraction
-    flatArray *result = A->subtract(B);
+    try {
+        (*A) += (*B);
+    }
 
-    result_py_list = ConvertFlatArray_PyList(result, "float");
+    catch (flatArrayDimensionMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
 
-    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+    catch (flatArrayColumnMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
+
+    catch (flatArrayRowMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
+
+    result_py_list = ConvertFlatArray_PyList(A, "float");
+    FinalResult = Py_BuildValue("O", result_py_list);
 
     // memory deallocation
-    delete result;
     delete A;
     delete B;
+
+    Py_DECREF(result_py_list);
+
+    return FinalResult;
+}
+
+
+static PyObject* subtract(PyObject* self, PyObject *args) {
+
+    // variable instantiation
+    flatArray<double>* A = nullptr;
+    flatArray<double>* B = nullptr;
+
+    PyObject *pA;
+    PyObject *pB;
+    PyObject *result_py_list;
+    PyObject *FinalResult;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pA, &PyList_Type, &pB)) {
+        PyErr_SetString(PyExc_TypeError, "Expected two lists!");
+        return nullptr;
+    }
+
+    // get python lists
+    A = readFromPythonList<double>(pA);
+    B = readFromPythonList<double>(pB);
+
+    // subtraction
+    try {
+        (*A) -= (*B);
+    }
+
+    catch (flatArrayDimensionMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
+
+    catch (flatArrayColumnMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
+
+    catch (flatArrayRowMismatchException<double> &e) {
+        PyErr_SetString(DimensionMismatchException, e.what());
+        return nullptr;
+    }
+
+    result_py_list = ConvertFlatArray_PyList(A, "float");
+    FinalResult = Py_BuildValue("O", result_py_list);
+
+
+    // memory deallocation
+    delete A;
+    delete B;
+
+    Py_DECREF(result_py_list);
+
+    return FinalResult;
+}
+
+
+static PyObject* multiply(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    flatArray<double>* A = nullptr;
+    flatArray<double>* B = nullptr;
+
+    // pointers to python lists
+    PyObject* pAArray = nullptr;
+    PyObject* pBArray = nullptr;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pAArray, &PyList_Type, &pBArray)) {
+        PyErr_SetString(PyExc_TypeError, "Expected two lists!");
+        return nullptr;
+    }
+
+    // read in python list
+    A = readFromPythonList<double>(pAArray);
+    B = readFromPythonList<double>(pBArray);
+
+    // calculate elementwise multiplication with B
+    (*A) *= (*B);
+
+    // convert vector to python list
+    PyObject* result_py_list = ConvertFlatArray_PyList(A, "float");
+
+    // build python object
+    PyObject* FinalResult = Py_BuildValue("O", result_py_list);
+
+    // deallocate memory
+    delete A;
+    delete B;
+
+    Py_DECREF(result_py_list);
+
+    return FinalResult;
+}
+
+
+static PyObject* divide(PyObject* self, PyObject *args) {
+
+    // variable declaration
+    flatArray<double>* A = nullptr;
+    flatArray<double>* B = nullptr;
+
+    // pointers to python lists
+    PyObject * pAArray;
+    PyObject * pBArray;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &pAArray, &PyList_Type, &pBArray)) {
+        PyErr_SetString(PyExc_TypeError, "Expected two lists!");
+        return nullptr;
+    }
+
+    // read in python list
+    A = readFromPythonList<double>(pAArray);
+    B = readFromPythonList<double>(pBArray);
+
+    // calculate elementwise division by n
+    try {
+        (*A) /= (*B);
+    }
+    catch (flatArrayZeroDivisionError &e) {
+        PyErr_SetString(ZeroDivisionError, e.what());
+        return nullptr;
+    }
+
+    // convert vector to python list
+    PyObject* result_py_list = ConvertFlatArray_PyList(A, "float");
+
+    // build python object
+    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    // deallocate memory
+    delete A;
 
     Py_DECREF(result_py_list);
 
@@ -131,7 +305,7 @@ static PyObject* sum(PyObject* self, PyObject *args) {
     // sum of all elements in a matrix/vector
 
     // variable declaration
-    auto A = new flatArray;
+    flatArray<double>* A = nullptr;
     PyObject *pAArray;
 
     // return error if we don't get all the arguments
@@ -141,22 +315,57 @@ static PyObject* sum(PyObject* self, PyObject *args) {
     }
 
     // use PyList_Size to get size of vector
-    A->readFromPythonList(pAArray);
+    A = readFromPythonList<double>(pAArray);
 
     double result = A->sum();
 
     PyObject *FinalResult = Py_BuildValue("d", result);
 
+    delete A;
+
     return FinalResult;
 }
+
+
+static PyObject* det(PyObject* self, PyObject *args) {
+
+    // sum of all elements in a matrix/vector
+
+    // variable declaration
+    flatArray<double>* A = nullptr;
+    PyObject *pAArray;
+
+    // return error if we don't get all the arguments
+    if(!PyArg_ParseTuple(args, "O!", &PyList_Type, &pAArray)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list!");
+        return nullptr;
+    }
+
+    // use PyList_Size to get size of vector
+    A = readFromPythonList<double>(pAArray);
+
+    if (A->getCols() != A->getRows()) {
+        PyErr_SetString(LinearAlgebraException, "Expected a square matrix!");
+    }
+
+    double result = A->det();
+
+    PyObject *FinalResult = Py_BuildValue("d", result);
+
+    delete A;
+
+    return FinalResult;
+}
+
 
 static PyObject* pyTranspose(PyObject* self, PyObject *args) {
 
     // declarations
-    auto A = new flatArray;
-//    int block_size;
-    PyObject* pyResult;
-    PyObject* pArray;
+    flatArray<double>* A = nullptr;
+    flatArray<double>* result = nullptr;
+
+    PyObject* pyResult = nullptr;
+    PyObject* pArray = nullptr;
 
     // return error if we don't get all the arguments
     if(!PyArg_ParseTuple(args, "O!", &PyList_Type, &pArray)) {
@@ -164,13 +373,9 @@ static PyObject* pyTranspose(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-//    if (block_size <= 0) {
-//        block_size = 1;
-//    }
+    A = readFromPythonList<double>(pArray);
 
-    A->readFromPythonList(pArray);
-
-    flatArray *result = A->transpose();
+    result = A->transpose();
 
     pyResult = ConvertFlatArray_PyList(result, "float");
 
@@ -188,8 +393,8 @@ static PyObject* pyTranspose(PyObject* self, PyObject *args) {
 static PyObject* least_squares(PyObject* self, PyObject *args) {
 
     // variable declaration
-    auto X = new flatArray;
-    auto y = new flatArray;
+    flatArray<double>* X = nullptr;
+    flatArray<double>* y = nullptr;
 
     PyObject *pX;
     PyObject *py;
@@ -203,8 +408,8 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
 
 
     // read in python lists
-    X->readFromPythonList(pX);
-    y->readFromPythonList(py);
+    X = readFromPythonList<double>(pX);
+    y =readFromPythonList<double>(py);
 
 
     // sanity check
@@ -217,7 +422,14 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
     auto theta = new double [X->getCols()];
 
     // get theta estimate using least squares
-    leastSquares(X, y, theta);
+    try {
+        leastSquares<double>(*X, *y, theta);
+    }
+    catch (singularMatrixException &e) {
+        PyErr_SetString(LinearAlgebraException, e.what());
+        return nullptr;
+    }
+    
 
     result_py_list = Convert_1DArray(theta, X->getCols());
 
@@ -238,9 +450,13 @@ static PyObject* mean(PyObject* self, PyObject *args) {
 
     // variable declaration
     int axis;
-    PyObject *pX;
-    auto X = new flatArray;
+
+    flatArray<double>* X = nullptr;
+    flatArray<double>* result = nullptr;
+
+    PyObject *pX = nullptr;
     PyObject *FinalResult = nullptr;
+
 
     // return error if we don't get all the arguments
     if (!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pX, &axis)) {
@@ -248,9 +464,15 @@ static PyObject* mean(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    X->readFromPythonList(pX);
+    X = readFromPythonList<double>(pX);
 
-    flatArray *result = X->mean(axis);
+    try {
+        result = X->mean(axis);
+    }
+    catch (flatArrayUnknownAxis &e) {
+        PyErr_SetString(UnknownAxis, e.what());
+        return nullptr;
+    }
 
     if (X->getRows() == 1) {
 
@@ -278,9 +500,11 @@ static PyObject* standardDeviation(PyObject* self, PyObject *args) {
 
     // variable declaration
     int axis, degreesOfFreedom;
-    PyObject *pX;
-    auto X = new flatArray;
+    flatArray<double>* X = nullptr;
+    flatArray<double>* result = nullptr;
+
     PyObject *FinalResult = nullptr;
+    PyObject *pX = nullptr;
 
     // return error if we don't get all the arguments
     if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &degreesOfFreedom, &axis)) {
@@ -288,9 +512,9 @@ static PyObject* standardDeviation(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    X->readFromPythonList(pX);
+    X = readFromPythonList<double>(pX);
 
-    flatArray *result = X->std(degreesOfFreedom, axis);
+    result = X->std(degreesOfFreedom, axis);
 
     if (X->getRows() == 1) {
 
@@ -318,8 +542,10 @@ static PyObject* variance(PyObject* self, PyObject *args) {
 
     // variable declaration
     int axis, degreesOfFreedom;
-    PyObject *pX;
-    auto X = new flatArray;
+    flatArray<double>* X = nullptr;
+    flatArray<double>* result = nullptr;
+
+    PyObject *pX = nullptr;
     PyObject *FinalResult = nullptr;
 
     // return error if we don't get all the arguments
@@ -328,9 +554,9 @@ static PyObject* variance(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    X->readFromPythonList(pX);
+    X = readFromPythonList<double>(pX);
 
-    flatArray *result = X->var(degreesOfFreedom, axis);
+    result = X->var(degreesOfFreedom, axis);
 
     if (X->getRows() == 1) {
 
@@ -357,8 +583,10 @@ static PyObject* variance(PyObject* self, PyObject *args) {
 static PyObject* cov(PyObject* self, PyObject *args) {
 
     // variable declaration
-    PyObject *pX;
-    auto X = new flatArray;
+    flatArray<double>* X = nullptr;
+    flatArray<double>* result = nullptr;
+
+    PyObject *pX = nullptr;
     PyObject *FinalResult = nullptr;
 
     // return error if we don't get all the arguments
@@ -367,9 +595,9 @@ static PyObject* cov(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    X->readFromPythonList(pX);
+    X = readFromPythonList<double>(pX);
 
-    flatArray *result = covariance(X);
+    result = covariance<double>(X);
 
     PyObject *result_py_list = ConvertFlatArray_PyList(result, "float");
 
@@ -389,11 +617,15 @@ static PyObject* eigenSolve(PyObject* self, PyObject *args) {
     // variable declaration
     int maxIterations;
     double tolerance;
-    auto X = new flatArray;
-    auto eigFArray = new flatArray;
 
-    PyObject *pX;
+    flatArray<double>* X = nullptr;
+    flatArray<double>* eigFArray = nullptr;
+    flatArray<double>* result = nullptr;
+
+    PyObject *pX = nullptr;
     PyObject *FinalResult = nullptr;
+    PyObject *eigV = nullptr;
+    PyObject *eigE = nullptr;
 
     // return error if we don't get all the arguments
     if (!PyArg_ParseTuple(args, "O!di", &PyList_Type, &pX, &tolerance, &maxIterations)) {
@@ -401,18 +633,21 @@ static PyObject* eigenSolve(PyObject* self, PyObject *args) {
         return nullptr;
     }
 
-    X->readFromPythonList(pX);
+    X = readFromPythonList<double>(pX);
 
-    flatArray *result = jacobiEigenDecomposition(X, tolerance, maxIterations);
+    result = jacobiEigenDecomposition<double>(X, tolerance, maxIterations);
 
-    PyObject *eigV = Convert_1DArray(result->getRow(0), result->getCols());
+    eigV = Convert_1DArray(result->getRow(0), result->getCols());
 
-    eigFArray->startEmptyArray(result->getCols(), result->getCols());
+    eigFArray = emptyArray<double>(result->getCols(), result->getCols());
+
     for (int i = 1; i < result->getRows(); ++i) {
-        eigFArray->setRow(result->getRow(i), i - 1);
+        double *rowResult = result->getRow(i);
+        eigFArray->setRow(rowResult, i - 1);
+        delete [] rowResult;
     }
 
-    PyObject *eigE = ConvertFlatArray_PyList(eigFArray, "float");
+    eigE = ConvertFlatArray_PyList(eigFArray, "float");
 
     FinalResult = Py_BuildValue("OO", eigV, eigE);
 
@@ -428,7 +663,7 @@ static PyObject* eigenSolve(PyObject* self, PyObject *args) {
 
 
 static PyObject* version(PyObject* self) {
-    return Py_BuildValue("s", "Version 0.2");
+    return Py_BuildValue("s", "Version 0.3");
 }
 
 
@@ -436,8 +671,12 @@ static PyMethodDef linearAlgebraMethods[] = {
         // Python name    C function              argument representation  description
         {"dot_product",   dot_product,            METH_VARARGS,            "Calculate the dot product of two vectors"},
         {"power",         power,                  METH_VARARGS,            "Calculate element wise power"},
+        {"add",           add,                    METH_VARARGS,            "Calculate element wise addition"},
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
+        {"multiply",      multiply,               METH_VARARGS,            "Calculate element wise multiplication"},
+        {"divide",        divide,                 METH_VARARGS,            "Calculate element wise division"},
         {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
+        {"determinant",   det,                    METH_VARARGS,            "Calculate the determinant of a square matrix"},
         {"transpose",     pyTranspose,            METH_VARARGS,            "Transpose a 2D matrix"},
         {"least_squares", least_squares,          METH_VARARGS,            "Perform least squares"},
         {"Cmean",         mean,                   METH_VARARGS,            "Numpy style array mean"},
@@ -460,5 +699,31 @@ static struct PyModuleDef linearAlgebraModule = {
 
 
 PyMODINIT_FUNC PyInit_Clinear_algebra(void) {
-    return PyModule_Create(&linearAlgebraModule);
+
+    PyObject *m;
+
+    m = PyModule_Create(&linearAlgebraModule);
+
+    if (m == nullptr)
+        return nullptr;
+
+    DimensionMismatchException = PyErr_NewException("Clinear_algebra.DimensionMismatchException", nullptr, nullptr);
+    OutOfBoundsException = PyErr_NewException("Clinear_algebra.OutOfBoundsException", nullptr, nullptr);
+    ZeroDivisionError = PyErr_NewException("Clinear_algebra.ZeroDivisionError", nullptr, nullptr);
+    UnknownAxis = PyErr_NewException("Clinear_algebra.UnknownAxis", nullptr, nullptr);
+    LinearAlgebraException = PyErr_NewException("Clinear_algebra.LinearAlgebraException", nullptr, nullptr);
+
+    Py_INCREF(DimensionMismatchException);
+    Py_INCREF(OutOfBoundsException);
+    Py_INCREF(ZeroDivisionError);
+    Py_INCREF(UnknownAxis);
+    Py_INCREF(LinearAlgebraException);
+
+    PyModule_AddObject(m, "error", DimensionMismatchException);
+    PyModule_AddObject(m, "out_of_bounds_error", OutOfBoundsException);
+    PyModule_AddObject(m, "zero_error", ZeroDivisionError);
+    PyModule_AddObject(m, "axis_error", UnknownAxis);
+    PyModule_AddObject(m, "linear_algebra_error", LinearAlgebraException);
+
+    return m;
 }

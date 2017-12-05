@@ -1,9 +1,10 @@
 from .base import KNNBase
+from pyml.base import Predictor, Classifier
 from ..maths import max_occurence, mean
 from pyml.metrics.scores import mean_squared_error, mean_absolute_error
 
 
-class KNNClassifier(KNNBase):
+class KNNClassifier(KNNBase, Classifier):
     def __init__(self, n=3, norm='l1'):
         KNNBase.__init__(self)
         self.n = n
@@ -45,7 +46,7 @@ class KNNRegressor(KNNBase):
         return [mean(row) for row in self._neighbours]
 
     def _score(self, X, y_true, scorer='mean_squared_error'):
-        if scorer == 'mean_squared_error':
+        if scorer in ['mean_squared_error', 'mse']:
             return mean_squared_error(self.predict(X), y_true)
-        elif scorer == 'mean_absolute_error':
+        elif scorer in ['mean_absolute_error', 'mae']:
             return mean_absolute_error(self.predict(X), y_true)
