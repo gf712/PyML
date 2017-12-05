@@ -19,11 +19,11 @@ inline void sigmoid(flatArray<T> *scores) {
 
 
 template <typename T>
-inline flatArray<T> *predict(flatArray<T> *X, flatArray<T> *w, char predType[10]) {
+inline flatArray<T> *predict(flatArray<T> &X, flatArray<T> &w, char predType[10]) {
 
     flatArray<T>* h;
 
-    h = X->dot(w);
+    h = X.dot(w);
 
     // if using classification, calculate sigmoid(h)
     if (strcmp(predType, "logit") == 0) {
@@ -35,12 +35,24 @@ inline flatArray<T> *predict(flatArray<T> *X, flatArray<T> *w, char predType[10]
 
 
 template <typename T>
-inline T logLikelihood(flatArray<T> *scores, flatArray<T> *y) {
+inline void *predictTest(flatArray<T> &X, flatArray<T> &w, char predType[10], flatArray<T> *result) {
+
+    result = X.dot(w);
+
+    // if using classification, calculate sigmoid(h)
+    if (strcmp(predType, "logit") == 0) {
+        sigmoid(result);
+    }
+
+}
+
+template <typename T>
+inline T logLikelihood(flatArray<T> &scores, flatArray<T> &y) {
 
     T result = 0;
 
-    for (int i = 0; i < y->getSize(); ++i) {
-        result += y->getNElement(i) * scores->getNElement(i) - log(1 + exp(scores->getNElement(i)));
+    for (int i = 0; i < y.getSize(); ++i) {
+        result += y[i] * scores[i] - log(1 + exp(scores[i]));
     }
 
     return result;
@@ -48,18 +60,18 @@ inline T logLikelihood(flatArray<T> *scores, flatArray<T> *y) {
 
 
 template <typename T>
-inline T cost(flatArray<T>* loss){
+inline T cost(flatArray<T>& loss){
 
-    loss->power(2, 1);
+    loss.power(2, 1);
 
-    T costResult = loss->sum() / (2 * loss->getCols());
+    T costResult = loss.sum() / (2 * loss.getCols());
 
     return costResult;
 }
 
 
 template <typename T>
-inline T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, char predType[10]) {
+inline T calculateCost(flatArray<T>& X, flatArray<T>& theta, flatArray<T> &y, char predType[10]) {
 
     T result;
     flatArray<T>* prediction = nullptr;
@@ -68,14 +80,14 @@ inline T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, ch
     prediction = predict(X, theta, empty);
 
     if (strcmp(predType, "logit") == 0) {
-        result = logLikelihood(prediction, y);
+        result = logLikelihood(*prediction, y);
     }
 
     else {
 
         // calculate initial cost and store result
         prediction->subtract(y, 1);
-        result = cost(prediction);
+        result = cost(*prediction);
     }
 
     delete prediction;
@@ -85,9 +97,9 @@ inline T calculateCost(flatArray<T>* X, flatArray<T>* theta, flatArray<T> *y, ch
 
 
 template <typename T>
-inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta, flatArray<T>* XT, flatArray<T>* nu,
-                          double gamma, double learningRate, int m, flatArray<T>* n, char predType[10], char method[10],
-                          flatArray<T>* epsilon, flatArray<T>* G, int iteration) {
+inline void updateWeights(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta, flatArray<T>& XT, flatArray<T>* nu,
+                          double gamma, double learningRate, int m, T n, char predType[10], char method[10],
+                          T epsilon, flatArray<T>* G, int iteration) {
 
     // variable declaration
     flatArray<T>* error = nullptr;
@@ -102,10 +114,12 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
     //                   updateTerm = ∇J(θ)
     //
         // get error for this step
-        error = predict<T>(X, theta, predType)->subtract(y, 1);
+        error = predict<T>(X, *theta, predType);
+        *error -= y;
 
         // calculate updateTerm = gradient
-        updateTerm = XT->dot(error)->divide(n, 1);
+        updateTerm = XT.dot(*error);
+        *updateTerm /= n;
     }
 
     else if (strcmp(method, "nesterov") == 0) {
@@ -123,13 +137,15 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
         // approximate next position of parameters (θ − γ · v[t-1])
         for (int i = 0; i < m; ++i) {
             T nu_i = nu->getNElement(i) * gamma;
-            tempTheta->setNElement(theta->getNElement(i) - nu_i, i);
+            tempTheta->setNElement((*theta)[i] - nu_i, i);
         }
 
         // calculate the gradient with new theta
-        error = predict<T>(X, tempTheta, predType)->subtract(y, 1);
+        error = predict<T>(X, *tempTheta, predType);
+        *error -= y;
 
-        updateTerm = XT->dot(error)->divide(n, 1);
+        updateTerm = XT.dot(*error);
+        *updateTerm /= n;
 
         delete tempTheta;
 
@@ -152,18 +168,20 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
         flatArray<T>* G_i = nullptr;
 
         // get predictions for this step
-        error = predict<T>(X, theta, predType)->subtract(y, 1);
+        error = predict<T>(X, *theta, predType);
+        (*error) -= y;
 
-        g = XT->dot(error)->divide(n, 1); // g = ∇J(θ[t])
+        g = XT.dot(*error);
+        (*g) /= n; // g = ∇J(θ[t])
 
         g_2 = g->power(2, 0); // g_2 = g[t] ** 2
 
-        G->add(g_2, 1); // G += g_2
+        (*G) += (*g_2); // G += g_2
 
         G_i = G->power(0.5, 0); // G_i = G ** 0.5
-        G_i->add(epsilon, 1); // G_i += e
+        (*G_i) += epsilon; // G_i += e
 
-        updateTerm = g->divide(G_i, 0); // updateTerm = g / G_i
+        updateTerm = g->divide(*G_i, 0); // updateTerm = g / G_i
 
         delete g;
         delete G_i;
@@ -190,13 +208,15 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
 
         // previous mean
         // (E[g[t-1]**2] + e) ** .5
-        E_prev = G->add(epsilon, 0);
+        E_prev = (*G) + epsilon;
         E_prev->power(0.5, 1);
 
         // get predictions for this step
-        error = predict<T>(X, theta, predType)->subtract(y, 1);
+        error = predict<T>(X, *theta, predType);
+        *error -= y;
 
-        g = XT->dot(error)->divide(n, 1); // g = ∇J(θ[t])
+        g = XT.dot(*error);
+        *g /= n; // g = ∇J(θ[t])
 
         g_2 = g->power(2, 0); // g_2 = g[t] ** 2
 
@@ -205,7 +225,7 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
         // delta = (x - mean) / n
         // mean += delta
 
-        g_2->subtract(G, 1);
+        *g_2 -= *G;
 
         // new mean
         for (int j = 0; j < m; ++j) {
@@ -213,10 +233,12 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
             G->setNElement(G->getNElement(j) + temp, j); // G += E[∆θ**2]
         }
 
-        E_i = G->add(epsilon, 0);
+        E_i = *G + epsilon;
         E_i->power(0.5, 1); // RMS[g[t]]
 
-        updateTerm = g->multiply(E_prev->divide(E_i, 1), 0); // g[t] * (RMS[∆θ[t-1]] / RMS[g[t]])
+        updateTerm = *E_prev / *E_i;
+
+        *updateTerm *= *g;// g[t] * (RMS[∆θ[t-1]] / RMS[g[t]])
 
         delete g;
         delete g_2;
@@ -239,16 +261,17 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
 
         flatArray<T>* g = nullptr;
         flatArray<T>* g_2 = nullptr;
-        T epsilon_i = epsilon->getNElement(0);
 
         // previous mean
         // E[g[t-1]**2]
         auto* E_prev = new flatArray<T>(*G);
 
         // get predictions for this step
-        error = predict<T>(X, theta, predType)->subtract(y, 1);
+        error = predict<T>(X, *theta, predType);
+        *error -= y;
 
-        g = XT->dot(error)->divide(n, 1); // g = ∇J(θ[t])
+        g = XT.dot(*error);
+        *g /= n; // g = ∇J(θ[t])
 
         g_2 = g->power(2, 0); // g_2 = g[t] ** 2
 
@@ -259,14 +282,14 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
         //
         // This avoids recalculating the mean after each iteration
 
-        g_2->subtract(G, 1);
+        *g_2 -= *G;
         T temp;
 
         // new mean and gradient update
         for (int j = 0; j < m; ++j) {
             temp = g_2->getNElement(j) / static_cast<T>(iteration + 1);
             G->setNElement(G->getNElement(j) + temp, j); // G += E[∆θ**2]
-            T update = learningRate / pow((gamma * E_prev->getNElement(j) + (1 - gamma) * G->getNElement(j)) + epsilon_i, 0.5);
+            T update = learningRate / pow((gamma * E_prev->getNElement(j) + (1 - gamma) * G->getNElement(j)) + epsilon, 0.5);
             theta->setNElement(theta->getNElement(j) - update * g->getNElement(j), j);
         }
 
@@ -292,6 +315,7 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
     //                 θ[t + 1] = θ[t-1] − v[t]
     //
 
+
     if (updateTerm == nullptr) {
         PyErr_SetString(PyExc_ValueError, "ERROR");
         return;
@@ -312,18 +336,18 @@ inline void updateWeights(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
 
 
 template <typename T>
-void batchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta, flatArray<T>* XT,
+void batchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta, flatArray<T>& XT,
                           flatArray<T>* costArray, flatArray<T>* nu, double e, double epsilon,
                           int maxIteration, char predType[10], double alpha,
-                          double learningRate, int m, flatArray<T>* n, int& iteration, char method[10],
-                          flatArray<T>* fudgeFactor) {
+                          double learningRate, int m, T n, int& iteration, char method[10],
+                          T fudgeFactor) {
 
     // calculate gradient using the whole dataset
     T JOld;
     T JNew;
     auto* G = zeroArray<T>(1, m);
 
-    JNew = calculateCost(X, theta, y, predType);
+    JNew = calculateCost(X, *theta, y, predType);
     costArray->setNElement(JNew, iteration);
 
 
@@ -335,8 +359,10 @@ void batchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
         // update weights
         updateWeights<T>(X, y, theta, XT, nu, alpha, learningRate, m, n, predType, method, fudgeFactor, G, iteration);
 
+//        PyErr_SetString(PyExc_ValueError, std::to_string(y.getNElement(0)).c_str());
+
         // calculate cost for new weights
-        JNew = calculateCost<T>(X, theta, y, predType);
+        JNew = calculateCost<T>(X, *theta, y, predType);
 
         e = fabs(JOld) - fabs(JNew);
 
@@ -350,16 +376,16 @@ void batchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta,
 
 
 template <typename T>
-void getBatches(flatArray<T>* X, flatArray<T>* y, flatArray<T>* XT, flatArray<T>* XNew, flatArray<T>* yNew,
+void getBatches(flatArray<T>& X, flatArray<T>& y, flatArray<T>& XT, flatArray<T>* XNew, flatArray<T>* yNew,
                 flatArray<T>* XTNew, int* rNums, int batchSize, int batchNumber, int n) {
 
     int t=0;
     for (int i = batchSize * batchNumber; i < MIN(batchSize * (batchNumber + 1), n); ++i) {
-        T* rowX = X->getRow(rNums[i]);
-        T* rowXT = XT->getCol(rNums[i]);
+        T* rowX = X.getRow(rNums[i]);
+        T* rowXT = XT.getCol(rNums[i]);
 
         XNew->setRow(rowX, t);
-        yNew->setNElement(y->getNElement(rNums[i]), t);
+        yNew->setNElement(y[rNums[i]], t);
         XTNew->setCol(rowXT, t);
 
         delete rowX;
@@ -371,22 +397,21 @@ void getBatches(flatArray<T>* X, flatArray<T>* y, flatArray<T>* XT, flatArray<T>
 
 
 template <typename T>
-void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* theta, flatArray<T>* XT,
+void minibatchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta, flatArray<T>& XT,
                               flatArray<T>* costArray, flatArray<T>* nu, double e, double epsilon,
                               int maxIteration, char predType[10], double alpha,
-                              double learningRate, int m, flatArray<T>* n, int batchSize, int& iteration,
-                              char method[10], flatArray<T>* fudgeFactor) {
+                              double learningRate, int m, T n, int batchSize, int& iteration,
+                              char method[10], T fudgeFactor) {
 
     // calculate gradient using mini batch (where 1 <= batch_size < m)
     T JOld;
     T JNew;
-    auto nScalar = static_cast<int>(n->getNElement(0));
     auto* G = zeroArray<T>(1, m);
 
-    JNew = calculateCost(X, theta, y, predType);
+    JNew = calculateCost(X, *theta, y, predType);
     costArray->setNElement(JNew, iteration);
 
-    auto batchIterations = static_cast<int>(floor(nScalar / batchSize));
+    auto batchIterations = static_cast<int>(floor(n / batchSize));
 
     int k = 0;
 
@@ -395,13 +420,13 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
         JOld = JNew;
 
         // reshuffle data
-        auto rNums = new int[nScalar];
+        auto rNums = new int[static_cast<int>(n)];
 
-        for (int i = 0; i < nScalar; ++i) {
+        for (int i = 0; i < n; ++i) {
             rNums[i] = i;
         }
 
-        shuffle(rNums, nScalar);
+        shuffle(rNums, n);
         int batchNumber = 0;
         flatArray<T>* XNew = nullptr;
         flatArray<T>* yNew = nullptr;
@@ -414,14 +439,14 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
         for (int i = 0; i < batchIterations; ++i) {
 
 
-            getBatches<T>(X, y, XT, XNew, yNew, XTNew, rNums, batchSize, batchNumber, nScalar);
+            getBatches<T>(X, y, XT, XNew, yNew, XTNew, rNums, batchSize, batchNumber, n);
 
             // update weights using this batch
-            updateWeights<T>(XNew, yNew, theta, XTNew, nu, alpha, learningRate, m, n, predType, method, fudgeFactor, G,
+            updateWeights<T>(*XNew, *yNew, theta, *XTNew, nu, alpha, learningRate, m, batchSize, predType, method, fudgeFactor, G,
                              iteration);
 
             // calculate overall cost
-            JNew = calculateCost<T>(X, theta, y, predType);
+            JNew = calculateCost<T>(X, *theta, y, predType);
 
             costArray->setNElement(JNew, k);
             batchNumber++;
@@ -432,7 +457,7 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
         delete yNew;
         delete XTNew;
 
-        int remainder = nScalar % batchSize;
+        int remainder = static_cast<int>(n) % batchSize;
 
         if (remainder != 0) {
             // in this case we need to perform update with last batch (where this batch < batchSize)
@@ -444,14 +469,14 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
             yNewi = emptyArray<T>(1, remainder);
             XTNewi = emptyArray<T>(m, remainder);
 
-            getBatches<T>(X, y, XT, XNewi, yNewi, XTNewi, rNums, batchSize, batchNumber, nScalar);
+            getBatches<T>(X, y, XT, XNewi, yNewi, XTNewi, rNums, batchSize, batchNumber, n);
 
             // update weights using this batch
-            updateWeights<T>(XNewi, yNewi, theta, XTNewi, nu, alpha, learningRate, m, n, predType, method, fudgeFactor,
+            updateWeights<T>(*XNewi, *yNewi, theta, *XTNewi, nu, alpha, learningRate, m, remainder, predType, method, fudgeFactor,
                              G, iteration);
 
             // calculate overall cost
-            JNew = calculateCost<T>(X, theta, y, predType);
+            JNew = calculateCost<T>(X, *theta, y, predType);
 
             costArray->setNElement(JNew, k);
 
@@ -471,7 +496,7 @@ void minibatchGradientDescent(flatArray<T>* X, flatArray<T>* y, flatArray<T>* th
 
 
 template <typename T>
-int gradientDescent(flatArray<T> *X, flatArray<T> *y, flatArray<T> *theta, int maxIteration, T epsilon,
+int gradientDescent(flatArray<T>& X, flatArray<T> &y, flatArray<T> *theta, int maxIteration, T epsilon,
                     T learningRate, T alpha, flatArray<T>* costArray, char predType[10], int batchSize,
                     int seed, char method[10], T fudge_factor) {
 
@@ -482,23 +507,16 @@ int gradientDescent(flatArray<T> *X, flatArray<T> *y, flatArray<T> *theta, int m
     int iteration = 0;
     double e = epsilon * 2;
 
-    int m = X->getCols();
+    int m = X.getCols();
 
-    auto * nArray = new T[1];
-    nArray[0] = static_cast<T>(X->getRows());
-
-    auto * fArray = new T[1];
-    fArray[0] = fudge_factor;
-
-    auto* n = new flatArray<T>(nArray, 1, 1);
-    auto* fudgeFactor = new flatArray<T>(fArray, 1, 1);
+    auto n = static_cast<T>(X.getRows());
 
     flatArray<T>* XT = nullptr;
     flatArray<T>* nu = nullptr;
 
     // X pyTranspose (m by n matrix)
     // X is a n by m matrix
-    XT = X->transpose();
+    XT = X.transpose();
 
     // initialise nu (when using momentum) as an empty array with same dimensions as theta (m dimensional vector)
     nu = zeroArray<T>(1, theta->getCols());
@@ -506,20 +524,20 @@ int gradientDescent(flatArray<T> *X, flatArray<T> *y, flatArray<T> *theta, int m
     // decide which type of gradient descent to perform (batch or mini batch gradient descent)
     if (batchSize <= 0) {
         // batch gradient descent
-        batchGradientDescent(X, y, theta, XT, costArray, nu, e, epsilon, maxIteration,
-                             predType, alpha, learningRate, m, n, iteration, method, fudgeFactor);
+        batchGradientDescent(X, y, theta, *XT, costArray, nu, e, epsilon, maxIteration,
+                             predType, alpha, learningRate, m, n, iteration, method, fudge_factor);
     }
 
-    else if (batchSize > 0 && batchSize < X->getRows()) {
+    else if (batchSize > 0 && batchSize < X.getRows()) {
         // mini batch gradient descent (if batch size = 1 it's the equivalent of stochastic gradient descent)
-        minibatchGradientDescent(X, y, theta, XT, costArray, nu, e, epsilon, maxIteration, predType,
-                                 alpha, learningRate, m, n, batchSize, iteration, method, fudgeFactor);
+        minibatchGradientDescent(X, y, theta, *XT, costArray, nu, e, epsilon, maxIteration, predType,
+                                 alpha, learningRate, m, n, batchSize, iteration, method, fudge_factor);
     }
 
-    else if (batchSize >= X->getRows()) {
+    else if (batchSize >= X.getRows()) {
         // batch_size > number of examples, default to batch gradient descent
-        batchGradientDescent(X, y, theta, XT, costArray, nu, e, epsilon, maxIteration,
-                             predType, alpha, learningRate, m, n, iteration, method, fudgeFactor);
+        batchGradientDescent(X, y, theta, *XT, costArray, nu, e, epsilon, maxIteration,
+                             predType, alpha, learningRate, m, n, iteration, method, fudge_factor);
     }
 
     else {
@@ -529,10 +547,6 @@ int gradientDescent(flatArray<T> *X, flatArray<T> *y, flatArray<T> *theta, int m
     // free up memory
     delete XT;
     delete nu;
-    delete n;
-    delete [] nArray;
-    delete fudgeFactor;
-    delete [] fArray;
 
     // return number of iterations needed to reach convergence
     return iteration;

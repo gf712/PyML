@@ -71,7 +71,7 @@ static PyObject *GD(PyObject *self, PyObject *args) {
     }
 
     // gradient descent
-    iterations = gradientDescent<double>(X, y, theta, maxIterations, epsilon, learningRate, alpha, costArray, predType,
+    iterations = gradientDescent<double>(*X, *y, theta, maxIterations, epsilon, learningRate, alpha, costArray, predType,
                                          batchSize, seed, method, fudge_factor);
 
     // costArray only needs #iterations columns
