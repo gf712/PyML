@@ -19,6 +19,27 @@
 #ifndef PYML_FLATARRAYS_H
 #define PYML_FLATARRAYS_H
 
+// forward declaration of exceptions to avoid infinite recursion of header files
+template<class T>
+class flatArrayDimensionMismatchException;
+
+template <class T>
+class flatArrayColumnMismatchException;
+
+template <class T>
+class flatArrayRowMismatchException;
+
+template <class T>
+class flatArrayOutOfBoundsException;
+
+template <class T>
+class flatArrayOutOfBoundsRowException;
+
+template <class T>
+class flatArrayOutOfBoundsColumnException;
+
+class flatArrayZeroDivisionError;
+class flatArrayUnknownAxis;
 
 template <class T>
 class flatArray {

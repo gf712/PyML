@@ -8,7 +8,7 @@
 #include <Python.h>
 #include <linearalgebramodule.h>
 #include "linearalgebramodule.cpp"
-#include "../../utils/include/exceptionClasses.h"
+#include "exceptionClasses.h"
 #include "arrayInitialisers.cpp"
 
 // Exceptions

@@ -13,7 +13,6 @@
  *
  */
 #include "pythonconverters.h"
-#include "exceptionClasses.h"
 #include "linearalgebramodule.h"
 
 template <class T>

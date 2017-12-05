@@ -5,6 +5,7 @@
 #include <flatArrays.h>
 #include "flatArrays.cpp"
 #include "linearalgebramodule.h"
+#include "exceptionClasses.h"
 
 // Handle errors
 // static PyObject *algebraError;

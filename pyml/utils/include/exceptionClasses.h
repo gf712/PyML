@@ -22,11 +22,11 @@ template <class T>
 class flatArrayDimensionMismatchException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayDimensionMismatchException(flatArray<T> *A, flatArray<T>* B) {
-        std::string thisColumn = std::to_string(A->getCols());
-        std::string thisRow = std::to_string(A->getRows());
-        std::string otherColumn = std::to_string(B->getCols());
-        std::string otherRow = std::to_string(B->getRows());
+    flatArrayDimensionMismatchException(const flatArray<T> &A, const flatArray<T> &B) {
+        std::string thisColumn = std::to_string(A.getCols());
+        std::string thisRow = std::to_string(A.getRows());
+        std::string otherColumn = std::to_string(B.getCols());
+        std::string otherRow = std::to_string(B.getRows());
 
         std::string msg = "Shape mismatch! Got an array of shape {" + thisRow + ", " + thisColumn + "} and {" + otherRow + ", " + otherColumn + "}!";
 
@@ -43,9 +43,9 @@ template <class T>
 class flatArrayColumnMismatchException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayColumnMismatchException(flatArray<T> *A, flatArray<T>* B) {
-        std::string thisColumn = std::to_string(A->getCols());
-        std::string otherColumn = std::to_string(B->getCols());
+    flatArrayColumnMismatchException(const flatArray<T> &A, const flatArray<T> &B) {
+        std::string thisColumn = std::to_string(A.getCols());
+        std::string otherColumn = std::to_string(B.getCols());
 
         std::string msg = "Column number mismatch! Got an array with " + thisColumn + " columns and an array with " + otherColumn + " columns!";
 
@@ -62,9 +62,9 @@ template <class T>
 class flatArrayRowMismatchException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayRowMismatchException(flatArray<T> *A, flatArray<T>* B) {
-        std::string thisRow = std::to_string(A->getRows());
-        std::string otherRow = std::to_string(B->getRows());
+    flatArrayRowMismatchException(const flatArray<T> &A, const flatArray<T> &B) {
+        std::string thisRow = std::to_string(A.getRows());
+        std::string otherRow = std::to_string(B.getRows());
 
         std::string msg = "Row number mismatch! Got an array with " + thisRow + " rows and an array with " + otherRow + " rows!";
 
@@ -81,10 +81,10 @@ template <class T>
 class flatArrayOutOfBoundsException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayOutOfBoundsException(flatArray<T> *A, int n) {
+    flatArrayOutOfBoundsException(const flatArray<T> &A, int n) {
 
         std::string nString = std::to_string(n);
-        std::string sizeString = std::to_string(A->getSize());
+        std::string sizeString = std::to_string(A.getSize());
 
         std::string msg = "Accessing an element that is out of bounds! Attempting to access element at position "
                           + nString + " in an array of size " + sizeString + " !";
@@ -102,10 +102,10 @@ template <class T>
 class flatArrayOutOfBoundsRowException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayOutOfBoundsRowException(flatArray<T> *A, int n) {
+    flatArrayOutOfBoundsRowException(const flatArray<T> &A, int n) {
 
         std::string nString = std::to_string(n);
-        std::string sizeString = std::to_string(A->getRows());
+        std::string sizeString = std::to_string(A.getRows());
 
         std::string msg = "Accessing an element that is out of bounds! Attempting to access row "
                           + nString + " in an array with " + sizeString + " rows!";
@@ -123,10 +123,10 @@ template <class T>
 class flatArrayOutOfBoundsColumnException: public flatArrayException {
     std::string errorMsg;
 public:
-    flatArrayOutOfBoundsColumnException(flatArray<T> *A, int n) {
+    flatArrayOutOfBoundsColumnException(const flatArray<T> &A, int n) {
 
         std::string nString = std::to_string(n);
-        std::string sizeString = std::to_string(A->getCols());
+        std::string sizeString = std::to_string(A.getCols());
 
         std::string msg = "Accessing an element that is out of bounds! Attempting to access column "
                           + nString + " in an array with " + sizeString + " columns!";
