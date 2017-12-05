@@ -30,3 +30,9 @@ class PCATest(unittest.TestCase):
     def test_PCA_inverse(self):
         R = self.decomposer.train_transform(self.X)
         self.assertAlmostEqual(self.decomposer.inverse(R)[1][2], self.X[1][2])
+
+    def test_PCA_explained_var(self):
+        self.assertAlmostEqual(self.decomposer.explained_variance[0], 4.1966751631979795)
+
+    def test_PCA_explained_var_ratio(self):
+        self.assertAlmostEqual(self.decomposer.explained_variance_ratio[0], 0.9246162071742684)

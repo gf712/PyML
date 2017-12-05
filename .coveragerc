@@ -6,4 +6,4 @@
 
     exclude_lines =
         raise NotImplementedError
-        warning.warn
+        warnings.warn
