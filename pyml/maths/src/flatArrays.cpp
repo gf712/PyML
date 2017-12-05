@@ -14,70 +14,7 @@
  */
 #include "pythonconverters.h"
 #include "linearalgebramodule.h"
-
-template <class T>
-int flatArray<T>::getRows() {
-    return flatArray::rows;
-}
-
-template <class T>
-int flatArray<T>::getCols() {
-    return flatArray::cols;
-}
-
-template <class T>
-void flatArray<T>::setRows(int r) {
-    rows = r;
-    // update size
-    size = rows * cols;
-}
-
-template <class T>
-void flatArray<T>::setCols(int c) {
-    cols = c;
-    // update size
-    size = rows * cols;
-}
-
-template <class T>
-T* flatArray<T>::getArray() {
-    return flatArray::array;
-}
-
-template <class T>
-int flatArray<T>::getSize() {
-    return size;
-}
-
-template <class T>
-T flatArray<T>::getNElement(int n) {
-    if (n > size) {
-        throw flatArrayOutOfBoundsException<T>(this, n);
-    }
-    return array[n];
-}
-
-template <class T>
-void flatArray<T>::setNElement(T value, int n) {
-    if (n > size) {
-        throw flatArrayOutOfBoundsException<T>(this, n);
-    }
-    array[n] = value;
-}
-
-template <class T>
-void flatArray<T>::setElement(T value, int row, int col) {
-    int n = cols * row + col;
-
-    setNElement(value, n);
-}
-
-template <class T>
-T flatArray<T>::getElement(int row, int col) {
-    int n = cols * row + col;
-
-    return getNElement(n);
-}
+#include "exceptionClasses.h"
 
 
 template <class T>
@@ -112,94 +49,25 @@ T flatArray<T>::sum() {
 }
 
 template <class T>
-T* flatArray<T>::getRow(int i) {
-
-    if (i > rows) {
-        throw flatArrayOutOfBoundsRowException<T>(this, i);
-    }
-
-    T *row = nullptr;
-
-    row = new T [cols];
-    int n = 0;
-
-    for (int j = i * cols; j < (i + 1) * cols; ++j) {
-        row[n] = array[j];
-        n++;
-    }
-
-    return row;
-}
-
-template <class T>
-T *flatArray<T>::getCol(int j) {
-
-    if (j > cols) {
-        throw flatArrayOutOfBoundsColumnException<T>(this, j);
-    }
-
-    T *column = nullptr;
-
-    column = new T [rows];
-    int n = 0;
-
-    for (int i = j; i < size; i+=cols) {
-        column[n] = array[i];
-        n++;
-    }
-
-    return column;
-}
-
-template <class T>
-void flatArray<T>::setRow(T *row, int i) {
-
-    if (i > rows) {
-        throw flatArrayOutOfBoundsRowException<T>(this, i);
-    }
-
-    int n = 0;
-
-    for (int j = i * cols; j < (i + 1) * cols; ++j) {
-        array[j] = row[n];
-        n++;
-    }
-}
-
-template <class T>
-void flatArray<T>::setCol(T *column, int j) {
-
-    if (j > cols) {
-        throw flatArrayOutOfBoundsColumnException<T>(this, j);
-    }
-
-    int n = 0;
-    for (int k = j; k < size; k+=cols) {
-        array[k] = column[n];
-        n++;
-    }
-}
-
-template <class T>
-flatArray<T>* flatArray<T>::dot(flatArray* other) {
+flatArray<T>* flatArray<T>::dot(const flatArray& other) {
 
     flatArray<T>* result = nullptr;
 
-    if (other->getRows() > 1) {
+    if (other.getRows() > 1) {
         // matrix matrix multiplication
-        if (cols != other->getRows()) {
-            throw flatArrayColumnMismatchException<T>(this, other);
+        if (cols != other.getRows()) {
+            throw flatArrayColumnMismatchException<T>(*this, other);
         }
 
-        result = emptyArray<T>(rows, other->getCols());
+        result = emptyArray<T>(rows, other.getCols());
 
         int rRows = result->getRows();
         int rCols = result->getCols();
         int N = getCols();
-        int M = other->getCols();
+        int M = other.getCols();
         int n, i, j, k, posA, posB;
         T eResult;
-        T *otherArray = other->getArray();
+        T *otherArray = other.getArray();
 
         for (i = 0; i < rRows; ++i) {
             for (j = 0; j < rCols; ++j) {
@@ -221,14 +89,14 @@ flatArray<T>* flatArray<T>::dot(flatArray* other) {
         return result;
     }
 
-    else if (other->getRows() == 1) {
+    else if (other.getRows() == 1) {
         // matrix/vector vector multiplication
-        if (cols != other->getCols()){
-            throw flatArrayDimensionMismatchException<T>(this, other);
+        if (cols != other.getCols()){
+            throw flatArrayDimensionMismatchException<T>(*this, other);
         }
 
         result = emptyArray<T>(1, rows);
-        T *v = other->getArray();
+        T *v = other.getArray();
 
         int n = 0;
         for (int i = 0; i < rows; ++i) {
@@ -244,29 +112,41 @@ flatArray<T>* flatArray<T>::dot(flatArray* other) {
     }
 
     else {
-        throw flatArrayDimensionMismatchException<T>(this, other);
+        throw flatArrayDimensionMismatchException<T>(*this, other);
     }
 }
 
 
-// this is a template for elementwise operations
+// templates for elementwise operations (matrix and scalar)
 template <typename T>
-void elementwiseTemplate(flatArray<T>* self, flatArray<T>* other, T (f(T,T)), T* result) {
+void scalarElementwiseTemplate(flatArray<T>& self, const T other, T (f(T, T)), T* result) {
 
-    int rows = self->getRows();
-    int cols = self->getCols();
-    int size = self->getSize();
-    T* array = self->getArray();
+    int size = self.getSize();
+    T* array = self.getArray();
 
-    if (other->getCols() > 1 && other->getRows() == 1 && rows > 1) {
+    for (int i = 0; i < size; ++i) {
+        result[i] = f(array[i], other);
+    }
+}
+
+
+template <typename T>
+void elementwiseTemplate(flatArray<T>& self, const flatArray<T> &other, T (f(T, T)), T* result) {
+
+    int rows = self.getRows();
+    int cols = self.getCols();
+    int size = self.getSize();
+    T* array = self.getArray();
+
+    if (other.getCols() > 1 && other.getRows() == 1 && rows > 1) {
         // other is a vector and self is a matrix
 
         // if square matrix will prioritise column wise operation f (consider transposing matrix
         // if this is not what you want)
-        if (rows == other->getCols()) {
+        if (rows == other.getCols()) {
 
             // number of rows match number of dimensions of vector
-            T *B = other->getRow(0);
+            T *B = other.getRow(0);
             int n = 0;
             for (int i = 0; i < rows; ++i) {
 
