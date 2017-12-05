@@ -6,7 +6,7 @@
 
 
 #include <Python.h>
-#include <linearalgebramodule.h>
+#include "linearalgebramodule.h"
 #include "linearalgebramodule.cpp"
 #include "exceptionClasses.h"
 #include "arrayInitialisers.cpp"
@@ -40,7 +40,7 @@ static PyObject* dot_product(PyObject* self, PyObject *args) {
 
     // calculate dot product
     try {
-        result = A->dot(V);
+        result = A->dot(*V);
     }
     catch (flatArrayDimensionMismatchException<double> &e) {
         PyErr_SetString(DimensionMismatchException, e.what());
@@ -131,7 +131,7 @@ static PyObject* add(PyObject* self, PyObject *args) {
 
     // subtraction
     try {
-        A->add(B, 1);
+        (*A) += (*B);
     }
 
     catch (flatArrayDimensionMismatchException<double> &e) {
@@ -185,7 +185,7 @@ static PyObject* subtract(PyObject* self, PyObject *args) {
 
     // subtraction
     try {
-        A->subtract(B, 1);
+        (*A) -= (*B);
     }
 
     catch (flatArrayDimensionMismatchException<double> &e) {
@@ -238,7 +238,7 @@ static PyObject* multiply(PyObject* self, PyObject *args) {
     B = readFromPythonList<double>(pBArray);
 
     // calculate elementwise multiplication with B
-    A->multiply(B, 1);
+    (*A) *= (*B);
 
     // convert vector to python list
     PyObject* result_py_list = ConvertFlatArray_PyList(A, "float");
@@ -278,7 +278,7 @@ static PyObject* divide(PyObject* self, PyObject *args) {
 
     // calculate elementwise division by n
     try {
-        A->divide(B, 1);
+        (*A) /= (*B);
     }
     catch (flatArrayZeroDivisionError &e) {
         PyErr_SetString(ZeroDivisionError, e.what());
@@ -423,7 +423,7 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
 
     // get theta estimate using least squares
     try {
-        leastSquares<double>(X, y, theta);
+        leastSquares<double>(*X, *y, theta);
     }
     catch (singularMatrixException &e) {
         PyErr_SetString(LinearAlgebraException, e.what());

@@ -113,7 +113,7 @@ void gaussianElimination(flatArray<T> *A, T *result) {
 
 
 template <typename T>
-void leastSquares(flatArray<T> *X, flatArray<T> *y, T *theta) {
+void leastSquares(flatArray<T> &X, flatArray<T> &y, T *theta) {
 
     // variable declaration
     flatArray<T>* A = nullptr;
@@ -121,7 +121,7 @@ void leastSquares(flatArray<T> *X, flatArray<T> *y, T *theta) {
     flatArray<T>* XTX = nullptr;
     flatArray<T>* right = nullptr;
 
-    int m = X->getCols();
+    int m = X.getCols();
     int n;
     int XTXn=0;
 
@@ -131,7 +131,7 @@ void leastSquares(flatArray<T> *X, flatArray<T> *y, T *theta) {
     // start algorithm
 
     // first transpose X and get XT
-    XT = X->transpose();
+    XT = X.transpose();
 
     // XT is a m by n matrix
     // an m by n matrix multiplied by a n by m matrix results in a m by m matrix
@@ -488,7 +488,7 @@ double determinant(flatArray<T>* array) {
 
         signs = signChart<T>(rows, cols);
 
-        C = M->multiply(signs);
+        C = (*M) * (*signs);
 
         T* row = array->getRow(0);
 

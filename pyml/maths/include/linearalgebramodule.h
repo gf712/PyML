@@ -8,7 +8,7 @@
 #define MATHS_LINEARALGEBRAMODULE_H
 
 template <typename T>
-void leastSquares(flatArray<T>* X, flatArray<T>* y, T *theta);
+void leastSquares(flatArray<T>& X, flatArray<T>& y, T *theta);
 
 template <typename T>
 flatArray<T>* covariance(flatArray<T> *X);
