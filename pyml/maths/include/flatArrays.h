@@ -52,12 +52,13 @@ private:
 public:
 
     // constructor
-    flatArray(T* array, int rows, int cols) {
+    flatArray(T* const array, int rows, int cols) {
         flatArray::rows = rows;
         flatArray::cols = cols;
         flatArray::size = rows * cols;
         flatArray::array = new T [size];
 
+        // creates a copy of input array and stores in flatArray::array
         for (int i = 0; i < size; ++i) {
             flatArray::array[i] = array[i];
         }
@@ -66,7 +67,7 @@ public:
     // destructor
     ~flatArray() {
         delete [] array;
-    };
+    }
 
     // Copy constructor
     flatArray(const flatArray& source) {
@@ -129,31 +130,91 @@ public:
 
     // GETTERS/SETTERS
     // column and row size
-    int getRows();
-    int getCols();
-    void setRows(int r);
-    void setCols(int c);
+    int getRows()const {return rows;}
+    int getCols()const {return cols;}
+    void setRows(int r) {rows = r;}
+    void setCols(int c) {cols = c;}
 
 
     // matrix size
-    int getSize();
+    int getSize()const {return size;};
 
     // get array
-    T* getArray();
+    T * getArray()const {return array;};
 
     // get array element by row and column
-    T getElement(int row, int col);
-    void setElement(T value, int row, int col);
+    T getElement(int row, int col) {return array[row * cols + col];}
+    void setElement(T value, int row, int col) {array[row * cols + col] = value;}
 
-    // set array element by row and column
-    T getNElement(int n);
-    void setNElement(T value, int n);
+    // set array element by element position inD array
+    T getNElement(int n)const {return array[n];}
+    void setNElement(T value, int n)const { array[n] = value;}
 
     // row and column
-    T* getRow(int i);
-    T* getCol(int j);
-    void setRow(T *row, int i);
-    void setCol(T *row, int j);
+    T * getRow(int i)const {
+
+        if (i > rows) {
+            throw flatArrayOutOfBoundsRowException<T>(*this, i);
+        }
+
+        T *row = nullptr;
+
+        row = new T [cols];
+        int n = 0;
+
+        for (int j = i * cols; j < (i + 1) * cols; ++j) {
+            row[n] = array[j];
+            n++;
+        }
+
+        return row;
+    }
+
+    T* getCol(int j){
+
+        if (j > cols) {
+            throw flatArrayOutOfBoundsColumnException<T>(*this, j);
+        }
+
+        T *column = nullptr;
+
+        column = new T [rows];
+        int n = 0;
+
+        for (int i = j; i < size; i+=cols) {
+            column[n] = array[i];
+            n++;
+        }
+
+        return column;
+    }
+
+    void setRow(const T *row, int i) {
+
+        if (i > rows) {
+            throw flatArrayOutOfBoundsRowException<T>(*this, i);
+        }
+
+        int n = 0;
+
+        for (int j = i * cols; j < (i + 1) * cols; ++j) {
+            array[j] = row[n];
+            n++;
+        }
+    }
+
+    void setCol(const T *column, int j) {
+
+        if (j > cols) {
+            throw flatArrayOutOfBoundsColumnException<T>(*this, j);
+        }
+
+        int n = 0;
+        for (int k = j; k < size; k+=cols) {
+            array[k] = column[n];
+            n++;
+        }
+    }
 
     // row and column slices
     T *getRowSlice(int i, int start, int end);
