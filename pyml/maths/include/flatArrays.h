@@ -162,20 +162,29 @@ public:
     // MATRIX MANIPULATION/LINEAR ALGEBRA
     flatArray<T>* transpose();
     T sum();
-    flatArray<T>* dot(flatArray *other);
-    flatArray<T>* subtract(flatArray *other, int replace=0);
-    flatArray<T>* add(flatArray *other, int replace=0);
+    flatArray<T>* dot(const flatArray& other);
+
+    flatArray<T>* subtract(const flatArray& other, int replace=0);
+    flatArray<T>* subtract(T other, int replace=0);
+
+    flatArray<T>* add(const flatArray& other, int replace=0);
+    flatArray<T>* add(T other, int replace=0);
+
+    flatArray<T>* divide(const flatArray& other, int replace=0);
+    flatArray<T>* divide(T other, int replace=0);
+
+    flatArray<T>* multiply(const flatArray& other, int replace=0);
+    flatArray<T>* multiply(T other, int replace=0);
+
     flatArray<T>* power(double p, int replace=0);
-    flatArray<T>* divide(flatArray *other, int replace=0);
-    flatArray<T>* multiply(flatArray *other, int replace=0);
-    flatArray<T>* nlog(double base);
+
+    flatArray<T>* nlog(double base, int replace=0);
     flatArray<T>* mean(int axis);
     flatArray<T>* std(int degreesOfFreedom, int axis);
     flatArray<T>* var(int degreesOfFreedom, int axis);
     T* diagonal();
     double det();
-    flatArray<T>* invertSign(int replace=0);
+    flatArray<T>& invertSign(int replace=0);
 };
-
 
 #endif //PYML_FLATARRAYS_H
