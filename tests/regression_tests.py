@@ -194,23 +194,25 @@ class MultiClassLogisticRegressionMiniBatch(unittest.TestCase):
         cls.classifier.train(X=cls.X_train, y=cls.y_train)
 
     def test_MLogRMin_iterations(self):
-        self.assertEqual(self.classifier.iterations[0], 1670)
+        self.assertEqual(self.classifier.iterations[0], 905)
+        self.assertEqual(self.classifier.iterations[1], 789)
+        self.assertEqual(self.classifier.iterations[2], 841)
 
     def test_MLogRMin_coefficients(self):
-        self.assertAlmostEqual(self.classifier.coefficients[0][-1], -6.166939294187147, delta=0.001)
-        self.assertAlmostEqual(self.classifier.coefficients[1][-1], 3.9011202616018834, delta=0.001)
-        self.assertAlmostEqual(self.classifier.coefficients[2][-1], 1.4360170566346704, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[0][-1], -8.55590366737834, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[1][-1], 5.300981091494979, delta=0.001)
+        self.assertAlmostEqual(self.classifier.coefficients[2][-1], 1.9547910473910273, delta=0.001)
 
     def test_MLogRMin_cost(self):
-        self.assertAlmostEqual(self.classifier.cost[0][-1], -38.882733287747826, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[1][-1], -71.22041849047173, delta=0.001)
-        self.assertAlmostEqual(self.classifier.cost[2][-1], -39.508909436219405, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[0][-1], -28.947086360092676, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[1][-1], -63.442959967464574, delta=0.001)
+        self.assertAlmostEqual(self.classifier.cost[2][-1], -30.33741258448764, delta=0.001)
 
     def test_MLogRMin_predict(self):
         self.assertEqual(self.classifier.predict(self.X_test)[0], 1)
 
     def test_MLogRMin_predict_proba(self):
-        self.assertAlmostEqual(self.classifier.predict_proba(self.X_test)[0][0], 0.047083994898380166, delta=0.001)
+        self.assertAlmostEqual(self.classifier.predict_proba(self.X_test)[0][0], 0.017049079187284634, delta=0.001)
 
     def test_MLogRMin_accuracy(self):
         self.assertAlmostEqual(self.classifier.score(self.X_test, self.y_test), 0.9833333333333333, delta=0.001)
