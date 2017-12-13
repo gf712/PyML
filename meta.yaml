@@ -1,0 +1,46 @@
+package:
+  name: pyml
+  version: '0.2.1'
+
+source:
+  path: ./ #[unix and py3k]
+
+build:
+  number: 0
+  script: python setup.py install --single-version-externally-managed --record record.txt
+
+requirements:
+  build:
+    - python
+    - setuptools
+    - gcc   # [not osx]
+    - llvm  # [osx]
+
+  run:
+    - python
+    - setuptools
+
+test:
+  requires:
+    - pytest
+
+  source_files:
+    - tests/
+
+  commands:
+    - pytest tests/*
+
+
+about:
+
+  home: https://github.com/gf712/PyML
+
+  license: MIT License
+
+  summary: " Machine Learning algorithms in Python and C written from scratch using the respective standard libraries"
+
+  description: |
+
+    PyML is a Python package with machine learning algorithms written in Python and C/C++.
+
+  dev_url: https://github.com/gf712/PyML/tree/dev
