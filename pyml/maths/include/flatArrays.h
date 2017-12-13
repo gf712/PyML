@@ -135,7 +135,6 @@ public:
     void setRows(int r) {rows = r;}
     void setCols(int c) {cols = c;}
 
-
     // matrix size
     int getSize()const {return size;};
 
@@ -246,6 +245,6 @@ public:
     T* diagonal();
     double det();
     flatArray<T>& invertSign(int replace=0);
-};
+    };
 
 #endif //PYML_FLATARRAYS_H
