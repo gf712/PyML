@@ -16,6 +16,10 @@ PyML is a Python package with machine learning algorithms written in Python and 
 
 Installation
 ============
+
+From source:
+------------
+
 :bash:`git clone git@github.com:gf712/PyML.git`
 
 :bash:`cd to/folder/of/pyml`
@@ -25,6 +29,11 @@ Installation
 To verify installation you should run:
 
 :bash:`python setup.py test`
+
+From anaconda:
+--------------
+
+:bash:`conda install -c gf712 pyml`
 
 Usage
 =====
@@ -39,6 +48,14 @@ Usage
 
 Changelog
 =========
+Version 0.2.2 (TBC):
+--------------------
+ - Major:
+    - Library now available on anaconda
+
+ - Minor:
+    - Backend speed improvements
+
 Version 0.2.1 (05/12/2017):
 ---------------------------
  - Major:
