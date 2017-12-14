@@ -7,11 +7,21 @@ PyML
     :target: https://coveralls.io/github/gf712/PyML?branch=master
 .. image:: https://travis-ci.org/gf712/PyML.svg?branch=master
     :target: https://travis-ci.org/gf712/PyML
+.. image:: https://anaconda.org/gf712/pyml/badges/installer/conda.svg
+    :target: https://conda.anaconda.org/gf712
+.. image:: https://anaconda.org/gf712/pyml/badges/downloads.svg
+    :target: https://anaconda.org/gf712/pyml
+.. image:: https://anaconda.org/gf712/pyml/badges/version.svg
+    :target: https://anaconda.org/gf712/pyml
 
 PyML is a Python package with machine learning algorithms written in Python and C/C++.
 
 Installation
 ============
+
+From source:
+------------
+
 :bash:`git clone git@github.com:gf712/PyML.git`
 
 :bash:`cd to/folder/of/pyml`
@@ -21,6 +31,11 @@ Installation
 To verify installation you should run:
 
 :bash:`python setup.py test`
+
+From anaconda:
+--------------
+
+:bash:`conda install -c gf712 pyml`
 
 Usage
 =====
@@ -35,6 +50,14 @@ Usage
 
 Changelog
 =========
+Version 0.2.1.1 (14/12/2017):
+--------------------
+ - Major:
+    - Library now available on anaconda
+
+ - Minor:
+    - Backend speed improvements
+
 Version 0.2.1 (05/12/2017):
 ---------------------------
  - Major:

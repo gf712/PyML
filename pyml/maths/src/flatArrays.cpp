@@ -19,22 +19,21 @@
 
 template <class T>
 flatArray<T>* flatArray<T>::transpose() {
-    // faster transpose method
-    flatArray* result = nullptr;
 
-    result = emptyArray <T> (cols, rows);
+    auto result = emptyArray <T> (cols, rows);
 
     for (int n = 0; n < rows * cols; ++n) {
 
         int column = n / rows;
         int row = n % rows * cols;
 
-        result->setNElement(array[row + column], n);
-
-        }
+        result->setNElement(array[row + column],n);
+    }
 
     return result;
 }
+
+
 
 template <class T>
 T flatArray<T>::sum() {
@@ -99,14 +98,17 @@ flatArray<T>* flatArray<T>::dot(const flatArray& other) {
         T *v = other.getArray();
 
         int n = 0;
+        T row_result;
+
         for (int i = 0; i < rows; ++i) {
-            T row_result  = 0;
+            row_result = 0;
             for (int j = 0; j < cols; ++j) {
                 row_result += array[n] * v[j];
                 n++;
             }
             result->setNElement(row_result, i);
         }
+
 
         return result;
     }
@@ -119,19 +121,19 @@ flatArray<T>* flatArray<T>::dot(const flatArray& other) {
 
 // templates for elementwise operations (matrix and scalar)
 template <typename T>
-void scalarElementwiseTemplate(flatArray<T>& self, const T other, T (f(T, T)), T* result) {
+void scalarElementwiseTemplate(flatArray<T>& self, const T other, T (f(T, T)), flatArray<T>* result) {
 
     int size = self.getSize();
     T* array = self.getArray();
 
     for (int i = 0; i < size; ++i) {
-        result[i] = f(array[i], other);
+        (*result)[i] = f(array[i], other);
     }
 }
 
 
 template <typename T>
-void elementwiseTemplate(flatArray<T>& self, const flatArray<T> &other, T (f(T, T)), T* result) {
+void elementwiseTemplate(flatArray<T>& self, const flatArray<T> &other, T (f(T, T)), flatArray<T>* result) {
 
     int rows = self.getRows();
     int cols = self.getCols();
@@ -153,7 +155,7 @@ void elementwiseTemplate(flatArray<T>& self, const flatArray<T> &other, T (f(T, 
                 for (int j = 0; j < cols; ++j) {
 
                     // operation f on each row by the ith element of other vector
-                    result[n] = f(array[n], B[i]);
+                    (*result)[n] = f(array[n], B[i]);
 
                     n++;
                 }
@@ -173,7 +175,7 @@ void elementwiseTemplate(flatArray<T>& self, const flatArray<T> &other, T (f(T, 
                 for (int j = 0; j < cols; ++j) {
 
                     // operation f on each each column by the ith element of other vector
-                    result[n] = f(array[n], B[j]);
+                    (*result)[n] = f(array[n], B[j]);
 
                     n++;
                 }
@@ -197,7 +199,7 @@ void elementwiseTemplate(flatArray<T>& self, const flatArray<T> &other, T (f(T, 
         T *B = other.getArray();
 
         for (int n = 0; n < size; ++n) {
-            result[n] = f(array[n], B[n]);
+            (*result)[n] = f(array[n], B[n]);
         }
     }
 
@@ -207,7 +209,7 @@ void elementwiseTemplate(flatArray<T>& self, const flatArray<T> &other, T (f(T, 
         T B = other.getNElement(0);
 
         for (int n = 0; n < size; ++n) {
-            result[n] = f(array[n], B);
+            (*result)[n] = f(array[n], B);
         }
 
     }
@@ -225,19 +227,15 @@ flatArray<T>* elementwiseHelper(flatArray<T>* self, const flatArray<T> &other, T
 
         int rows = self->getRows();
         int cols = self->getCols();
-        auto* newArray = new T[rows * cols];
+        auto* result = emptyArray<T>(rows, cols);
 
-        elementwiseTemplate<T>(*self, other, f, newArray);
-
-        auto result = new flatArray<T>(newArray, rows, cols);
-
-        delete newArray;
+        elementwiseTemplate<T>(*self, other, f, result);
 
         return result;
     }
 
     else {
-        elementwiseTemplate<T>(*self, other, f, self->getArray());
+        elementwiseTemplate<T>(*self, other, f, self);
         return self;
     }
 }
@@ -250,19 +248,15 @@ flatArray<T>* scalarElementwiseHelper(flatArray<T>* self, const T other, T (f(T,
 
         int rows = self->getRows();
         int cols = self->getCols();
-        auto* newArray = new T[rows * cols];
+        auto* result = emptyArray<T>(rows, cols);
 
-        scalarElementwiseTemplate<T>(*self, other, f, newArray);
-
-        auto result = new flatArray<T>(newArray, rows, cols);
-
-        delete newArray;
+        scalarElementwiseTemplate<T>(*self, other, f, result);
 
         return result;
     }
 
     else {
-        scalarElementwiseTemplate<T>(*self, other, f, self->getArray());
+        scalarElementwiseTemplate<T>(*self, other, f, self);
         return self;
     }
 }
@@ -271,7 +265,7 @@ flatArray<T>* scalarElementwiseHelper(flatArray<T>* self, const T other, T (f(T,
 template <class T>
 flatArray<T>* flatArray<T>::add(const flatArray<T> &other, int replace) {
 
-    T (*f)(T, T)=[](T a, T b) { return (a + b); };
+    auto f =[](T a, T b) { return (a + b); };
 
     return elementwiseHelper<T>(this, other, f, replace);
 }
@@ -280,7 +274,7 @@ flatArray<T>* flatArray<T>::add(const flatArray<T> &other, int replace) {
 template <class T>
 flatArray<T> *flatArray<T>::add(T other, int replace) {
 
-    T (*f)(T, T)=[](T a, T b) { return (a + b); };
+    auto f =[](T a, T b) { return (a + b); };
 
     return scalarElementwiseHelper<T>(this, other, f, replace);
 }
@@ -290,7 +284,7 @@ flatArray<T> *flatArray<T>::add(T other, int replace) {
 template <class T>
 flatArray<T>* flatArray<T>::subtract(const flatArray<T> &other, int replace) {
 
-    T (*f)(T, T)=[](T a, T b) { return (a - b); };
+    auto f =[](T a, T b) { return (a - b); };
 
     return elementwiseHelper<T>(this, other, f, replace);
 }
@@ -299,7 +293,7 @@ flatArray<T>* flatArray<T>::subtract(const flatArray<T> &other, int replace) {
 template <class T>
 flatArray<T> *flatArray<T>::subtract(T other, int replace) {
 
-    T (*f)(T, T)=[](T a, T b) { return (a - b); };
+    auto f =[](T a, T b) { return (a - b); };
 
     return scalarElementwiseHelper<T>(this, other, f, replace);
 }
@@ -308,7 +302,7 @@ flatArray<T> *flatArray<T>::subtract(T other, int replace) {
 template <class T>
 flatArray<T>* flatArray<T>::divide(const flatArray<T> &other, int replace) {
 
-    T (*f)(T, T)=[](T a, T b) { if (b != 0) {return (a / b);} else {throw flatArrayZeroDivisionError();} };
+    auto f =[](T a, T b) { if (b != 0) {return (a / b);} else {throw flatArrayZeroDivisionError();} };
 
     return elementwiseHelper<T>(this, other, f, replace);
 }
@@ -316,7 +310,7 @@ flatArray<T>* flatArray<T>::divide(const flatArray<T> &other, int replace) {
 template <class T>
 flatArray<T> *flatArray<T>::divide(const T other, int replace) {
 
-    T (*f)(T, T)=[](T a, T b) { if (b != 0) {return (a / b);} else {throw flatArrayZeroDivisionError();} };
+    auto f =[](T a, T b) { if (b != 0) {return (a / b);} else {throw flatArrayZeroDivisionError();} };
 
     return scalarElementwiseHelper<T>(this, other, f, replace);
 }
@@ -325,7 +319,7 @@ flatArray<T> *flatArray<T>::divide(const T other, int replace) {
 template <class T>
 flatArray<T>* flatArray<T>::multiply(const flatArray<T> &other, int replace) {
 
-    T (*f)(T, T)=[](T a, T b) { return (a * b); };
+    auto f =[](T a, T b) { return (a * b); };
 
     return elementwiseHelper<T>(this, other, f, replace);
 
@@ -335,7 +329,7 @@ flatArray<T>* flatArray<T>::multiply(const flatArray<T> &other, int replace) {
 template <class T>
 flatArray<T> *flatArray<T>::multiply(T other, int replace) {
 
-    T (*f)(T, T)=[](T a, T b) { return (a * b); };
+    auto f =[](T a, T b) { return (a * b); };
 
     return scalarElementwiseHelper<T>(this, other, f, replace);
 }
@@ -344,7 +338,7 @@ flatArray<T> *flatArray<T>::multiply(T other, int replace) {
 template <class T>
 flatArray<T>* flatArray<T>::power(double p, int replace) {
 
-    T (*f)(T, T)=[](T a, T b) { return (pow(a, b)); };
+    auto f =[](T a, T b) { return (pow(a, b)); };
 
     return scalarElementwiseHelper<T>(this, p, f, replace);
 }
@@ -354,7 +348,7 @@ template <class T>
 flatArray<T>* flatArray<T>::nlog(double base, int replace) {
 
 
-    T (*f)(T, T)=[](T a, T b) { return (log(a) / log(b)); };
+    auto f =[](T a, T b) { return (log(a) / log(b)); };
 
     return scalarElementwiseHelper<T>(this, base, f, replace);
 }
@@ -376,7 +370,7 @@ flatArray<T>* flatArray<T>::mean(int axis) {
 
         rowResult /= static_cast<T>(cols);
 
-        result->setNElement(rowResult, 0);
+        (*result)[0] = rowResult;
     }
 
     else if (rows > 1) {
@@ -398,7 +392,7 @@ flatArray<T>* flatArray<T>::mean(int axis) {
 
                 colResult /= static_cast<T>(rows);
 
-                result->setNElement(colResult, i);
+                (*result)[i] = colResult;
 
                 delete [] colArray;
             }
@@ -421,7 +415,7 @@ flatArray<T>* flatArray<T>::mean(int axis) {
 
                 rowResult /= static_cast<T>(cols);
 
-                result->setNElement(rowResult, i);
+                (*result)[i] = rowResult;
 
                 delete [] rowArray;
             }
