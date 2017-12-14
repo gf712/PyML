@@ -4,43 +4,32 @@ import warnings
 
 
 class KMeans(ClusterBase):
-    def __init__(self, k=3, initialisation='Forgy', max_iterations=100, min_change=1,
+    def __init__(self, k=3, initialisation='forgy', max_iterations=100, min_change=1,
                  seed=None, norm='l1'):
-
         """
         KMeans implementation
 
-        :type k: int
-        :type initialisation: str
-        :type max_iterations: int
-        :type min_change: int
-        :type seed: None or int
-        :type norm: str or int
+        Args:
+            k (int): number of clusters.
+            initialisation (str): indicates method to initialise clusters (currently forgy or random).
+            max_iterations (int): maximum number of iterations.
+            min_change (int): minimum assignment changes after each iteration required to continue algorithm.
+            seed (int or NoneType): sets random seed.
+            norm (str): norm to use in the calculation of distances between each point and all centroids,
+                 e.g. 'l2' or 2 are equivalent to using the euclidean distance.
 
-        :param k: number of clusters
-        :param initialisation: indicates method to initialise clusters (currently Forgy or Random)
-        :param max_iterations: maximum number of iterations
-        :param min_change: minimum assignment changes after each iteration required to continue algorithm
-        :param seed: sets random seed
-        :param norm: norm to use in the calculation of distances between each point and all centroids,
-         e.g. 'l2' or 2 are equivalent to using the euclidean distance
-
-
-        Example:
-        --------
-
-        >>> from pyml.cluster import KMeans
-        >>> from pyml.datasets.random_data import gaussian
-        >>> from pyml.preprocessing import train_test_split
-        >>> datapoints, labels = gaussian(n=100, d=2, labels=3, sigma=0.1, seed=1970)
-        >>> X_train, y_train, X_test, y_test = train_test_split(datapoints, labels, train_split=0.95, seed=1970)
-        >>> kmeans = KMeans(k=3, max_iterations=1000, seed=1970)
-        >>> _ = kmeans.train(X_train, y_train)
-        >>> kmeans.iterations
-        7
-        >>> kmeans.centroids[1]
-        [0.12801075816403754, 0.21926563270201577]
-
+        Examples:
+            >>> from pyml.cluster import KMeans
+            >>> from pyml.datasets.random_data import gaussian
+            >>> from pyml.preprocessing import train_test_split
+            >>> datapoints, labels = gaussian(n=100, d=2, labels=3, sigma=0.1, seed=1970)
+            >>> X_train, y_train, X_test, y_test = train_test_split(datapoints, labels, train_split=0.95, seed=1970)
+            >>> kmeans = KMeans(k=3, max_iterations=1000, seed=1970)
+            >>> _ = kmeans.train(X_train, y_train)
+            >>> kmeans.iterations
+            7
+            >>> kmeans.centroids[1]
+            [0.12801075816403754, 0.21926563270201577]
         """
         ClusterBase.__init__(self)
 
@@ -54,26 +43,29 @@ class KMeans(ClusterBase):
         self._max_iterations = max_iterations
         self._min_change = min_change
 
-        if initialisation in ['Forgy', 'Random']:
+        if initialisation in ['forgy', 'random']:
             self._initialisation = initialisation
         else:
             raise ValueError("Unknown initialisation method.")
 
     def _train(self, X, y=None):
         """
-        KMeans clustering to determine the position of centroids and cluster assignment given number of clusters (k)
+        KMeans clustering to determine the position of centroids and cluster assignment given number of clusters (k).
 
-        Algorithm:
-        ----------
+        Args:
+            X (list): list of size N of lists (all of size M) to perform KMeans on
+            y (NoneType): KMeans does not use labels
 
-        1. Initiate centroid coordinates
-        2. Assign cluster labels to each point of X
-        3. Update centroid coordinates of each cluster (average of each dimension of all point in a cluster)
-        4. Repeat 2 and 3 until reaching one of the stopping criteria
+        Notes:
+            Algorithm:
+                1. Initiate centroid coordinates
+                2. Assign cluster labels to each point of X
+                3. Update centroid coordinates of each cluster (average of each dimension of all point in a cluster)
+                4. Repeat 2 and 3 until reaching one of the stopping criteria
 
         :type X: list
         :type y: None
-        :param X: list of size N of lists (all of size M) to perform KMeans on
+        :param X: 
         :param y: None
         :rtype: object
         :return: self
