@@ -14,7 +14,7 @@ env:
 install:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install md5sha1sum; fi
-    - source install_miniconda.sh
+    - source build_tools/travis/install_miniconda.sh
     - hash -r
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
@@ -34,4 +34,4 @@ script:
 
 after_success:
     - coveralls
-    - codecov
+    - codecov || echo "codecov upload failed"
