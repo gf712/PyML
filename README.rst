@@ -11,6 +11,8 @@ PyML
     :target: https://conda.anaconda.org/gf712
 .. image:: https://anaconda.org/gf712/pyml/badges/downloads.svg
     :target: https://anaconda.org/gf712/pyml
+.. image:: https://anaconda.org/gf712/pyml/badges/version.svg
+    :target: https://anaconda.org/gf712/pyml
 
 PyML is a Python package with machine learning algorithms written in Python and C/C++.
 
