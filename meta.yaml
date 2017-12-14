@@ -16,7 +16,7 @@ requirements:
     - setuptools
 #    - {{compiler('cxx')}}
 #    - gxx_{{target_platform}}
-    - gcc >= 4.8 # [osx]
+    - gcc >=4.8 # [osx]
 
   run:
     - python

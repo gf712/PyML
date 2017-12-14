@@ -4,6 +4,21 @@ from ..utils import set_seed
 
 def gaussian(n=100, d=2, labels=3, sigma=1, seed=None, shuffle=True):
 
+    """
+    Builds a dummy dataset using a gaussian distribution.
+
+    Args:
+        n (int): number of datapoints per label
+        d (int): number of dimensions
+        labels (int): number of labels
+        sigma (float): mean of distribution
+        seed (int or NoneType): random seed
+        shuffle (bool): whether to shuffle data
+
+    Returns:
+        tuple: (list with datapoints, labels of datapoints)
+    """
+
     set_seed(seed)
 
     means = [[random.random() for dim in range(d)] for label in range(labels)]
@@ -26,7 +41,25 @@ def gaussian(n=100, d=2, labels=3, sigma=1, seed=None, shuffle=True):
     return datapoints, data_labels
 
 
-def regression(n=100, noise='gaussian', mu=0, sigma=1, x_min=[0], x_max=[10], intercept=0, gradient=[1], seed=None):
+def regression(n=100, noise='gaussian', mu=0, sigma=1, x_min=[0], x_max=[10], gradient=[1], seed=None):
+
+    """
+    Create a dummy dataset to perform regression. EXPERIMENTAL (can create a singular matrix)
+    Args:
+        n (int): number of datapoints
+        noise (str): type of noise to add to the data
+            Currently only gaussian is supported
+        mu (float): mean of the noise
+        sigma (float): standard deviation of the noise
+        x_min (list): minimum value of each feature
+        x_max (list): maxium value of each feature
+        gradient (list): gradient of each feature
+        seed (int or NoneType): set random seed
+
+    Returns:
+        tuple: (feature values, target values)
+
+    """
 
     set_seed(seed=seed)
 

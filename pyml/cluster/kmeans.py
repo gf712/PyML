@@ -53,8 +53,8 @@ class KMeans(ClusterBase):
         KMeans clustering to determine the position of centroids and cluster assignment given number of clusters (k).
 
         Args:
-            X (list): list of size N of lists (all of size M) to perform KMeans on
-            y (NoneType): KMeans does not use labels
+            X (list): list of size N of lists (all of size M) to perform KMeans on.
+            y (NoneType): KMeans does not use labels.
 
         Notes:
             Algorithm:
@@ -99,91 +99,86 @@ class KMeans(ClusterBase):
 
     def _predict(self, X):
         """
-        Predict cluster assignment using centroids from training step
+        Predict cluster assignment using centroids from training step.
 
-        :param X: list of size N of lists (all of size M) to perform prediction
-        :rtype: list
-        :return: list of label predictions
+        Args:
+            X (list): list of size N of lists (all of size M) to perform prediction.
+
+        Returns:
+            list: list of label predictions.
         """
+
         return self._assign_cluster(X)
 
     def _update_centroids(self):
         """
         Update rule of KMeans.
-        Directly updates _centroids attribute
-        :return: None
+        Directly updates _centroids attribute.
         """
+
         self._centroids = [self._get_cluster_mean(x) for x in range(self.k)]
 
     @property
     def k(self):
         """
-        Number of clusters
-        :getter: Returns the number of clusters k
-        :type: int
+        int: returns the number of clusters k.
         """
+
         return self._k
 
     @property
     def n(self):
         """
-        Number of training examples
-        :getter: Returns the number of training examples
-        :type: int
+        int: Returns the number of training examples.
         """
+
         return self._n
 
     @property
     def iterations(self):
         """
-        Number of iterations of KMeans (if train method has been called)
-        :getter: Returns the number of KMeans algorithm iterations
-        :type: int
+        int: Returns the number of KMeans algorithm iterations (if train method has been called).
         """
+
         return self._iterations
 
     @property
     def max_iterations(self):
         """
-        Maximum number of iterations to run KMeans for.
-        :getter: Returns the maximum number of iterations
-        :type: int
+        int: Returns the maximum number of iterations.
         """
+
         return self._max_iterations
 
     @property
     def min_change(self):
         """
-        Minimum label changes per iteration.
-        :getter: Returns the minimum number of changes per iteration
-        :type: int
+        int: Returns the minimum number of changes per iteration
         """
+
         return self._min_change
 
     @property
     def seed(self):
         """
-        Random seed.
-        :getter: Returns the random seed number.
-        :type: int
+        int: Returns the random seed number.
         """
+
         return self._seed
 
     @property
     def centroids(self):
         """
-        List of centroid coordinates
-        :getter: Returns a list of lists with centroid coordinates
-        :type: list
+        list: Returns a list of lists with centroid coordinates.
         """
+
         return self._centroids
 
     @property
     def norm(self):
         """
-        Norm for distance calculation
-        :getter: Returns the norm used for distance calculations
-        :type: int
+        int: Returns the norm used for distance calculations.
         """
+
         return self._norm
 
