@@ -19,13 +19,14 @@ install:
     - sudo apt-get update
     - source install_miniconda.sh
     - source activate test-environment
+    - conda install conda-build
     - pip install coveralls
     - pip install coverage
     - pip install codecov
-#    - python setup.py install
 
 script:
     - conda build --quiet .
+    - conda install pyml --use-local
     - coverage run setup.py test
 
 after_success:
