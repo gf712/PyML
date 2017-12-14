@@ -6,6 +6,9 @@ os:
   - linux
   - osx
 
+compiler:
+  - gcc
+
 env:
   - CONDA_PY=3.5
   - CONDA_PY=3.6
