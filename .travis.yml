@@ -17,7 +17,7 @@ python:
 # Install packages
 install:
     - sudo apt-get update
-    - source activate install_miniconda.sh
+    - source install_miniconda.sh
     - source activate test-environment
     - pip install coveralls
     - pip install coverage
