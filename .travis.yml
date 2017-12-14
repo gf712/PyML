@@ -6,13 +6,9 @@ os:
   - linux
   - osx
 
-compiler:
-  - gcc
-  - clang
-
-python:
-    - 3.5
-    - 3.6
+env:
+  - CONDA_PY=3.5
+  - CONDA_PY=3.6
 
 # Install packages
 install:
@@ -24,14 +20,14 @@ install:
     - conda install conda-build
     # Useful for debugging any issues with conda
     - conda info -a
-    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
+    - conda create -q -n test-environment python=$CONDA_PY
     - source activate test-environment
     - pip install coveralls
     - pip install coverage
     - pip install codecov
 
 script:
-    - conda build --quiet --python=$TRAVIS_PYTHON_VERSION .
+    - conda build --quiet --python=$CONDA_PY .
     - conda install pyml --use-local
     - coverage run setup.py test
 
