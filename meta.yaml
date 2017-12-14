@@ -11,17 +11,17 @@ build:
 
 requirements:
   build:
-    - python
+    - python >=3.5
     - setuptools
     - {{ compiler('cxx') }}
 
   run:
-    - python
+    - python >=3.5
     - setuptools
 
 test:
   requires:
-    - python
+    - python >=3.5
     - pytest
 
   source_files:
