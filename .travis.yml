@@ -18,13 +18,20 @@ python:
 install:
     - sudo apt-get update
     - source install_miniconda.sh
+    - hash -r
+    - conda config --set always_yes yes --set changeps1 no
+    - conda update -q conda
+    - conda install conda-build
+    # Useful for debugging any issues with conda
+    - conda info -a
+    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
     - source activate test-environment
     - pip install coveralls
     - pip install coverage
     - pip install codecov
 
 script:
-    - conda build --quiet .
+    - conda build --quiet --python=$TRAVIS_PYTHON_VERSION .
     - conda install pyml --use-local
     - coverage run setup.py test
 

@@ -17,12 +17,3 @@ bash $MINICONDA -b -p $HOME/miniconda
 export PATH="$HOME/miniconda/bin:$PATH"
 
 rm -f $MINICONDA
-
-
-hash -r
-conda config --set always_yes yes --set changeps1 no
-conda update -q conda
-conda install conda-build
-# Useful for debugging any issues with conda
-conda info -a
-conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
