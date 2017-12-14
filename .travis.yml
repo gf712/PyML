@@ -13,22 +13,24 @@ env:
   - CONDA_PY=3.5
   - CONDA_PY=3.6
 
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install md5sha1sum; fi
+
 # Install packages
 install:
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install md5sha1sum; fi
-    - source build_tools/travis/install_miniconda.sh
-    - hash -r
-    - conda config --set always_yes yes --set changeps1 no
-    - conda update -q conda
-    - conda install conda-build
-    # Useful for debugging any issues with conda
-    - conda info -a
-    - conda create -q -n test-environment python=$CONDA_PY
-    - source activate test-environment
-    - pip install coveralls
-    - pip install coverage
-    - pip install codecov
+  - source build_tools/travis/install_miniconda.sh
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda install conda-build
+  # Useful for debugging any issues with conda
+  - conda info -a
+  - conda create -q -n test-environment python=$CONDA_PY
+  - source activate test-environment
+  - pip install coveralls
+  - pip install coverage
+  - pip install codecov
 
 script:
     - conda build --quiet --python=$CONDA_PY .
