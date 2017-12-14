@@ -1,10 +1,14 @@
 PyML
 ====
-[![Build Status](https://travis-ci.org/gf712/PyML.svg?branch=dev)](https://travis-ci.org/gf712/PyML)
-[![Coverage Status](https://coveralls.io/repos/github/gf712/PyML/badge.svg)](https://coveralls.io/github/gf712/PyML)
+
 [![Anaconda-Server Badge](https://anaconda.org/gf712/pyml/badges/installer/conda.svg)](https://conda.anaconda.org/gf712)
 [![Anaconda-Server Badge](https://anaconda.org/gf712/pyml/badges/downloads.svg)](https://anaconda.org/gf712/pyml)
 [![Anaconda-Server Badge](https://anaconda.org/gf712/pyml/badges/version.svg)](https://anaconda.org/gf712/pyml)
+
+Branch      | Linux/OSX | Coverage |
+------------|-----------|---------|
+[master](https://github.com/boostorg/beast/tree/master)   | [![Build Status](https://travis-ci.org/gf712/PyML.svg?branch=master)](https://travis-ci.org/gf712/PyML) | [![Coverage Status](https://coveralls.io/repos/github/gf712/PyML/badge.svg)](https://coveralls.io/github/gf712/PyML)
+[dev](https://github.com/boostorg/beast/tree/dev)  |  [![Build Status](https://travis-ci.org/gf712/PyML.svg?branch=dev)](https://travis-ci.org/gf712/PyML) | [![Coverage Status](https://coveralls.io/repos/github/gf712/PyML/badge.svg?branch=dev)](https://coveralls.io/github/gf712/PyML?branch=dev)
 
 PyML is a Python package with machine learning algorithms written in Python and C/C++.
 
