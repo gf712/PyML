@@ -4,87 +4,86 @@ from pyml.maths.math_utils import argsort
 
 def dot_product(u, v):
     """
-    Matrix/matrix, matrix/vector and vector/vector dot product
+    Matrix/matrix, matrix/vector and vector/vector dot product.
 
-    :param u:
-    :param v:
-    :return:
+    Args:
+        u (list): either a list or a list of lists representing a vector or matrix, respectively.
+        v (list): either a list or a list of lists representing a vector or matrix, respectively.
 
-    Example:
-    --------
+    Returns:
+        list:
 
-    >>> from pyml.maths.linear_algebra import dot_product
-    >>> u = [1, 2, 3]
-    >>> v = [4, 5, 6]
-    >>> x = dot_product(u, v)
-    >>> print(x)
-    [32.0]
-    >>> A = [[1, -1, 2], [0, -3, 1]]
-    >>> x = [2, 1, 0]
-    >>> result = dot_product(A, x)
-    >>> print(result)
-    [1.0, -3.0]
-    >>> A = [[0, -4, 4], [-3, -2, 0]]
-    >>> B = [[0, 1], [2, 1], [-1, 3]]
-    >>> result = dot_product(A, B)
-    >>> print(result)
-    [[-12.0, 8.0], [-4.0, -5.0]]
-
+    Examples:
+        >>> from pyml.maths.linear_algebra import dot_product
+        >>> u = [1, 2, 3]
+        >>> v = [4, 5, 6]
+        >>> x = dot_product(u, v)
+        >>> print(x)
+        [32.0]
+        >>> A = [[1, -1, 2], [0, -3, 1]]
+        >>> x = [2, 1, 0]
+        >>> result = dot_product(A, x)
+        >>> print(result)
+        [1.0, -3.0]
+        >>> A = [[0, -4, 4], [-3, -2, 0]]
+        >>> B = [[0, 1], [2, 1], [-1, 3]]
+        >>> result = dot_product(A, B)
+        >>> print(result)
+        [[-12.0, 8.0], [-4.0, -5.0]]
     """
+
     # TODO: write exceptions to help user with errors from the backend
     return Clinear_algebra.dot_product(u, v)
 
 
 def transpose(A):
     """
-    Matrix transposition
+    Matrix transposition.
 
-    :rtype m: list
-    :param m: a list of lists representing a matrix A
-    :rtype: list
-    :return: a list of lists representing the transpose of matrix A
+    Args:
+        A (list): a list of lists representing a matrix.
 
-    Example:
-    --------
+    Returns:
+        list: a list of lists representing the transpose of matrix A.
+
+    Examples:
 
     >>> A = [[0, -4, 4], [-3, -2, 0]]
     >>> print(transpose(A))
     [[0.0, -3.0], [-4.0, -2.0], [4.0, 0.0]]
-
     """
+
     # TODO: write exceptions to help user with errors from the backend
     return Clinear_algebra.transpose(A)
 
 
 def add(A, B):
     """
-    Calculates elementwise sum of each element in a list (vector) or list of lists (matrix)
-    If matrix has the same number of columns or rows as the vector the vector is automatically broadcast to fit the matrix
+    Calculates elementwise addition of each element in a list (vector) or list of lists (matrix).
+    If matrix has the same number of columns or rows as the vector the vector is automatically broadcast to fit the matrix.
 
-    :type A: list
-    :type B: scalar or list
+    Args:
+        A (list):  either a list or a list of lists representing a vector or matrix, respectively.
+        B (list):  either a list or a list of lists representing a vector or matrix, respectively.
 
-    :param A: either a list or a list of lists representing a vector or matrix, respectively
-    :param B: either a list or a list of lists representing a vector or matrix, respectively
+    Returns:
+        list: same format as A (list or list of lists).
 
-    :rtype: list
-    :return: same format as A (list or list of lists)
+    Examples:
+        >>> from pyml.maths import add
+        >>> A = [[0, -4, 4], [-3, -2, 0]]
+        >>> B = [0, 1, 2]
+        >>> print(add(A, B))
+        [[0.0, -3.0, 6.0], [-3.0, -1.0, 2.0]]
+        >>> C = [0, 1]
+        >>> print(add(A, C))
+        [[0.0, -4.0, 4.0], [-2.0, -1.0, 1.0]]
+        >>> D = [[1, 5, 11], [-5, -7, 10]]
+        >>> print(add(A, D))
+        [[1.0, 1.0, 15.0], [-8.0, -9.0, 10.0]]
 
-    Example:
-    --------
-
-    >>> from pyml.maths import add
-    >>> A = [[0, -4, 4], [-3, -2, 0]]
-    >>> B = [0, 1, 2]
-    >>> print(add(A, B))
-    [[0.0, -3.0, 6.0], [-3.0, -1.0, 2.0]]
-    >>> C = [0, 1]
-    >>> print(add(A, C))
-    [[0.0, -4.0, 4.0], [-2.0, -1.0, 1.0]]
-    >>> D = [[1, 5, 11], [-5, -7, 10]]
-    >>> print(add(A, D))
-    [[1.0, 1.0, 15.0], [-8.0, -9.0, 10.0]]
     """
+
     # TODO: write exceptions to help user with errors from the backend
     if isinstance(B, (float, int)):
         B = [B]
@@ -93,34 +92,32 @@ def add(A, B):
 
 
 def subtract(A, B):
+
     """
-    Calculates elementwise difference of each element in a list (vector) or list of lists (matrix)
-    If matrix has the same number of columns or rows as the vector the vector is automatically broadcast to fit the matrix
+    Calculates elementwise difference of each element in a list (vector) or list of lists (matrix).
+    If matrix has the same number of columns or rows as the vector the vector is automatically broadcast to fit the matrix.
+    
+    Args:
+        A (list): either a list or a list of lists representing a vector or matrix, respectively.
+        B (list): either a list or a list of lists representing a vector or matrix, respectively.
 
-    :type A: list
-    :type B: scalar or list
+    Returns:
+        list: same format as A (list or list of lists).
 
-    :param A: either a list or a list of lists representing a vector or matrix, respectively
-    :param B: either a list or a list of lists representing a vector or matrix, respectively
-
-    :rtype: list
-    :return: same format as A (list or list of lists)
-
-    Example:
-    --------
-
-    >>> from pyml.maths import subtract
-    >>> A = [[0, -4, 4], [-3, -2, 0]]
-    >>> B = [0, 1, 2]
-    >>> print(subtract(A, B))
-    [[0.0, -5.0, 2.0], [-3.0, -3.0, -2.0]]
-    >>> C = [0, 1]
-    >>> print(subtract(A, C))
-    [[0.0, -4.0, 4.0], [-4.0, -3.0, -1.0]]
-    >>> D = [[1, 5, 11], [-5, -7, 10]]
-    >>> print(subtract(A, D))
-    [[-1.0, -9.0, -7.0], [2.0, 5.0, -10.0]]
+    Examples:
+        >>> from pyml.maths import subtract
+        >>> A = [[0, -4, 4], [-3, -2, 0]]
+        >>> B = [0, 1, 2]
+        >>> print(subtract(A, B))
+        [[0.0, -5.0, 2.0], [-3.0, -3.0, -2.0]]
+        >>> C = [0, 1]
+        >>> print(subtract(A, C))
+        [[0.0, -4.0, 4.0], [-4.0, -3.0, -1.0]]
+        >>> D = [[1, 5, 11], [-5, -7, 10]]
+        >>> print(subtract(A, D))
+        [[-1.0, -9.0, -7.0], [2.0, 5.0, -10.0]]
     """
+
     # TODO: write exceptions to help user with errors from the backend
     if isinstance(B, (float, int)):
         B = [B]
@@ -130,25 +127,22 @@ def subtract(A, B):
 
 def power(A, n):
     """
-    Calculates elementwise power of a list (vector) or list of lists (matrix)
+    Calculates elementwise power of a list (vector) or list of lists (matrix).
 
-    :type A: list
-    :type n: int
+    Args:
+        A (list): either a list or a list of lists.
+        n (float): exponent.
 
-    :param A: either a list or a list of lists
-    :param n: int to calculate the power
+    Returns:
+        list: same shape as A (list or list of lists).
 
-    :rtype: list
-    :return: same shape as A (list or list of lists)
-
-    Example:
-    --------
-
-    >>> from pyml.maths import power
-    >>> A = [[0, -4, 4], [-3, -2, 0]]
-    >>> print(power(A, 2))
-    [[0.0, 16.0, 16.0], [9.0, 4.0, 0.0]]
+    Examples:
+        >>> from pyml.maths import power
+        >>> A = [[0, -4, 4], [-3, -2, 0]]
+        >>> print(power(A, 2))
+        [[0.0, 16.0, 16.0], [9.0, 4.0, 0.0]]
     """
+
     # TODO: write exceptions to help user with errors from the backend
     return Clinear_algebra.power(A, n)
 
@@ -156,25 +150,22 @@ def power(A, n):
 def multiply(A, B):
     """
     Calculates elementwise multiplication of a list (vector) or list of lists (matrix) with another vector or matrix
-    and automatic broadcasting if needed
+    and automatic broadcasting if needed.
 
-    :type A: list
-    :type B: scalar or list
+    Args:
+        A (list): either a list (vector) or a list of lists (matrix).
+        B (list): either a list (vector) or a list of lists (matrix) or a constant.
 
-    :param A: either a list (vector) or a list of lists (matrix)
-    :param B: either a list (vector) or a list of lists (matrix) or a constant
+    Returns:
+        list: matrix divided by constant n with the same shape as A (list or list of lists).
 
-    :rtype: list
-    :return: matrix divided by constant n with the same shape as A (list or list of lists)
-
-    Example:
-    --------
-
-    >>> from pyml.maths import multiply
-    >>> A = [[0, -4, 4], [-3, -2, 0]]
-    >>> print(multiply(A, 2))
-    [[0.0, -8.0, 8.0], [-6.0, -4.0, 0.0]]
+    Examples:
+        >>> from pyml.maths import multiply
+        >>> A = [[0, -4, 4], [-3, -2, 0]]
+        >>> print(multiply(A, 2))
+        [[0.0, -8.0, 8.0], [-6.0, -4.0, 0.0]]
     """
+
     if isinstance(B, (float, int)):
         B = [B]
 
@@ -182,26 +173,26 @@ def multiply(A, B):
 
 
 def divide(A, B):
+
     """
-    Calculates elementwise division of a list (vector) or list of lists (matrix)
+    Calculates elementwise division of a list (vector) or list of lists (matrix).
+    Args:
+        A (list): either a list or a list of lists.
+        B (list or float): scalar to perform division.
 
-    :type A: list
-    :type B: scalar or list
+    Returns:
+        list: matrix divided by constant n with the same shape as A (list or list of lists).
 
-    :param A: either a list or a list of lists
-    :param B: scalar to perform division
+    Raises:
+        ZeroDivisionError: If any of the values in B is 0.
 
-    :rtype: list
-    :return: matrix divided by constant n with the same shape as A (list or list of lists)
-
-    Example:
-    --------
-
-    >>> from pyml.maths import divide
-    >>> A = [[0, -4, 4], [-3, -2, 0]]
-    >>> print(divide(A, 2))
-    [[0.0, -2.0, 2.0], [-1.5, -1.0, 0.0]]
+    Examples:
+        >>> from pyml.maths import divide
+        >>> A = [[0, -4, 4], [-3, -2, 0]]
+        >>> print(divide(A, 2))
+        [[0.0, -2.0, 2.0], [-1.5, -1.0, 0.0]]
     """
+
     if isinstance(B, (float, int)):
         B = [B]
     try:
@@ -212,39 +203,36 @@ def divide(A, B):
 
 def determinant(A):
     """
-    Calculates the determinant of matrix A
+    Calculates the determinant of matrix A.
 
-    :type A: list
+    Args:
+        A (list): list of lists representing a square matrix.
 
-    :param A: list of lists representing a square matrix
+    Returns:
+        float: determinant of matrix A.
 
-    :rtype: float
-    :return: determinant of matrix A
-
-    Example:
-    --------
-
-    >>> from pyml.maths import determinant
-    >>> A = [[3, 1], [5, 2]]
-    >>> print(determinant(A))
-    1.0
+    Examples:
+        >>> from pyml.maths import determinant
+        >>> A = [[3, 1], [5, 2]]
+        >>> print(determinant(A))
+        1.0
     """
+
     return Clinear_algebra.determinant(A)
 
 
 def least_squares(X, y):
     """
-    Solves a system of linear equations using Gaussian elimination
+    Solves a system of linear equations using Gaussian elimination.
 
-    :type X: list
-    :type y: list
+    Args:
+        X (list): list of lists representing a matrix.
+        y (list): a vector with all targets.
 
-    :param X: list of lists representing a matrix
-    :param y: a vector with all targets
+    Returns:
+        list: list with the same number of dimensions as the number of columns of X with the solution of the system of
+            linear equations.
 
-    :rtype: list
-    :return: list with the same number of dimensions as the number of columns of X with the solution of the system of
-    linear equations
     """
     # TODO: write exceptions to help user with errors from the backend
 
@@ -253,33 +241,30 @@ def least_squares(X, y):
 
 def eigen(array, tolerance=1.0e-9, max_iterations=0, sort=True, normalise=True):
     """
-    :type array: list
-    :type tolerance: float
-    :type max_iterations: int
-    :type sort: bool
-    :type normalise: bool
+    Eigendecomposition of square matrices with Jacobi rotations.
 
-    :param array: list of lists representing a matrix
-    :param tolerance: early stopping parameter of Jacobi matrix decomposition algorithm
-    :param max_iterations: maximum number of iterations of Jacobi matrix decomposition algorithm
-    :param sort: whether or not to sort eigenvalues (descending) and respective eigenvectors
-    :param normalise: whether or not to normalise eigenvectors using eigenvectors of the first eigenvalue
+    Args:
+        array (list): list of lists representing a matrix.
+        tolerance (Optional[float]): early stopping parameter of Jacobi matrix decomposition algorithm.
+            Defaults to 1.0e-9.
+        max_iterations (Optional[int]): maximum number of iterations of Jacobi matrix decomposition algorithm.
+            Defaults to 0, and in the C++ code is calculated as 5 * n ** 2.
+        sort (Optional[bool]): whether or not to sort eigenvalues (descending) and respective eigenvectors.
+        normalise (Optional[bool]): whether or not to normalise eigenvectors using eigenvectors of the first eigenvalue.
 
-    :rtype: tuple
-    :return: (eigenvalues (list), eigenvectors(list of lists))
+    Returns:
+        tuple: (eigenvalues (list), eigenvectors(list of lists)).
 
-    Example:
-    --------
-
-    >>> from pyml.maths import eigen
-    >>> S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]
-    >>> w, v = eigen(S)
-    >>> v = [[round(x, 1) for x in row] for row in v]
-    >>> w = [round(x, 1) for x in w]
-    >>> print(v)
-    [[1.0, 1.0, 1.0], [-1.0, -0.0, 2.0], [1.0, -1.0, 1.0]]
-    >>> print(w)
-    [4.0, 3.0, 1.0]
+    Examples:
+        >>> from pyml.maths import eigen
+        >>> S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]
+        >>> w, v = eigen(S)
+        >>> v = [[round(x, 1) for x in row] for row in v]
+        >>> w = [round(x, 1) for x in w]
+        >>> print(v)
+        [[1.0, 1.0, 1.0], [-1.0, -0.0, 2.0], [1.0, -1.0, 1.0]]
+        >>> print(w)
+        [4.0, 3.0, 1.0]
 
     """
 
