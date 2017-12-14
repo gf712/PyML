@@ -41,7 +41,7 @@ Usage
 
 Changelog
 =========
-## Version 0.2.2 (TBC):
+## Version 0.2.1.1 (14/12/2017):
  - Major:
     - Library now available on anaconda
  

@@ -1,9 +1,9 @@
 package:
   name: pyml
-  version: '0.2.1'
+  version: '0.2.1.1'
 
 source:
-  path: ./ #[unix and py3k]
+  path: ./
 
 build:
   number: 0
@@ -13,8 +13,7 @@ requirements:
   build:
     - python
     - setuptools
-    - gcc   # [not osx]
-    - llvm  # [osx]
+    - {{ compiler('cxx') }}
 
   run:
     - python
@@ -22,13 +21,15 @@ requirements:
 
 test:
   requires:
+    - python
     - pytest
 
   source_files:
-    - tests/
+    - pytest.ini
+    - tests/*
 
   commands:
-    - pytest tests/*
+    - pytest
 
 
 about:
