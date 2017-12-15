@@ -13,8 +13,16 @@ env:
   - CONDA_PY=3.5
   - CONDA_PY=3.6
 
+matrix:
+include:
+  - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
+
 before_install:
   - source build_tools/travis/before_install.sh
+  - eval "${MATRIX_EVAL}"
 
 # Install packages
 install:
