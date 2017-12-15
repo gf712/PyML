@@ -9,13 +9,34 @@ import warnings
 class LinearBase(BaseLearner, Predictor):
 
     """
-    Base class for linear models
     """
 
     def __init__(self, learning_rate, epsilon, max_iterations, alpha, fudge_factor, batch_size, method, seed, _type):
         """
-        Inherits methods from BaseLearner
+        Base class for linear models.
+        Inherits methods from BaseLearner and Predictor.
+
+        Args:
+            learning_rate (float): learning rate of gradient descent.
+            epsilon (float): early stopping criterium for gradient descent.
+                If the difference in loss of two consecutive iterations is less than delta the algorithm stops.
+            max_iterations (int): maximum number of gradients descent iterations.
+            alpha (float): momentum of gradient descent
+            fudge_factor (float): fudge factor to prevent zero divisions.
+            batch_size (int): batch size to perform batch gradients descent.
+                Set to one to perform stochastic gradient descent
+            method (str): gradient descent method.
+                - 'normal'
+                - 'nesterov'
+                - 'adagrad'
+                - 'adadelta'
+                - 'rmsprop'
+            seed (int or NoneType): set random seed
+            _type (str): tells backend to perform classification or regression
+                - 'regression'
+                - 'classification'
         """
+
         BaseLearner.__init__(self)
         Predictor.__init__(self)
 
@@ -48,14 +69,17 @@ class LinearBase(BaseLearner, Predictor):
         self._fudge_factor = fudge_factor
 
     def _initiate_weights(self, bias):
-        """
-        initialisation of weights
 
-        :type bias: bool
-        :param bias: whether or not to include bias, and if so add a column of 1's
-        :rtype: None
-        :return: returns init coefficients
         """
+        Weight initialisation method.
+
+        Args:
+            bias (bool): whether or not to include bias, and if so add a column of 1's.
+
+        Returns (list): returns initialised coefficients.
+
+        """
+
         if bias:
             coefficients = [random.gauss(0, 1) for x in range(self._n_features + 1)]
             self.X = [[1] + row for row in self.X]
