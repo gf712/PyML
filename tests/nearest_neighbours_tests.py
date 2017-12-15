@@ -41,8 +41,8 @@ class TestKNNRegressor(unittest.TestCase):
 
     def test_predict(self):
         predictions = self.regressor.predict(X=self.X_test)
-        self.assertEqual(predictions[:5], [3.1161666191379163, 4.933573052500679, 6.611283497257544,
-                                           9.185848057766739, 3.110023909806445])
+        self.assertEqual(predictions[1:5], [4.933573052500679, 6.611283497257544,
+                                            9.185848057766739, 3.110023909806445])
 
     def test_score_mse(self):
         mse = self.regressor.score(X=self.X_test, y_true=self.y_test, scorer='mse')

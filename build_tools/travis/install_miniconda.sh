@@ -16,3 +16,6 @@ bash $MINICONDA -b -p $HOME/miniconda
 export PATH="$HOME/miniconda/bin:$PATH"
 
 rm -f $MINICONDA
+
+echo "$CC"
+echo "$CXX"
