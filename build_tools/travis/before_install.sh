@@ -1,7 +1,5 @@
 #!/bin/bash
 
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then apt-get update; fi
-
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install md5sha1sum; fi
 
 #if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then

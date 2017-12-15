@@ -34,6 +34,7 @@ install:
 script:
     - conda build --quiet --python=$CONDA_PY .
     - conda install pyml --use-local
+    - which gcc
     - coverage run setup.py test
 
 after_success:
