@@ -6,118 +6,100 @@ from math import exp
 
 def sort(array, axis=0):
     """
-    sort array elements in ascending order using the quicksort algorithm
+    Sort array elements in ascending order using the quicksort algorithm.
 
-    :type array: list
-    :type axis: int
+    Args:
+        array (list): ist of lists (matrix) or list (vector).
+        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
 
-    :param array: list of lists (matrix) or list (vector)
-    :param axis: if array is a matrix this is used to determine whether to order array column or row wise
+    Returns:
+        list: sorted array in ascending order.
 
-    :rtype: list or list of lists with same shape as input array
-    :return: sorted array in ascending order
-
-    Example:
-    --------
-
-    >>> from pyml.maths import sort
-    >>> a = [-5, 3, 10, 2, 1, -1]
-    >>> print(sort(a))
-    [-5.0, -1.0, 1.0, 2.0, 3.0, 10.0]
+    Examples:
+        >>> from pyml.maths import sort
+        >>> a = [-5, 3, 10, 2, 1, -1]
+        >>> print(sort(a))
+        [-5.0, -1.0, 1.0, 2.0, 3.0, 10.0]
     """
+
     return quick_sort(array, axis)[0]
 
 
 def argsort(array, axis=0):
     """
-    calculate order of elements in array
+    Calculate order of elements in array.
 
-    :type array: list
-    :type axis: int
+    Args:
+        array (list): ist of lists (matrix) or list (vector).
+        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
 
-    :param array: list of lists (matrix) or list (vector)
-    :param axis: if array is a matrix this is used to determine whether to order array column or row wise
+    Returns:
+        list: indices sorted array in ascending order.
 
-    :rtype: list or list of lists with same shape as input array
-    :return: sorted array in ascending order
-
-    Example:
-    --------
-
-    >>> from pyml.maths import argsort
-    >>> a = [-5, 3, 10, 2, 1, -1]
-    >>> print(argsort(a))
-    [0, 5, 4, 3, 1, 2]
+    Examples:
+        >>> from pyml.maths import argsort
+        >>> a = [-5, 3, 10, 2, 1, -1]
+        >>> print(argsort(a))
+        [0, 5, 4, 3, 1, 2]
     """
     return quick_sort(array, axis)[1]
 
 
 def argmin(array, axis=0):
     """
-    Returns index of smallest element in a vector, with numpy style column and row wise behaviour for matrices
+    Returns index of smallest element in a vector, with numpy style column and row wise behaviour for matrices.
 
-    :type array: list
-    :type axis: axis
+    Args:
+        array (list): ist of lists (matrix) or list (vector).
+        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
 
-    :param array: list of lists (matrix) or list (vector)
-    :param axis: if array is a matrix this is used to determine whether to order array column or row wise
+    Returns:
+        list: vector with argmin for each column/row.
 
-    :rtype: list
-    :return: vector with argmin for each vector
-
-    Example:
-    --------
-
-    >>> from pyml.maths import argmin
-    >>> a = [-5, 3, 10, 2, 1, -1]
-    >>> print(argmin(a))
-    [0]
+    Examples:
+        >>> from pyml.maths import argmin
+        >>> a = [-5, 3, 10, 2, 1, -1]
+        >>> print(argmin(a))
+        [0]
     """
     return Cargmin(array, axis)
 
 
 def argmax(array, axis=0):
     """
-    Returns index of largest element in a vector, with numpy style column and row wise behaviour for matrices
+    Returns index of largest element in a vector, with numpy style column and row wise behaviour for matrices.
 
-    :type array: list
-    :type axis: axis
+    Args:
+        array (list): ist of lists (matrix) or list (vector).
+        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
 
-    :param array: list of lists (matrix) or list (vector)
-    :param axis: if array is a matrix this is used to determine whether to order array column or row wise
+    Returns:
+        list: vector with argmax for each column/row.
 
-    :rtype: list
-    :return: vector with argmax for each vector
-
-    Example:
-    --------
-
-    >>> from pyml.maths import argmax
-    >>> a = [-5, 3, 10, 2, 1, -1]
-    >>> print(argmax(a))
-    [2]
+    Examples:
+        >>> from pyml.maths import argmax
+        >>> a = [-5, 3, 10, 2, 1, -1]
+        >>> print(argmax(a))
+        [2]
     """
     return Cargmax(array, axis)
 
 
 def max_occurence(array):
     """
-    find the element with highest occurrence in an array
+    Finds the element with highest occurrence in an array
 
-    :type array: list
+    Args:
+        array (list): a vector
 
-    :param array: a vector
+    Returns:
+        int: element with highest occurence
 
-    :rtype: int/float
-    :return: element with highest occurence
-
-    Example:
-    --------
-
-    >>> from pyml.maths import max_occurence
-    >>> a = [-5, 3, 10, 2, 1, -1, -5, 2, 2]
-    >>> print(max_occurence(a))
-    2
+    Examples:
+        >>> from pyml.maths import max_occurence
+        >>> a = [-5, 3, 10, 2, 1, -1, -5, 2, 2]
+        >>> print(max_occurence(a))
+        2
     """
     count = Counter(array)
     return max(count, key=count.get)
@@ -125,24 +107,20 @@ def max_occurence(array):
 
 def mean(array, axis=None):
     """
-    numpy style mean of array
+    Numpy style mean of array
 
-    :type array: list
-    :type axis: int
+    Args:
+        array (list): ist of lists (matrix) or list (vector).
+        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
 
-    :param array: list of lists (matrix) or list (vector)
-    :param axis: if array is a matrix this is used to determine whether to calculate mean of array column or row wise
+    Returns:
+        list or int: row/column mean(s) or int of overall mean.
 
-    :rtype: list or int
-    :return: list with row/column mean(s) or int of overall mean
-
-    Example:
-    --------
-
-    >>> from pyml.maths import mean
-    >>> a = [-5, 3, 10, 2, 5, 0]
-    >>> print(mean(a))
-    2.5
+    Examples:
+        >>> from pyml.maths import mean
+        >>> a = [-5, 3, 10, 2, 5, 0]
+        >>> print(mean(a))
+        2.5
     """
     if isinstance(array, list):
 
@@ -167,26 +145,22 @@ def mean(array, axis=None):
 
 
 def std(array, degrees_of_freedom=0, axis=None):
-
     """
-    numpy style standard deviation of array
+    Numpy style standard deviation of array.
 
-    :type array: list
-    :type axis: int
+    Args:
+        array (list): ist of lists (matrix) or list (vector).
+        degrees_of_freedom (int): degrees of freedom for standard deviation calculation.
+        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
 
-    :param array: list of lists (matrix) or list (vector)
-    :param axis: if array is a matrix this is used to determine whether to calculate standard deviation of array column or row wise
+    Returns:
+        list or int: row/column standard deviation(s) or int of overall standard deviation.
 
-    :rtype: list or int
-    :return: list with row/column standard deviation(s) or int of overall standard deviation
-
-    Example:
-    --------
-
-    >>> from pyml.maths import std
-    >>> a = [-5, 3, 8, 2, 0, -1]
-    >>> print(std(a))
-    3.9756201472921875
+    Examples:
+        >>> from pyml.maths import std
+        >>> a = [-5, 3, 8, 2, 0, -1]
+        >>> print(std(a))
+        3.9756201472921875
     """
     if isinstance(array, list):
 
@@ -214,17 +188,17 @@ def std(array, degrees_of_freedom=0, axis=None):
 def variance(array, degrees_of_freedom=0, axis=None):
 
     """
-    numpy style standard deviation of array
+    Numpy style variance of array
 
-    :type array: list
-    :type axis: int
+    Args:
+        array (list): ist of lists (matrix) or list (vector).
+        degrees_of_freedom (int): degrees of freedom for standard deviation calculation.
+        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
 
-    :param array: list of lists (matrix) or list (vector)
-    :param axis: if array is a matrix this is used to determine whether to calculate variance of array column or row wise
-
-    :rtype: list or int
-    :return: list with row/column standard deviation(s) or int of overall variance
+    Returns:
+        list or int: list with row/column standard deviation(s) or int of overall variance.
     """
+
     if isinstance(array, list):
 
         if len(array) > 0:
@@ -253,36 +227,32 @@ def covariance(array):
     """
     Calculates covariance matrix.
 
-    :type array: list
+    Args:
+        array (list): ist of lists (matrix) or list (vector).
 
-    :param array: list of lists representing a matrix
+    Returns:
+        list: list of lists representing the covariance matrix of array.
 
-    :rtype: list
-    :return: list of lists representing the covariance matrix of array
-
-    Example:
-    --------
-
-    >>> from pyml.datasets import load_iris
-    >>> X, y = load_iris()
-    >>> print(*covariance(X), sep="\n")
-    [0.6811222222222222, -0.039006666666669076, 1.2651911111111005, 0.5134577777777753]
-    [-0.039006666666669076, 0.1867506666666667, -0.31956800000001273, -0.11719466666666767]
-    [1.2651911111111005, -0.31956800000001273, 3.0924248888888854, 1.2877448888888843]
-    [0.5134577777777753, -0.11719466666666767, 1.2877448888888843, 0.5785315555555559]
+    Examples:
+        >>> from pyml.datasets import load_iris
+        >>> X, y = load_iris()
+        >>> [[round(x, 2) for x in i] for i in covariance(X)]
+        [[0.68, -0.04, 1.27, 0.51], [-0.04, 0.19, -0.32, -0.12], [1.27, -0.32, 3.09, 1.29], [0.51, -0.12, 1.29, 0.58]]
     """
 
     return Ccovariance(array)
 
 
-def sigmoid(array):
-    """
-    Python implementation of element wise sigmoid of a vector
+def sigmoid(u):
 
-    :type array: list
-    :param array: list representing a vector
-
-    :rtype: list
-    :return: list of same size as array
     """
-    return [1 / (1 + exp(-el)) for el in array]
+    Python implementation of element wise sigmoid of a vector.
+
+    Args:
+        u (list): list representing a vector
+
+    Returns:
+        list: sigmoid of u
+    """
+
+    return [1 / (1 + exp(-el)) for el in u]

@@ -6,23 +6,31 @@ from pyml.base import BaseLearner, Predictor
 class KNNBase(BaseLearner, Predictor):
     def __init__(self):
         """
-
-        :param neighbours:
-        :param norm:
+        Base learner for KNN regressor and classifier.
         """
+
         pass
 
     def _train(self, X, y):
+        """
+        KNN training phase is just retaining the training set
+
+        Args:
+            X (list): list of lists with each row corresponding to a datapoint's features
+            y (list): list of targets
+        """
+
         self.X = X
         self.y = y
 
     def _find_neighbours(self, X):
         """
+        Finds the nearest neighbours to each point of X
 
-        :param X:
-        :param y:
-        :return:
+        Args:
+            X: list of lists with each row corresponding to a datapoint's features
         """
+
         self._neighbours = list()
 
         # for each data point find n closest points in training set

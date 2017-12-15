@@ -1,13 +1,23 @@
+from pyml.utils import set_seed
 import random
-import time
 
 
 def train_test_split(X, y, train_split=0.3, shuffle=True, seed=None):
 
-    if seed is None:
-        seed = time.time()
+    """
+    Train test split for model validation.
 
-    random.seed(seed)
+    Args:
+        X (list): list of lists with features
+        y (list): list of targets
+        train_split (float): train split ratio
+        shuffle (bool): whether or not to additionally shuffle the data
+        seed (int or NoneType): random seed for shuffle
+
+    Returns:
+        tuple: (X_train, y_train, X_test, y_test)
+    """
+    set_seed(seed)
 
     if shuffle:
         data = list(zip(X, y))
