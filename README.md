@@ -8,8 +8,7 @@ PyML
 Branch      | Linux/OSX | Coverage | Landscape |
 ------------|-----------|----------|-----------| 
 [master](https://github.com/boostorg/beast/tree/master)   | [![Build Status](https://travis-ci.org/gf712/PyML.svg?branch=master)](https://travis-ci.org/gf712/PyML) | [![Coverage Status](https://coveralls.io/repos/github/gf712/PyML/badge.svg)](https://coveralls.io/github/gf712/PyML) | [![Code Health](https://landscape.io/github/gf712/PyML/master/landscape.svg?style=flat)](https://landscape.io/github/gf712/PyML/master)
-[dev](https://github.com/boostorg/beast/tree/dev)  |  [![Build Status](https://travis-ci.org/gf712/PyML.svg?branch=dev)](https://travis-ci.org/gf712/PyML) | [![Coverage Status](https://coveralls.io/repos/github/gf712/PyML/badge.svg?branch=dev)](https://coveralls.io/github/gf712/PyML?branch=dev)
-Health](https://landscape.io/github/gf712/PyML/dev/landscape.svg?style=flat)](https://landscape.io/github/gf712/PyML/dev)
+[dev](https://github.com/boostorg/beast/tree/dev)  |  [![Build Status](https://travis-ci.org/gf712/PyML.svg?branch=dev)](https://travis-ci.org/gf712/PyML) | [![Coverage Status](https://coveralls.io/repos/github/gf712/PyML/badge.svg?branch=dev)](https://coveralls.io/github/gf712/PyML?branch=dev) | [![Code Health](https://landscape.io/github/gf712/PyML/dev/landscape.svg?style=flat)](https://landscape.io/github/gf712/PyML/dev)
 
 PyML is a Python package with machine learning algorithms written in Python and C/C++.
 
