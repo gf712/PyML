@@ -14,7 +14,7 @@ env:
   - CONDA_PY=3.6
 
 before_install:
-  - source build_tools/travos/before_install.sh
+  - source build_tools/travis/before_install.sh
 
 # Install packages
 install:
