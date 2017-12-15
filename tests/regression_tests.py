@@ -30,7 +30,8 @@ class LinearRegressionGradientDescentTest(unittest.TestCase):
         self.assertAlmostEqual(self.regressor.predict(self.X_test)[0], 3.8176098320897065, delta=0.001)
 
     def test_LinR_train_predict(self):
-        self.assertAlmostEqual(self.regressor.train_predict(self.X_train, self.y_train)[0], 9.770956237446251,
+        regressor = LinearRegression(seed=1970, solver='gradient_descent')
+        self.assertAlmostEqual(regressor.train_predict(self.X_train, self.y_train)[0], 9.770956237446251,
                                delta=0.001)
 
     def test_LinR_mse(self):
