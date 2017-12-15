@@ -14,8 +14,8 @@ requirements:
   build:
     - python {{PY_VER}}*,>=3.5
     - setuptools
-#    - {{compiler('cxx')}}
-    - gcc ==4.9 # [osx]
+    - {{compiler('cxx')}}
+#    - gcc ==4.9 # [osx]
 
   run:
     - python
