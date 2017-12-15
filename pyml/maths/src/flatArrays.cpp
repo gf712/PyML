@@ -648,7 +648,7 @@ flatArray<T>& flatArray<T>::invertSign(int replace) {
 
         flatArray<T> result = flatArray<T>(newArray, rows, cols);
 
-        delete newArray;
+        delete  [] newArray;
 
         return result;
     }

@@ -19,7 +19,7 @@ inline void maximumSearch(double* vector, int size, int i, double* result) {
 
     for (int k=i+1; k<size; k++) {
 
-        if (abs(vector[i]) > result[0]) {
+        if (fabs(vector[i]) > result[0]) {
 
             // if this element is larger than the previous maximum store result
             result[0] = vector[k];

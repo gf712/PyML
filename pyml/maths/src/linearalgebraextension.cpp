@@ -436,7 +436,7 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
 
     // memory deallocation
-    delete theta;
+    delete [] theta;
     delete X;
     delete y;
 

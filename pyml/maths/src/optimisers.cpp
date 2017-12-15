@@ -341,9 +341,7 @@ void batchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
         // update weights
         updateWeights<T>(X, y, theta, XT, nu, error, alpha, learningRate, m, n, predType, method, fudgeFactor, G,
                          iteration);
-
-//        PyErr_SetString(PyExc_ValueError, std::to_string(y.getNElement(0)).c_str());
-
+        
         // calculate cost for new weights
         JNew = calculateCost<T>(X, *theta, y, prediction, predType);
 
