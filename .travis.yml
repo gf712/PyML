@@ -19,8 +19,6 @@ matrix:
       env:
         - CONDA_PY=3.5
         - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
-
-  include:
     - os: osx
       osx_image: xcode8
       env:
