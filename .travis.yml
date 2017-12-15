@@ -6,8 +6,8 @@ os:
   - linux
   - osx
 
-compiler:
-  - gcc
+#compiler:
+#  - gcc
 
 env:
   - CONDA_PY=3.5
@@ -34,7 +34,7 @@ install:
 script:
     - conda build --quiet --python=$CONDA_PY .
     - conda install pyml --use-local
-    - which gcc
+#    - which gcc
     - coverage run setup.py test
 
 after_success:
