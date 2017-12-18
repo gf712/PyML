@@ -36,8 +36,8 @@
             packages:
               - clang-3.6
         env:
-          - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
-          - CONDA_PY=3.5
+           - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+           - CONDA_PY=3.5
 
       - os: linux
         addons:
@@ -48,8 +48,8 @@
             packages:
               - clang-3.6
         env:
-          - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
-          - CONDA_PY=3.6
+           - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+           - CONDA_PY=3.6
 
       - os: osx
         osx_image: xcode8
