@@ -1,38 +1,31 @@
-sudo: false
+  sudo: false
 
-language: c
+  language: c
 
-os:
-  - linux
-  - osx
+  matrix:
+    include:
+      # works on Precise and Trusty
+      - os: linux
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+            packages:
+              - g++-4.9
+        env:
+           - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+           - CONDA_PY=3.5
 
-compiler:
-  - gcc
-
-matrix:
-  include:
-    # works on Precise and Trusty
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.9
-      env:
-         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
-         - CONDA_PY=3.5
-
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.9
-      env:
-         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
-         - CONDA_PY=3.6
+      - os: linux
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+            packages:
+              - g++-4.9
+        env:
+           - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+           - CONDA_PY=3.6
 
       - os: linux
         addons:
@@ -42,67 +35,68 @@ matrix:
               - llvm-toolchain-precise-3.6
             packages:
               - clang-3.6
+          env:
+            - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+            - CONDA_PY=3.5
+
+      - os: linux
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+              - llvm-toolchain-precise-3.6
+            packages:
+              - clang-3.6
+          env:
+            - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+            - CONDA_PY=3.6
+
+      - os: osx
+        osx_image: xcode8
         env:
-          - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
           - CONDA_PY=3.5
 
-      - os: linux
-        addons:
-          apt:
-            sources:
-              - ubuntu-toolchain-r-test
-              - llvm-toolchain-precise-3.6
-            packages:
-              - clang-3.6
+
+      - os: osx
+        osx_image: xcode8
         env:
-          - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
           - CONDA_PY=3.6
 
-    - os: osx
-      osx_image: xcode8
-      env:
-        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
-        - CONDA_PY=3.5
+      - os: osx
+        env:
+          - CONDA_PY=3.5
 
-    - os: osx
-      osx_image: xcode8
-      env:
-        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
-        - CONDA_PY=3.6
+      - os: osx
+        env:
+          - CONDA_PY=3.6
 
-    - os: osx
-      env:
-        - CONDA_PY=3.5
+  before_install:
+    - source build_tools/travis/before_install.sh
+    - eval "${MATRIX_EVAL}"
 
-    - os: osx
-      env:
-        - CONDA_PY=3.6
+  # Install packages
+  install:
+    - source build_tools/travis/install_miniconda.sh
+    - hash -r
+    - conda config --set always_yes yes --set changeps1 no
+    - conda update -q conda
+    - conda install conda-build
+    # Useful for debugging any issues with conda
+    - conda info -a
+    - conda create -q -n test-environment python=$CONDA_PY
+    - source activate test-environment
+    - pip install coveralls
+    - pip install coverage
+    - pip install codecov
 
-before_install:
-  - source build_tools/travis/before_install.sh
-  - eval "${MATRIX_EVAL}"
+  script:
+      - conda build --quiet --python=$CONDA_PY .
+      - conda install pyml --use-local
+  #    - which gcc
+      - coverage run setup.py test
 
-# Install packages
-install:
-  - source build_tools/travis/install_miniconda.sh
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda install conda-build
-  # Useful for debugging any issues with conda
-  - conda info -a
-  - conda create -q -n test-environment python=$CONDA_PY
-  - source activate test-environment
-  - pip install coveralls
-  - pip install coverage
-  - pip install codecov
-
-script:
-    - conda build --quiet --python=$CONDA_PY .
-    - conda install pyml --use-local
-#    - which gcc
-    - coverage run setup.py test
-
-after_success:
-    - coveralls
-    - codecov || echo "codecov upload failed"
+  after_success:
+      - coveralls
+      - codecov || echo "codecov upload failed"
