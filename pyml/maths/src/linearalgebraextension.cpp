@@ -667,7 +667,7 @@ static PyObject* version(PyObject* self) {
 }
 
 
-static PyMethodDef linearAlgebraMethods[] = {
+static PyMethodDef Clinear_algebraMethods[] = {
         // Python name    C function              argument representation  description
         {"dot_product",   dot_product,            METH_VARARGS,            "Calculate the dot product of two vectors"},
         {"power",         power,                  METH_VARARGS,            "Calculate element wise power"},
@@ -689,12 +689,12 @@ static PyMethodDef linearAlgebraMethods[] = {
 };
 
 
-static struct PyModuleDef linearAlgebraModule = {
+static struct PyModuleDef Clinear_algebraModule = {
         PyModuleDef_HEAD_INIT,
-        "linearAlgebra", // module name
+        "Clinear_algebra", // module name
         "Collection of linear algebra functions in C to be used in Python", // documentation of module
         -1, // global state
-        linearAlgebraMethods // method defs
+        Clinear_algebraMethods // method defs
 };
 
 
@@ -702,7 +702,7 @@ PyMODINIT_FUNC PyInit_Clinear_algebra(void) {
 
     PyObject *m;
 
-    m = PyModule_Create(&linearAlgebraModule);
+    m = PyModule_Create(&Clinear_algebraModule);
 
     if (m == nullptr)
         return nullptr;
@@ -719,11 +719,11 @@ PyMODINIT_FUNC PyInit_Clinear_algebra(void) {
     Py_INCREF(UnknownAxis);
     Py_INCREF(LinearAlgebraException);
 
-    PyModule_AddObject(m, "error", DimensionMismatchException);
-    PyModule_AddObject(m, "out_of_bounds_error", OutOfBoundsException);
-    PyModule_AddObject(m, "zero_error", ZeroDivisionError);
-    PyModule_AddObject(m, "axis_error", UnknownAxis);
-    PyModule_AddObject(m, "linear_algebra_error", LinearAlgebraException);
+    PyModule_AddObject(m, "DimensionMismatchException", DimensionMismatchException);
+    PyModule_AddObject(m, "OutOfBoundsException", OutOfBoundsException);
+    PyModule_AddObject(m, "ZeroDivisionError", ZeroDivisionError);
+    PyModule_AddObject(m, "UnknownAxis", UnknownAxis);
+    PyModule_AddObject(m, "LinearAlgebraException", LinearAlgebraException);
 
     return m;
 }

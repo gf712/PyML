@@ -15,15 +15,15 @@ env:
 matrix:
   include:
     - os: osx
-      osx_image: xcode8
       env:
         - CONDA_PY=3.5
-        - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
+      compiler:
+        - clang
     - os: osx
-      osx_image: xcode8
       env:
         - CONDA_PY=3.6
-        - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
+      compiler:
+        - clang
 
 before_install:
   - source build_tools/travis/before_install.sh

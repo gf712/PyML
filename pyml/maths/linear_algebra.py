@@ -63,11 +63,14 @@ def add(A, B):
     If matrix has the same number of columns or rows as the vector the vector is automatically broadcast to fit the matrix.
 
     Args:
-        A (list):  either a list or a list of lists representing a vector or matrix, respectively.
+        A (list or scalar):  either a list or a list of lists representing a vector or matrix, respectively.
         B (list):  either a list or a list of lists representing a vector or matrix, respectively.
 
     Returns:
         list: same format as A (list or list of lists).
+
+    Raises:
+        DimensionMismatchException: if A and B do not have matching dimensions
 
     Examples:
         >>> from pyml.maths import add
@@ -81,10 +84,8 @@ def add(A, B):
         >>> D = [[1, 5, 11], [-5, -7, 10]]
         >>> print(add(A, D))
         [[1.0, 1.0, 15.0], [-8.0, -9.0, 10.0]]
-
     """
 
-    # TODO: write exceptions to help user with errors from the backend
     if isinstance(B, (float, int)):
         B = [B]
 
@@ -98,11 +99,14 @@ def subtract(A, B):
     If matrix has the same number of columns or rows as the vector the vector is automatically broadcast to fit the matrix.
     
     Args:
-        A (list): either a list or a list of lists representing a vector or matrix, respectively.
+        A (list or scalar): either a list or a list of lists representing a vector or matrix, respectively.
         B (list): either a list or a list of lists representing a vector or matrix, respectively.
 
     Returns:
         list: same format as A (list or list of lists).
+
+    Raises:
+        DimensionMismatchException: if A and B do not have matching dimensions
 
     Examples:
         >>> from pyml.maths import subtract
@@ -118,7 +122,6 @@ def subtract(A, B):
         [[-1.0, -9.0, -7.0], [2.0, 5.0, -10.0]]
     """
 
-    # TODO: write exceptions to help user with errors from the backend
     if isinstance(B, (float, int)):
         B = [B]
 
@@ -197,8 +200,9 @@ def divide(A, B):
         B = [B]
     try:
         return Clinear_algebra.divide(A, B)
-    except:
-        raise ZeroDivisionError
+    except Clinear_algebra.ZeroDivisionError as e:
+        # raises Python builtin error instead
+        raise ZeroDivisionError(e)
 
 
 def determinant(A):
@@ -210,6 +214,9 @@ def determinant(A):
 
     Returns:
         float: determinant of matrix A.
+
+    Raises:
+        LinearAlgebraException: if A is not a square matrix.
 
     Examples:
         >>> from pyml.maths import determinant
@@ -234,7 +241,6 @@ def least_squares(X, y):
             linear equations.
 
     """
-    # TODO: write exceptions to help user with errors from the backend
 
     return Clinear_algebra.least_squares(X, y)
 
