@@ -5,29 +5,26 @@ language: c
 os:
   - linux
 
-#compiler:
-#  - gcc
+compiler:
+  - gcc
+  - clang
 
 env:
   - CONDA_PY=3.5
   - CONDA_PY=3.6
 
-matrix:
-  include:
-    - os: osx
-      env:
-        - CONDA_PY=3.5
-      compiler:
-        - clang
-    - os: osx
-      env:
-        - CONDA_PY=3.6
-      compiler:
-        - clang
+#matrix:
+#  exclude:
+#    - os: osx
+#      env: CONDA_PY=3.5
+#      compiler: gcc
+#    - os: osx
+#      env: CONDA_PY=3.6
+#      compiler: gcc
 
 before_install:
   - source build_tools/travis/before_install.sh
-  - eval "${MATRIX_EVAL}"
+#  - eval "${MATRIX_EVAL}"
 
 # Install packages
 install:
