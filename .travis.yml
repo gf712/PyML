@@ -4,27 +4,83 @@ language: c
 
 os:
   - linux
+  - osx
 
 compiler:
   - gcc
-  - clang
 
-env:
-  - CONDA_PY=3.5
-  - CONDA_PY=3.6
+matrix:
+  include:
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env:
+         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+         - CONDA_PY=3.5
 
-#matrix:
-#  exclude:
-#    - os: osx
-#      env: CONDA_PY=3.5
-#      compiler: gcc
-#    - os: osx
-#      env: CONDA_PY=3.6
-#      compiler: gcc
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env:
+         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+         - CONDA_PY=3.6
+
+      - os: linux
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+              - llvm-toolchain-precise-3.6
+            packages:
+              - clang-3.6
+        env:
+          - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+          - CONDA_PY=3.5
+
+      - os: linux
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+              - llvm-toolchain-precise-3.6
+            packages:
+              - clang-3.6
+        env:
+          - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+          - CONDA_PY=3.6
+
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+        - CONDA_PY=3.5
+
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+        - CONDA_PY=3.6
+
+    - os: osx
+      env:
+        - CONDA_PY=3.5
+
+    - os: osx
+      env:
+        - CONDA_PY=3.6
 
 before_install:
   - source build_tools/travis/before_install.sh
-#  - eval "${MATRIX_EVAL}"
+  - eval "${MATRIX_EVAL}"
 
 # Install packages
 install:
