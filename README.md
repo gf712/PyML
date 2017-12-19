@@ -47,12 +47,14 @@ Usage
 
 Changelog
 =========
-## Version 0.2.1.1 (14/12/2017):
+## Version 0.2.1.1 (TBC):
  - Major:
     - Library now available on anaconda
  
  - Minor:
     - Backend speed improvements
+    - PEP8 formatting
+    - Code maintainability tracking with codeclimate
 
 ## Version 0.2.1 (05/12/2017):
  - Major:

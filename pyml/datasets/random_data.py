@@ -28,7 +28,8 @@ def gaussian(n=100, d=2, labels=3, sigma=1, seed=None, shuffle=True):
     data_labels = list()
 
     for label, mean in zip(range(labels), means):
-        datapoints += [[random.gauss(mu=mean_i, sigma=sigma) for mean_i in mean] for x in range(n)]
+        datapoints += [[random.gauss(mu=mean_i, sigma=sigma) for mean_i
+                        in mean] for x in range(n)]
         labels_i = [label] * n
         data_labels += labels_i
 
@@ -38,23 +39,25 @@ def gaussian(n=100, d=2, labels=3, sigma=1, seed=None, shuffle=True):
     return datapoints, data_labels
 
 
-def regression(n=100, noise='gaussian', mu=0, sigma=1, x_min=[0], x_max=[10], gradient=[1], seed=None):
+def regression(n=100, noise='gaussian', mu=0, sigma=1, x_min=[0],
+               x_max=[10], gradient=[1], seed=None):
 
     """
-    Create a dummy dataset to perform regression. EXPERIMENTAL (can create a singular matrix)
+    Create a dummy dataset to perform regression. EXPERIMENTAL (can create a
+    singular matrix)
     Args:
         n (int): number of datapoints
-        noise (str): type of noise to add to the data
-            Currently only gaussian is supported
-        mu (float): mean of the noise
-        sigma (float): standard deviation of the noise
-        x_min (list): minimum value of each feature
-        x_max (list): maxium value of each feature
-        gradient (list): gradient of each feature
-        seed (int or NoneType): set random seed
+        noise (str): type of noise to add to the data.
+            Currently only gaussian is supported.
+        mu (float): mean of the noise.
+        sigma (float): standard deviation of the noise.
+        x_min (list): minimum value of each feature.
+        x_max (list): maxium value of each feature.
+        gradient (list): gradient of each feature.
+        seed (int or NoneType): set random seed.
 
     Returns:
-        tuple: (feature values, target values)
+        tuple: (feature values, target values).
 
     """
 

@@ -41,4 +41,5 @@ def accuracy(y, y_true):
     Returns:
         float: accuracy.
     """
-    return sum([1 for y_i, y_true_i in zip(y, y_true) if y_i == y_true_i]) / len(y)
+    return sum([1 for y_i, y_true_i in zip(y, y_true)
+                if y_i == y_true_i]) / len(y)

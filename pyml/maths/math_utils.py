@@ -1,6 +1,7 @@
 from collections import Counter
 from pyml.maths.CMaths import quick_sort, Cargmax, Cargmin
-from pyml.maths.Clinear_algebra import Cmean, Cstd, Cvariance, Ccovariance, Csum
+from pyml.maths.Clinear_algebra import Cmean, Cstd, Cvariance, Ccovariance, \
+    Csum
 
 
 def sort(array, axis=0):
@@ -9,7 +10,8 @@ def sort(array, axis=0):
 
     Args:
         array (list): ist of lists (matrix) or list (vector).
-        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
+        axis (int): if array is a matrix this is used to determine whether to
+            order array column or row wise.
 
     Returns:
         list: sorted array in ascending order.
@@ -30,7 +32,8 @@ def argsort(array, axis=0):
 
     Args:
         array (list): ist of lists (matrix) or list (vector).
-        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
+        axis (int): if array is a matrix this is used to determine whether
+            to order array column or row wise.
 
     Returns:
         list: indices sorted array in ascending order.
@@ -46,11 +49,13 @@ def argsort(array, axis=0):
 
 def argmin(array, axis=0):
     """
-    Returns index of smallest element in a vector, with numpy style column and row wise behaviour for matrices.
+    Returns index of smallest element in a vector, with numpy style column
+        and row wise behaviour for matrices.
 
     Args:
         array (list): ist of lists (matrix) or list (vector).
-        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
+        axis (int): if array is a matrix this is used to determine whether to
+            order array column or row wise.
 
     Returns:
         list: vector with argmin for each column/row.
@@ -66,11 +71,13 @@ def argmin(array, axis=0):
 
 def argmax(array, axis=0):
     """
-    Returns index of largest element in a vector, with numpy style column and row wise behaviour for matrices.
+    Returns index of largest element in a vector, with numpy style column and
+        row wise behaviour for matrices.
 
     Args:
         array (list): ist of lists (matrix) or list (vector).
-        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
+        axis (int): if array is a matrix this is used to determine whether to
+            order array column or row wise.
 
     Returns:
         list: vector with argmax for each column/row.
@@ -110,7 +117,8 @@ def mean(array, axis=None):
 
     Args:
         array (list): ist of lists (matrix) or list (vector).
-        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
+        axis (int): if array is a matrix this is used to determine whether to
+            order array column or row wise.
 
     Returns:
         list or int: row/column mean(s) or int of overall mean.
@@ -131,11 +139,14 @@ def std(array, degrees_of_freedom=0, axis=None):
 
     Args:
         array (list): ist of lists (matrix) or list (vector).
-        degrees_of_freedom (int): degrees of freedom for standard deviation calculation.
-        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
+        degrees_of_freedom (int): degrees of freedom for standard deviation
+            calculation.
+        axis (int): if array is a matrix this is used to determine whether to
+            order array column or row wise.
 
     Returns:
-        list or int: row/column standard deviation(s) or int of overall standard deviation.
+        list or int: row/column standard deviation(s) or int of overall
+            standard deviation.
 
     Examples:
         >>> from pyml.maths import std
@@ -154,11 +165,14 @@ def variance(array, degrees_of_freedom=0, axis=None):
 
     Args:
         array (list): ist of lists (matrix) or list (vector).
-        degrees_of_freedom (int): degrees of freedom for standard deviation calculation.
-        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
+        degrees_of_freedom (int): degrees of freedom for standard deviation
+            calculation.
+        axis (int): if array is a matrix this is used to determine whether to
+            order array column or row wise.
 
     Returns:
-        list or int: list with row/column standard deviation(s) or int of overall variance.
+        list or int: list with row/column standard deviation(s) or int of
+            overall variance.
     """
 
     return _axis_calc(array, Cvariance, axis, degrees_of_freedom)
@@ -190,7 +204,8 @@ def sum(A, axis=None):
     Calculates the sum, numpy style
     Args:
         A (list): list of lists (matrix) or list (vector).
-        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
+        axis (int): if array is a matrix this is used to determine whether to
+            order array column or row wise.
 
     Returns:
         list: sum along given axis
@@ -207,22 +222,26 @@ def _axis_calc(array, func, axis, *args):
     Args:
         array (list): list of lists (matrix) or list (vector).
         func (function): calculation to perform.
-        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
+        axis (int): if array is a matrix this is used to determine whether to
+            order array column or row wise.
         *args: additional arguments to pass to func (e.g. degrees of freedom)
 
     Returns:
         list: result of func given axis
 
     Raises:
-        TypeError:  raised when array is not a list of lists or list with just ints/floats
+        TypeError:  raised when array is not a list of lists or list with just
+            ints/floats
         ValueError: raised when list is empty
-        NotImplementedError: raised when using axis value different from None, 0 or 1.
+        NotImplementedError: raised when using axis value different from None,
+            0 or 1.
     """
 
     if isinstance(array, list):
 
         if len(array) > 0:
-            if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
+            if isinstance(array[0], list) and isinstance(array[0][0],
+                                                         (float, int)):
                 # in this case we have a 2D matrix
                 if axis == 1 or axis == 0:
                     return func(array, axis, *args)
@@ -230,14 +249,16 @@ def _axis_calc(array, func, axis, *args):
                     return func(func(array, 0), 0)
 
                 else:
-                    raise NotImplementedError("This is not the code you are looking for.")
+                    raise NotImplementedError("This is not the code you are "
+                                              "looking for.")
 
             elif isinstance(array[0], (int, float)):
                 # in this case we have a vector
                 return func(array, 0, *args)
 
             else:
-                raise TypeError("Expected a list of lists or a list of int/floats")
+                raise TypeError("Expected a list of lists or a list of "
+                                "int/floats")
 
         else:
             raise ValueError("Empty list")

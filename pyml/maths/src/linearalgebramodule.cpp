@@ -504,3 +504,20 @@ double determinant(flatArray<T>* array) {
 
     return determinantResult;
 }
+
+template <typename T>
+void softmax(flatArray<T>& input, flatArray<T>* result) {
+
+    if (input.getRows() > 1) {
+        // matrix
+
+        auto sum_of_rows = input.sum();
+
+        for (int i = 0; i < input.getRows(); ++i) {
+            auto* row = input.getRow(i);
+
+        }
+
+    }
+
+}

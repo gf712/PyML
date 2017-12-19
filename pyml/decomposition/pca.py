@@ -1,17 +1,20 @@
 from pyml.base import BaseLearner, Transformer
-from pyml.maths import covariance, eigen, mean, dot_product, transpose, subtract, add
+from pyml.maths import covariance, eigen, mean, dot_product, transpose, \
+    subtract, add
 
 
 class PCA(BaseLearner, Transformer):
 
-    def __init__(self, n_components=0.95, tolerance=1.0e-9, max_iterations=1000):
+    def __init__(self, n_components=0.95, tolerance=1.0e-9,
+                 max_iterations=1000):
 
         """
         Principal component analysis.
 
         Args:
             n_components (int or float): Number of components to keep.
-                If it is less than 1 it will be interpreted as a fraction of components to keep.
+                If it is less than 1 it will be interpreted as a fraction of
+                components to keep.
                 Otherwise n_components will be kept.
             tolerance (float): Tolerance of jacobi rotations.
             max_iterations (int): maximum number of rotations.
@@ -40,7 +43,8 @@ class PCA(BaseLearner, Transformer):
             self._n_components = int(round(self._n_components * self._m))
 
         if self._m > 20:
-            raise NotImplementedError("Jacobi decomposition can be unstable with N>20 symmetric matrices!")
+            raise NotImplementedError("Jacobi decomposition can be unstable "
+                                      "with N>20 symmetric matrices!")
 
         # get the mean of each column
         self._X_means = mean(self._X, axis=0)
@@ -52,10 +56,13 @@ class PCA(BaseLearner, Transformer):
         cov = covariance(X_whitened)
 
         # eigen decomposition of covariance matrix
-        self._v, self._w = eigen(cov, self.tolerance, self.max_iterations, normalise=False, sort=True)
+        self._v, self._w = eigen(cov, self.tolerance, self.max_iterations,
+                                 normalise=False, sort=True)
 
         # create feature vector
-        self._feat_vect = [[self._w[row][column] for column in range(self.n_components)] for row in range(self._m)]
+        self._feat_vect = [[self._w[row][column] for column in
+                            range(self.n_components)] for row in
+                           range(self._m)]
 
         return self
 
@@ -72,7 +79,8 @@ class PCA(BaseLearner, Transformer):
         # subtract X by mean
         X_whitened = subtract(X, self._X_means)
 
-        return transpose(dot_product(transpose(self._feat_vect), transpose(X_whitened)))
+        return transpose(dot_product(transpose(self._feat_vect),
+                                     transpose(X_whitened)))
 
     def _inverse(self, X):
         """
@@ -118,14 +126,16 @@ class PCA(BaseLearner, Transformer):
     @property
     def explained_variance(self):
         """
-        list: Returns the explained variance of each component (it's the eigenvalue).
+        list: Returns the explained variance of each component
+        (it's the eigenvalue).
         """
         return self._v
 
     @property
     def explained_variance_ratio(self):
         """
-        list: Returns the relative importance of each eigenvalue (sums up to 1).
+        list: Returns the relative importance of each eigenvalue
+        (sums up to 1).
         """
         return [eig / sum(self.eigenvalues) for eig in self.eigenvalues]
 

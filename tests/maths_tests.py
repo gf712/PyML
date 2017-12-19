@@ -138,22 +138,28 @@ class LinearAlgebraTest(unittest.TestCase):
         self.assertAlmostEqual(transpose(self.A)[5][8], 0.38628163852256203)
 
     def test_matrix_product(self):
-        self.assertAlmostEqual(dot_product(self.A, self.B)[5][8], 2.2269865779018874)
+        self.assertAlmostEqual(dot_product(self.A, self.B)[5][8],
+                               2.2269865779018874)
 
     def test_dot_product(self):
-        self.assertAlmostEqual(dot_product(self.A[0], transpose(self.B)[0])[0], 0.691239893627)
+        self.assertAlmostEqual(dot_product(self.A[0], transpose(self.B)[0])[0],
+                               0.691239893627)
 
     def test_add_matrix(self):
-        self.assertAlmostEqual(add(self.A, transpose(self.B))[0][-1], 0.16094185221109958)
+        self.assertAlmostEqual(add(self.A, transpose(self.B))[0][-1],
+                               0.16094185221109958)
 
     def test_add_scalar(self):
-        self.assertAlmostEqual(add(self.A, transpose(self.B)[0][-1])[0][-1], 0.16094185221109958)
+        self.assertAlmostEqual(add(self.A, transpose(self.B)[0][-1])[0][-1],
+                               0.16094185221109958)
 
     def test_subtract_matrix(self):
-        self.assertAlmostEqual(subtract(self.A, transpose(self.B))[0][3], 0.6442101271237023)
+        self.assertAlmostEqual(subtract(self.A, transpose(self.B))[0][3],
+                               0.6442101271237023)
 
     def test_subtract_scalar(self):
-        self.assertAlmostEqual(subtract(self.A, transpose(self.B)[0][3])[0][3], 0.6442101271237023)
+        self.assertAlmostEqual(subtract(self.A, transpose(self.B)[0][3])[0][3],
+                               0.6442101271237023)
 
     def test_power(self):
         self.assertAlmostEqual(power(self.A, 2)[0][5], 0.9336806492618525)
@@ -162,7 +168,8 @@ class LinearAlgebraTest(unittest.TestCase):
         self.assertAlmostEqual(multiply(self.A, 2)[0][0], 0.2792398429743861)
 
     def test_multiply_2(self):
-        self.assertAlmostEqual(multiply(self.A, transpose(self.B))[0][0], 0.04580368872627444)
+        self.assertAlmostEqual(multiply(self.A, transpose(self.B))[0][0],
+                               0.04580368872627444)
 
     def test_divide(self):
         self.assertAlmostEqual(divide(self.A[0], 0.5)[0], 0.2792398429743861)
@@ -180,7 +187,8 @@ class LinearAlgebraTest(unittest.TestCase):
     def test_eigen_normalised(self):
         S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]
         self.assertAlmostEqual(eigen(S, sort=True, normalise=False)[0][0], 4)
-        self.assertAlmostEqual(eigen(S, sort=True, normalise=False)[1][0][0], 0.5773502691313449)
+        self.assertAlmostEqual(eigen(S, sort=True, normalise=False)[1][0][0],
+                               0.5773502691313449)
 
     def test_eigen_unnormalised(self):
         S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]

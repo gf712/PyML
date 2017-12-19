@@ -34,7 +34,8 @@ class KNNClassifier(KNNBase, Classifier):
         Prediction using a majority classifier.
 
         Args:
-            X (list): list of lists with each row corresponding to a datapoint's features.
+            X (list): list of lists with each row corresponding to a
+            datapoint's features.
 
         Returns:
             list: list of predictions
@@ -47,8 +48,10 @@ class KNNClassifier(KNNBase, Classifier):
         """
         Calculates the model accuracy.
         Args:
-            X (list): list of lists with each row corresponding to a datapoint's features.
-            y_true (list): list of lists with each row corresponding to a datapoint's features.
+            X (list): list of lists with each row corresponding to a
+                datapoint's features.
+            y_true (list): list of lists with each row corresponding to a
+                datapoint's features.
 
         Returns:
             float: model accuracy.
@@ -57,7 +60,8 @@ class KNNClassifier(KNNBase, Classifier):
 
         predictions = self.predict(X)
 
-        return sum([1 if pred_i == y_i else 0 for pred_i, y_i in zip(predictions, y_true)]) / len(X)
+        return sum([1 if pred_i == y_i else 0 for pred_i, y_i in
+                    zip(predictions, y_true)]) / len(X)
 
 
 class KNNRegressor(KNNBase, Predictor):
@@ -91,7 +95,8 @@ class KNNRegressor(KNNBase, Predictor):
         Prediction using a the mean of neighbours.
 
         Args:
-            X (list): list of lists with each row corresponding to a datapoint's features.
+            X (list): list of lists with each row corresponding to a
+                datapoint's features.
 
         Returns:
             list: list of predictions
@@ -105,9 +110,12 @@ class KNNRegressor(KNNBase, Predictor):
         Model score.
 
         Args:
-            X (list): list of lists with each row corresponding to a datapoint's features.
-            y_true (list): list of lists with each row corresponding to a datapoint's features.
-            scorer (str): scorer name (either 'mean_squared_error' or 'mean_absolute_error'
+            X (list): list of lists with each row corresponding to a
+                datapoint's features.
+            y_true (list): list of lists with each row corresponding to a
+                datapoint's features.
+            scorer (str): scorer name (either 'mean_squared_error' or
+                'mean_absolute_error'
 
         Returns:
             float: model score.

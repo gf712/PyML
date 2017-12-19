@@ -8,8 +8,10 @@ def dot_product(u, v):
     Matrix/matrix, matrix/vector and vector/vector dot product.
 
     Args:
-        u (list): either a list or a list of lists representing a vector or matrix, respectively.
-        v (list): either a list or a list of lists representing a vector or matrix, respectively.
+        u (list): either a list or a list of lists representing a vector or
+            matrix, respectively.
+        v (list): either a list or a list of lists representing a vector or
+            matrix, respectively.
 
     Returns:
         list:
@@ -60,12 +62,16 @@ def transpose(A):
 
 def add(A, B):
     """
-    Calculates elementwise addition of each element in a list (vector) or list of lists (matrix).
-    If matrix has the same number of columns or rows as the vector the vector is automatically broadcast to fit the matrix.
+    Calculates elementwise addition of each element in a list (vector) or list
+        of lists (matrix).
+    If matrix has the same number of columns or rows as the vector the vector
+        is automatically broadcast to fit the matrix.
 
     Args:
-        A (list or scalar):  either a list or a list of lists representing a vector or matrix, respectively.
-        B (list):  either a list or a list of lists representing a vector or matrix, respectively.
+        A (list or scalar):  either a list or a list of lists representing a
+            vector or matrix, respectively.
+        B (list):  either a list or a list of lists representing a vector or
+            matrix, respectively.
 
     Returns:
         list: same format as A (list or list of lists).
@@ -93,12 +99,16 @@ def add(A, B):
 def subtract(A, B):
 
     """
-    Calculates elementwise difference of each element in a list (vector) or list of lists (matrix).
-    If matrix has the same number of columns or rows as the vector the vector is automatically broadcast to fit the matrix.
+    Calculates elementwise difference of each element in a list (vector) or
+        list of lists (matrix).
+    If matrix has the same number of columns or rows as the vector the vector
+        is automatically broadcast to fit the matrix.
     
     Args:
-        A (list or scalar): either a list or a list of lists representing a vector or matrix, respectively.
-        B (list): either a list or a list of lists representing a vector or matrix, respectively.
+        A (list or scalar): either a list or a list of lists representing a
+            vector or matrix, respectively.
+        B (list): either a list or a list of lists representing a vector or
+            matrix, respectively.
 
     Returns:
         list: same format as A (list or list of lists).
@@ -147,15 +157,18 @@ def power(A, n):
 
 def multiply(A, B):
     """
-    Calculates elementwise multiplication of a list (vector) or list of lists (matrix) with another vector or matrix
+    Calculates elementwise multiplication of a list (vector) or list of lists
+        (matrix) with another vector or matrix
     and automatic broadcasting if needed.
 
     Args:
         A (list): either a list (vector) or a list of lists (matrix).
-        B (list): either a list (vector) or a list of lists (matrix) or a constant.
+        B (list): either a list (vector) or a list of lists (matrix) or a
+            constant.
 
     Returns:
-        list: matrix divided by constant n with the same shape as A (list or list of lists).
+        list: matrix divided by constant n with the same shape as A
+            (list or list of lists).
 
     Examples:
         >>> from pyml.maths import multiply
@@ -170,13 +183,15 @@ def multiply(A, B):
 def divide(A, B):
 
     """
-    Calculates elementwise division of a list (vector) or list of lists (matrix).
+    Calculates elementwise division of a list (vector) or list of lists
+        (matrix).
     Args:
         A (list): either a list or a list of lists.
         B (list or float): scalar to perform division.
 
     Returns:
-        list: matrix divided by constant n with the same shape as A (list or list of lists).
+        list: matrix divided by constant n with the same shape as A (list or
+            list of lists).
 
     Raises:
         ZeroDivisionError: If any of the values in B is 0.
@@ -227,7 +242,8 @@ def least_squares(X, y):
         y (list): a vector with all targets.
 
     Returns:
-        list: list with the same number of dimensions as the number of columns of X with the solution of the system of
+        list: list with the same number of dimensions as the number of columns
+            of X with the solution of the system of
             linear equations.
 
     """
@@ -235,18 +251,23 @@ def least_squares(X, y):
     return Clinear_algebra.least_squares(X, y)
 
 
-def eigen(array, tolerance=1.0e-9, max_iterations=0, sort=True, normalise=True):
+def eigen(array, tolerance=1.0e-9, max_iterations=0, sort=True,
+          normalise=True):
     """
     Eigendecomposition of square matrices with Jacobi rotations.
 
     Args:
         array (list): list of lists representing a matrix.
-        tolerance (Optional[float]): early stopping parameter of Jacobi matrix decomposition algorithm.
+        tolerance (Optional[float]): early stopping parameter of Jacobi matrix
+            decomposition algorithm.
             Defaults to 1.0e-9.
-        max_iterations (Optional[int]): maximum number of iterations of Jacobi matrix decomposition algorithm.
+        max_iterations (Optional[int]): maximum number of iterations of Jacobi
+            matrix decomposition algorithm.
             Defaults to 0, and in the C++ code is calculated as 5 * n ** 2.
-        sort (Optional[bool]): whether or not to sort eigenvalues (descending) and respective eigenvectors.
-        normalise (Optional[bool]): whether or not to normalise eigenvectors using eigenvectors of the first eigenvalue.
+        sort (Optional[bool]): whether or not to sort eigenvalues (descending)
+            and respective eigenvectors.
+        normalise (Optional[bool]): whether or not to normalise eigenvectors
+            using eigenvectors of the first eigenvalue.
 
     Returns:
         tuple: (eigenvalues (list), eigenvectors(list of lists)).
@@ -282,7 +303,8 @@ def eigen(array, tolerance=1.0e-9, max_iterations=0, sort=True, normalise=True):
 
 def _template_func(A, B, func):
     """
-    Helper function that takes function and applies to A and B, and changes B to list if it's a scalar
+    Helper function that takes function and applies to A and B, and changes B
+        to list if it's a scalar
     Args:
         A (list):
         B (list or float or int):

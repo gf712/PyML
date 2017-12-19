@@ -16,7 +16,8 @@ class KNNBase(BaseLearner, Predictor):
         KNN training phase is just retaining the training set
 
         Args:
-            X (list): list of lists with each row corresponding to a datapoint's features
+            X (list): list of lists with each row corresponding to a
+            datapoint's features
             y (list): list of targets
         """
 
@@ -28,7 +29,8 @@ class KNNBase(BaseLearner, Predictor):
         Finds the nearest neighbours to each point of X
 
         Args:
-            X: list of lists with each row corresponding to a datapoint's features
+            X: list of lists with each row corresponding to a datapoint's
+            features
         """
 
         self._neighbours = list()
@@ -41,7 +43,8 @@ class KNNBase(BaseLearner, Predictor):
             sorted_distances = argsort(distances_i)
 
             # get k points
-            k_nearest_neighbours = [self.y[sorted_distances[i]] for i in range(self.n)]
+            k_nearest_neighbours = [self.y[sorted_distances[i]] for i in
+                                    range(self.n)]
 
             # majority vote
             self._neighbours.append(k_nearest_neighbours)
