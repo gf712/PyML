@@ -1,7 +1,6 @@
 from collections import Counter
 from pyml.maths.CMaths import quick_sort, Cargmax, Cargmin
-from pyml.maths.Clinear_algebra import Cmean, Cstd, Cvariance, Ccovariance
-from math import exp
+from pyml.maths.Clinear_algebra import Cmean, Cstd, Cvariance, Ccovariance, Csum
 
 
 def sort(array, axis=0):
@@ -122,26 +121,8 @@ def mean(array, axis=None):
         >>> print(mean(a))
         2.5
     """
-    if isinstance(array, list):
 
-        if len(array) > 0:
-            if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
-                # in this case we have a 2D matrix
-                if axis == 1 or axis == 0:
-                    return Cmean(array, axis)
-                else:
-                    return Cmean(Cmean(array, 0), 0)
-
-            elif isinstance(array[0], (int, float)):
-                # in this case we have a vector
-                return Cmean(array, 0)
-
-            else:
-                raise TypeError("Expected a list of lists or a list of int/floats")
-        else:
-            raise ValueError("Empty list")
-    else:
-        raise TypeError("Expected a list")
+    return _axis_calc(array, Cmean, axis)
 
 
 def std(array, degrees_of_freedom=0, axis=None):
@@ -162,27 +143,8 @@ def std(array, degrees_of_freedom=0, axis=None):
         >>> print(std(a))
         3.9756201472921875
     """
-    if isinstance(array, list):
 
-        if len(array) > 0:
-            if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
-                # in this case we have a 2D matrix
-                if axis == 1 or axis == 0:
-                    return Cstd(array, degrees_of_freedom, axis)
-                else:
-                    raise NotImplementedError("This is not the code you are looking for.")
-
-            elif isinstance(array[0], (int, float)):
-                # in this case we have a vector
-                return Cstd(array, degrees_of_freedom, 0)
-
-            else:
-                raise TypeError("Expected a list of lists or a list of int/floats")
-
-        else:
-            raise ValueError("Empty list")
-    else:
-        raise TypeError("Expected a list")
+    return _axis_calc(array, Cstd, axis, degrees_of_freedom)
 
 
 def variance(array, degrees_of_freedom=0, axis=None):
@@ -199,27 +161,7 @@ def variance(array, degrees_of_freedom=0, axis=None):
         list or int: list with row/column standard deviation(s) or int of overall variance.
     """
 
-    if isinstance(array, list):
-
-        if len(array) > 0:
-            if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
-                # in this case we have a 2D matrix
-                if axis == 1 or axis == 0:
-                    return Cvariance(array, degrees_of_freedom, axis)
-                else:
-                    raise NotImplementedError("This is not the code you are looking for.")
-
-            elif isinstance(array[0], (int, float)):
-                # in this case we have a vector
-                return Cvariance(array, degrees_of_freedom, 0)
-
-            else:
-                raise TypeError("Expected a list of lists or a list of int/floats")
-
-        else:
-            raise ValueError("Empty list")
-    else:
-        raise TypeError("Expected a list")
+    return _axis_calc(array, Cvariance, axis, degrees_of_freedom)
 
 
 def covariance(array):
@@ -243,53 +185,57 @@ def covariance(array):
     return Ccovariance(array)
 
 
-def sigmoid(u):
-
+def sum(A, axis=None):
     """
-    Python implementation of element wise sigmoid of a vector.
-
+    Calculates the sum, numpy style
     Args:
-        u (list): list representing a vector.
+        A (list): list of lists (matrix) or list (vector).
+        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
 
     Returns:
-        list: sigmoid of u
-
-    Raises:
-        TypeError: raised if list passed is not a list of scalars.
-    """
-
-    if isinstance(u[0], (float, int)):
-        return [1 / (1 + exp(-el)) for el in u]
-
-    else:
-        raise TypeError("Expected a list of scalars.")
-
-
-def softmax(u):
+        list: sum along given axis
 
     """
-    Computes softmax of a matrix/vector u.
+    return _axis_calc(A, Csum, axis)
+
+
+def _axis_calc(array, func, axis, *args):
+
+    """
+    Helper function to perform matrix/vector calculations along a given axis
 
     Args:
-        u (list): vector.
+        array (list): list of lists (matrix) or list (vector).
+        func (function): calculation to perform.
+        axis (int): if array is a matrix this is used to determine whether to order array column or row wise.
+        *args: additional arguments to pass to func (e.g. degrees of freedom)
 
     Returns:
-        list: softmax of vector u.
+        list: result of func given axis
 
     Raises:
-        TypeError: raised if argument is not a list of scalars (vector),
-                   or a list of lists (matrix).
+        TypeError:  raised when array is not a list of lists or list with just ints/floats
+        ValueError: raised when list is empty
     """
 
-    if isinstance(u[0], list):
-        # matrix
-        return [softmax(row) for row in u]
+    if isinstance(array, list):
 
-    elif isinstance(u[0], (float, int)):
-        # vector
-        z_exp = [exp(u_i) for u_i in u]
-        sum_z_exp = sum(z_exp)
-        return [i / sum_z_exp for i in z_exp]
+        if len(array) > 0:
+            if isinstance(array[0], list) and isinstance(array[0][0], (float, int)):
+                # in this case we have a 2D matrix
+                if axis == 1 or axis == 0:
+                    return func(array, axis, *args)
+                else:
+                    return func(func(array, 0), 0)
 
+            elif isinstance(array[0], (int, float)):
+                # in this case we have a vector
+                return func(array, 0, *args)
+
+            else:
+                raise TypeError("Expected a list of lists or a list of int/floats")
+
+        else:
+            raise ValueError("Empty list")
     else:
-        raise TypeError("Expected a list or a list of lists")
+        raise TypeError("Expected a list")
