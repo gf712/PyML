@@ -216,6 +216,7 @@ def _axis_calc(array, func, axis, *args):
     Raises:
         TypeError:  raised when array is not a list of lists or list with just ints/floats
         ValueError: raised when list is empty
+        NotImplementedError: raised when using axis value different from None, 0 or 1.
     """
 
     if isinstance(array, list):
@@ -225,8 +226,11 @@ def _axis_calc(array, func, axis, *args):
                 # in this case we have a 2D matrix
                 if axis == 1 or axis == 0:
                     return func(array, axis, *args)
-                else:
+                elif axis is None:
                     return func(func(array, 0), 0)
+
+                else:
+                    raise NotImplementedError("This is not the code you are looking for.")
 
             elif isinstance(array[0], (int, float)):
                 # in this case we have a vector

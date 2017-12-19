@@ -302,7 +302,7 @@ static PyObject* divide(PyObject* self, PyObject *args) {
 
 static PyObject* sum(PyObject* self, PyObject *args) {
 
-    // sum of all elements in a matrix/vector
+    // sum of all elements in a matrix/vector, numpy style
 
     // variable declaration
     flatArray<double>* A = nullptr;
@@ -317,19 +317,37 @@ static PyObject* sum(PyObject* self, PyObject *args) {
 
     // use PyList_Size to get size of vector
     A = readFromPythonList<double>(pAArray);
+    flatArray<double>* result= nullptr;
+    PyObject* FinalResult = nullptr;
 
-    auto result = A->sum(axis);
+    try {
+        result = A->sum(axis);
+    }
 
-    // convert vector to python list
-    PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
+    catch (flatArrayUnknownAxis &e) {
+        PyErr_SetString(UnknownAxis, e.what());
+        return nullptr;
+    }
 
-    // build python object
-    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+//    PyErr_SetString(PyExc_ValueError, std::to_string(result->getCols()).c_str());
 
-    // deallocate memory
+    if (result->getCols() == 1) {
+
+        FinalResult = Py_BuildValue("d", result->getNElement(0));
+
+    }
+
+    else {
+
+        PyObject *result_py_list = ConvertFlatArray_PyList(result, "float");
+
+        FinalResult = Py_BuildValue("O", result_py_list);
+
+        Py_DECREF(result_py_list);
+    }
+
     delete A;
-
-    Py_DECREF(result_py_list);
+    delete result;
 
     return FinalResult;
 }
