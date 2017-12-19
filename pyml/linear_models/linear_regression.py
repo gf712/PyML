@@ -52,7 +52,7 @@ class LinearRegression(LinearBase):
                             batch_size=batch_size, method=method, seed=seed,
                             _type='regressor', fudge_factor=fudge_factor)
 
-        self.bias = bias
+        self._bias = bias
         if solver in ['OLS', 'gradient_descent']:
             self._solver = solver
         else:
@@ -75,11 +75,11 @@ class LinearRegression(LinearBase):
         self._n_features = len(X[0])
 
         if self._solver == 'gradient_descent':
-            theta = self._initiate_weights(bias=self.bias)
+            theta = self._initiate_weights(bias=self._bias)
             self._coefficients, self._cost, self._iterations = \
                 self._gradient_descent(self.X, self.y, theta=theta)
         else:
-            if self.bias:
+            if self._bias:
                 self.X = [[1] + row for row in self.X]
             self._cost = 'NaN'
             self._iterations = 'NaN'
@@ -98,9 +98,10 @@ class LinearRegression(LinearBase):
             list: list of predictions
         """
 
-        if (self.bias and len(X[0]) == self._n_features + 1) or not self.bias:
+        if (self._bias and len(X[0]) == self._n_features + 1) or\
+                not self._bias:
             return dot_product(X, self.coefficients)
-        elif self.bias and len(X[0]) == self._n_features:
+        elif self._bias and len(X[0]) == self._n_features:
             return dot_product([[1] + row for row in X], self._coefficients)
         else:
             raise NotImplementedError("This part of the code has not been "

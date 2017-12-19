@@ -123,8 +123,8 @@ class LogisticRegression(LinearBase, Classifier):
             list: list of probabilities.
         """
 
-        if (self._bias and len(X[0]) == self._n_features + 1) or not \
-                self._bias:
+        if (self._bias and len(X[0]) == self._n_features + 1) or \
+                not self._bias:
 
             if self.n_classes > 2:
                 scores = transpose([dot_product(X, coef) for coef in
