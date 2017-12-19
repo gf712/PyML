@@ -98,12 +98,10 @@ class LinearRegression(LinearBase):
             list: list of predictions
         """
 
-        if self.bias and len(X[0]) == self._n_features + 1:
+        if (self.bias and len(X[0]) == self._n_features + 1) or not self.bias:
             return dot_product(X, self.coefficients)
         elif self.bias and len(X[0]) == self._n_features:
             return dot_product([[1] + row for row in X], self._coefficients)
-        elif not self.bias:
-            return dot_product(X, self.coefficients)
         else:
             raise NotImplementedError("This part of the code has not been "
                                       "explored yet, returning to safety...")
