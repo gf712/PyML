@@ -54,6 +54,15 @@ class MathsTest(unittest.TestCase):
         argsorted_array = argmax(array, axis=1)
         self.assertEqual(argsorted_array, [2, 0])
 
+    def test_sum(self):
+        self.assertAlmostEqual(sum(self.A), 35.796210306462129)
+
+    def test_sum_0(self):
+        self.assertAlmostEqual(sum(self.A, axis=0)[0], 4.40005171000251)
+
+    def test_sum_1(self):
+        self.assertAlmostEqual(sum(self.A, axis=1)[0], 3.6822028792082095)
+
     def test_mean(self):
         self.assertAlmostEqual(mean(self.A), 0.44745262883077663)
 
