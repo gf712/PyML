@@ -307,9 +307,10 @@ static PyObject* sum(PyObject* self, PyObject *args) {
     // variable declaration
     flatArray<double>* A = nullptr;
     PyObject *pAArray;
+    int axis;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!", &PyList_Type, &pAArray)) {
+    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pAArray, &axis)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list and an integer!");
         return nullptr;
     }
@@ -317,11 +318,18 @@ static PyObject* sum(PyObject* self, PyObject *args) {
     // use PyList_Size to get size of vector
     A = readFromPythonList<double>(pAArray);
 
-    double result = A->sum();
+    auto result = A->sum(axis);
 
-    PyObject *FinalResult = Py_BuildValue("d", result);
+    // convert vector to python list
+    PyObject* result_py_list = ConvertFlatArray_PyList(result, "float");
 
+    // build python object
+    PyObject *FinalResult = Py_BuildValue("O", result_py_list);
+
+    // deallocate memory
     delete A;
+
+    Py_DECREF(result_py_list);
 
     return FinalResult;
 }
@@ -507,7 +515,7 @@ static PyObject* standardDeviation(PyObject* self, PyObject *args) {
     PyObject *pX = nullptr;
 
     // return error if we don't get all the arguments
-    if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &degreesOfFreedom, &axis)) {
+    if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &axis, &degreesOfFreedom)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list and one integer!");
         return nullptr;
     }
@@ -549,7 +557,7 @@ static PyObject* variance(PyObject* self, PyObject *args) {
     PyObject *FinalResult = nullptr;
 
     // return error if we don't get all the arguments
-    if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &degreesOfFreedom, &axis)) {
+    if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &axis, &degreesOfFreedom)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list and two integers!");
         return nullptr;
     }
@@ -675,7 +683,7 @@ static PyMethodDef Clinear_algebraMethods[] = {
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
         {"multiply",      multiply,               METH_VARARGS,            "Calculate element wise multiplication"},
         {"divide",        divide,                 METH_VARARGS,            "Calculate element wise division"},
-        {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
+        {"Csum",          sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
         {"determinant",   det,                    METH_VARARGS,            "Calculate the determinant of a square matrix"},
         {"transpose",     pyTranspose,            METH_VARARGS,            "Transpose a 2D matrix"},
         {"least_squares", least_squares,          METH_VARARGS,            "Perform least squares"},

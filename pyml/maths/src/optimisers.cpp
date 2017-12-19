@@ -49,7 +49,7 @@ inline T cost(flatArray<T>& loss){
 
     loss.power(2, 1);
 
-    T costResult = loss.sum() / (2 * loss.getCols());
+    T costResult = (*(*loss.sum(0)).sum(0))[0] / (2 * loss.getCols());
 
     return costResult;
 }

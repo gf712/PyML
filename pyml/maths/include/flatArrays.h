@@ -221,7 +221,7 @@ public:
 
     // MATRIX MANIPULATION/LINEAR ALGEBRA
     flatArray<T>* transpose();
-    T sum();
+    flatArray<T>* sum(int axis=0);
     flatArray<T>* dot(const flatArray& other);
 
     flatArray<T>* subtract(const flatArray& other, int replace=0);
