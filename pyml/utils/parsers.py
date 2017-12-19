@@ -11,13 +11,18 @@ def to_number(s):
         return s
 
 
-def csv_parser(filename, column_names=[]):
+def csv_parser(filename, column_names=None):
 
     """
-    CSV file parser
-    :param filename:
-    :param column_names:
-    :return:
+    CSV file parser.
+
+    Args:
+        filename: path to file from pyml directory
+        column_names (list): if None uses default names [1, 2, 3, etc.]
+
+    Returns:
+        dict: dictionary with keys with the name of column and values
+            of each column
     """
 
     csv_to_dict = defaultdict(list)
@@ -31,7 +36,7 @@ def csv_parser(filename, column_names=[]):
                 for i, el in enumerate(row.split(',')):
                     csv_to_dict[i].append(to_number(el))
 
-    if len(column_names) > 0:
+    if column_names is not None:
         for i, x in enumerate(column_names):
             csv_to_dict[x] = csv_to_dict.pop(i)
 
