@@ -7,7 +7,6 @@ import warnings
 
 
 class LinearBase(BaseLearner, Predictor):
-
     """
     """
 
@@ -59,13 +58,12 @@ class LinearBase(BaseLearner, Predictor):
         self._seed = set_seed(seed)
         self._type = _type
 
-        if self._method == 'adagrad' or self._method == 'adadelta' or \
-                self._method == 'rmsprop':
-            if fudge_factor == 0:
-                warnings.warn("Fudge factor for {} optimisation is 0, "
-                              "it will be set to 10e-8 for your own "
-                              "safety".format(self._method))
-                fudge_factor = 10e-8
+        if (self._method == 'adagrad' or self._method == 'adadelta' or
+            self._method == 'rmsprop') and fudge_factor == 0:
+            warnings.warn("Fudge factor for {} optimisation is 0, "
+                          "it will be set to 10e-8 for your own "
+                          "safety".format(self._method))
+            fudge_factor = 10e-8
 
         if self._method == 'adadelta' and self._learning_rate != 1:
             warnings.warn("Adadelta does not use a learning rate, "
