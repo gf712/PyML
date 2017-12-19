@@ -34,18 +34,16 @@
 import sphinx_rtd_theme
 
 extensions = ['sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.todo',
-    'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages',
-    'sphinxcontrib.napoleon']
+              'sphinx.ext.doctest',
+              'sphinx.ext.todo',
+              'sphinx.ext.coverage',
+              'sphinx.ext.mathjax',
+              'sphinx.ext.viewcode',
+              'sphinx.ext.githubpages',
+              'sphinxcontrib.napoleon']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
-
-
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -88,7 +86,6 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
-
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -122,12 +119,10 @@ html_sidebars = {
     ]
 }
 
-
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'PyMLdoc'
-
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -157,7 +152,6 @@ latex_documents = [
      'Gil Ferreira Hoben', 'manual'),
 ]
 
-
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
@@ -166,7 +160,6 @@ man_pages = [
     (master_doc, 'pyml', 'PyML Documentation',
      [author], 1)
 ]
-
 
 # -- Options for Texinfo output -------------------------------------------
 
@@ -178,6 +171,3 @@ texinfo_documents = [
      author, 'PyML', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-

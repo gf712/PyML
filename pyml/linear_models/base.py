@@ -59,7 +59,7 @@ class LinearBase(BaseLearner, Predictor):
         self._type = _type
 
         if (self._method == 'adagrad' or self._method == 'adadelta' or
-            self._method == 'rmsprop') and fudge_factor == 0:
+           self._method == 'rmsprop') and fudge_factor == 0:
             warnings.warn("Fudge factor for {} optimisation is 0, "
                           "it will be set to 10e-8 for your own "
                           "safety".format(self._method))

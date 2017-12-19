@@ -68,21 +68,15 @@ class KMeans(ClusterBase):
                 3. Update centroid coordinates of each cluster (average of each
                     dimension of all point in a cluster)
                 4. Repeat 2 and 3 until reaching one of the stopping criteria
-
-        :type X: list
-        :type y: None
-        :param X: 
-        :param y: None
-        :rtype: object
-        :return: self
         """
         self._X = X
         self._y = y
         self._n = len(X)
 
         if self.n < self.k:
-            raise ValueError("Number of clusters should be lower than the number of data points, "
-                             "instead got {} datapoints for {} clusters".format(self.n, self.k))
+            raise ValueError("Number of clusters should be lower than the "
+                             "number of data points, instead got {} datapoints"
+                             " for {} clusters".format(self.n, self.k))
 
         self._initialise_centroids()
         self._dimensions = len(X[0])
@@ -92,7 +86,8 @@ class KMeans(ClusterBase):
 
         self._labels = self._assign_cluster(self._X)
 
-        while self.iterations < self.max_iterations and self._min_change < change:
+        while self.iterations < self.max_iterations and \
+                self._min_change < change:
             self._old_indices = [self._get_cluster(i) for i in range(self.k)]
             self._update_centroids()
             self._labels = self._assign_cluster(self._X)
@@ -100,7 +95,8 @@ class KMeans(ClusterBase):
             change = self._changes()
 
         if change > self._min_change:
-            warnings.warn("Failed to converge within {} iterations, consider increasing max_iterations".
+            warnings.warn("Failed to converge within {} iterations, consider"
+                          " increasing max_iterations".
                           format(self.max_iterations))
 
     def _predict(self, X):
@@ -108,7 +104,8 @@ class KMeans(ClusterBase):
         Predict cluster assignment using centroids from training step.
 
         Args:
-            X (list): list of size N of lists (all of size M) to perform prediction.
+            X (list): list of size N of lists (all of size M) to perform
+            prediction.
 
         Returns:
             list: list of label predictions.
@@ -188,4 +185,3 @@ class KMeans(ClusterBase):
         """
 
         return self._norm
-

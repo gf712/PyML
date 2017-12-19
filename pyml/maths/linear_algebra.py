@@ -103,7 +103,7 @@ def subtract(A, B):
         list of lists (matrix).
     If matrix has the same number of columns or rows as the vector the vector
         is automatically broadcast to fit the matrix.
-    
+
     Args:
         A (list or scalar): either a list or a list of lists representing a
             vector or matrix, respectively.
