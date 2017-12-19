@@ -11,6 +11,8 @@ Branch      | Linux/OSX | Coverage | Landscape |
 [dev](https://github.com/boostorg/beast/tree/dev)  |  [![Build Status](https://travis-ci.org/gf712/PyML.svg?branch=dev)](https://travis-ci.org/gf712/PyML) | [![Coverage Status](https://coveralls.io/repos/github/gf712/PyML/badge.svg?branch=dev)](https://coveralls.io/github/gf712/PyML?branch=dev) | [![Code Health](https://landscape.io/github/gf712/PyML/dev/landscape.svg?style=flat)](https://landscape.io/github/gf712/PyML/dev)
 
 PyML is a Python package with machine learning algorithms written in Python and C/C++.
+ 
+PyML is currently supported on Linux and OSX, with GCC>=4.8 and Clang>=3.3, on both platforms.
 
 Installation
 ============
