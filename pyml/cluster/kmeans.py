@@ -4,18 +4,21 @@ import warnings
 
 
 class KMeans(ClusterBase):
-    def __init__(self, k=3, initialisation='forgy', max_iterations=100, min_change=1,
-                 seed=None, norm='l1'):
+    def __init__(self, k=3, initialisation='forgy', max_iterations=100,
+                 min_change=1, seed=None, norm='l1'):
         """
         KMeans implementation
 
         Args:
             k (int): number of clusters.
-            initialisation (str): indicates method to initialise clusters (currently forgy or random).
+            initialisation (str): indicates method to initialise clusters
+                (currently forgy or random).
             max_iterations (int): maximum number of iterations.
-            min_change (int): minimum assignment changes after each iteration required to continue algorithm.
+            min_change (int): minimum assignment changes after each iteration
+                required to continue algorithm.
             seed (int or NoneType): sets random seed.
-            norm (str): norm to use in the calculation of distances between each point and all centroids,
+            norm (str): norm to use in the calculation of distances between
+            each point and all centroids,
                  e.g. 'l2' or 2 are equivalent to using the euclidean distance.
 
         Examples:
@@ -50,17 +53,20 @@ class KMeans(ClusterBase):
 
     def _train(self, X, y=None):
         """
-        KMeans clustering to determine the position of centroids and cluster assignment given number of clusters (k).
+        KMeans clustering to determine the position of centroids and cluster
+        assignment given number of clusters (k).
 
         Args:
-            X (list): list of size N of lists (all of size M) to perform KMeans on.
+            X (list): list of size N of lists (all of size M) to perform KMeans
+                on.
             y (NoneType): KMeans does not use labels.
 
         Notes:
             Algorithm:
                 1. Initiate centroid coordinates
                 2. Assign cluster labels to each point of X
-                3. Update centroid coordinates of each cluster (average of each dimension of all point in a cluster)
+                3. Update centroid coordinates of each cluster (average of each
+                    dimension of all point in a cluster)
                 4. Repeat 2 and 3 until reaching one of the stopping criteria
 
         :type X: list
@@ -137,7 +143,8 @@ class KMeans(ClusterBase):
     @property
     def iterations(self):
         """
-        int: Returns the number of KMeans algorithm iterations (if train method has been called).
+        int: Returns the number of KMeans algorithm iterations
+         (if train method has been called).
         """
 
         return self._iterations

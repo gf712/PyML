@@ -25,14 +25,16 @@ class ClusterBase(BaseLearner, Predictor):
             list: indices of datapoints belonging to cluster
         """
 
-        return [i for i, label in enumerate(self._labels) if label == cluster_label]
+        return [i for i, label in enumerate(self._labels)
+                if label == cluster_label]
 
     def _initialise_centroids(self):
         """
         Method to initialise centroids.
         Currently supports forgy and random initialisation.
         (see https://en.wikipedia.org/wiki/K-means_clustering#Initialization_methods).
-        This method directly sets centroids with the self._centroids attribute of the child class.
+        This method directly sets centroids with the self._centroids attribute
+        of the child class.
 
         Returns:
             NoneType
@@ -46,11 +48,13 @@ class ClusterBase(BaseLearner, Predictor):
             self._centroids = [self._X[x] for x in indices]
 
         elif self._initialisation == 'random':
-            self._centroids = [[random.random() for x in range(len(self._X[0]))] for x in range(self.k)]
+            self._centroids = [[random.random() for x in
+                                range(len(self._X[0]))] for x in range(self.k)]
 
     def _get_cluster_mean(self, cluster_label=0):
         """
-        Calculate centroid location (which is the mean in each dimension of all points in a cluster).
+        Calculate centroid location (which is the mean in each dimension of all
+        points in a cluster).
         Returns a list with M coordinates for the cluster_label centroid.
 
         Args:
@@ -78,7 +82,8 @@ class ClusterBase(BaseLearner, Predictor):
         """
 
         # calculate distance to each centroid
-        distances = [calculate_distance(X, self._centroids[i], self.norm) for i in range(self.k)]
+        distances = [calculate_distance(X, self._centroids[i], self.norm) for
+                     i in range(self.k)]
 
         # minimum distance column wise
         return argmin(distances, axis=0)

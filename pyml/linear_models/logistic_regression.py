@@ -87,32 +87,9 @@ class LogisticRegression(LinearBase, Classifier):
                 self._gradient_descent(self.X, self.y, theta=theta)
 
         else:
-
             # multiclass prediction
             # let's train individual binary classifiers
-            self._cost = []
-            self._iterations = []
-
-            first = True
-            for x in range(self._n_classes):
-                # relabel classes
-                y_i = [1 if y_ == x else 0 for y_ in self.y]
-
-                # initiate coefficients
-                if first:
-                    theta = self._initiate_weights(bias=self._bias)
-                    first = False
-                else:
-                    theta = [random.gauss(0, 1) for x in
-                             range(self._n_features + 1)]
-
-                _coefficients_i, cost_i, iterations_i = \
-                    self._gradient_descent(self.X, y_i, theta=theta)
-
-                # keep coefficients of each model
-                self._coefficients.append(_coefficients_i)
-                self._cost.append(cost_i)
-                self._iterations.append(iterations_i)
+            self._one_vs_rest()
 
     def _predict(self, X):
 
@@ -228,3 +205,34 @@ class LogisticRegression(LinearBase, Classifier):
         int: returns the number of classes.
         """
         return self._n_classes
+
+    def _one_vs_rest(self):
+
+        """
+        One vs rest classification
+
+        """
+
+        self._cost = []
+        self._iterations = []
+
+        first = True
+        for x in range(self._n_classes):
+            # relabel classes
+            y_i = [1 if y_ == x else 0 for y_ in self.y]
+
+            # initiate coefficients
+            if first:
+                theta = self._initiate_weights(bias=self._bias)
+                first = False
+            else:
+                theta = [random.gauss(0, 1) for x in
+                         range(self._n_features + 1)]
+
+            _coefficients_i, cost_i, iterations_i = \
+                self._gradient_descent(self.X, y_i, theta=theta)
+
+            # keep coefficients of each model
+            self._coefficients.append(_coefficients_i)
+            self._cost.append(cost_i)
+            self._iterations.append(iterations_i)
