@@ -1,5 +1,6 @@
 import random
-from ..utils import set_seed
+from pyml.utils import set_seed
+from pyml.preprocessing import shuffle_data
 
 
 def gaussian(n=100, d=2, labels=3, sigma=1, seed=None, shuffle=True):
@@ -19,7 +20,7 @@ def gaussian(n=100, d=2, labels=3, sigma=1, seed=None, shuffle=True):
         tuple: (list with datapoints, labels of datapoints)
     """
 
-    set_seed(seed)
+    seed = set_seed(seed)
 
     means = [[random.random() for dim in range(d)] for label in range(labels)]
 
@@ -32,11 +33,7 @@ def gaussian(n=100, d=2, labels=3, sigma=1, seed=None, shuffle=True):
         data_labels += labels_i
 
     if shuffle:
-        data = list(zip(datapoints, data_labels))
-        random.shuffle(data)
-        datapoints, data_labels = zip(*data)
-        datapoints = list(datapoints)
-        data_labels = list(data_labels)
+        datapoints, data_labels = shuffle_data(datapoints, data_labels)
 
     return datapoints, data_labels
 

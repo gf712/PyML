@@ -2,6 +2,27 @@ from pyml.utils import set_seed
 import random
 
 
+def shuffle_data(X, y):
+    """
+    Shuffle data, uses random seed set by the env calling this function.
+    Args:
+        X (list): list to shuffle in the same way as y
+        y (list): list to shuffle in the same way as X
+
+    Returns:
+        tuple: (X, y)
+
+    """
+
+    data = list(zip(X, y))
+    random.shuffle(data)
+    X, y = zip(*data)
+    X = list(X)
+    y = list(y)
+
+    return X, y
+
+
 def train_test_split(X, y, train_split=0.3, shuffle=True, seed=None):
 
     """
@@ -17,14 +38,11 @@ def train_test_split(X, y, train_split=0.3, shuffle=True, seed=None):
     Returns:
         tuple: (X_train, y_train, X_test, y_test)
     """
-    set_seed(seed)
+
+    seed = set_seed(seed)
 
     if shuffle:
-        data = list(zip(X, y))
-        random.shuffle(data)
-        X, y = zip(*data)
-        X = list(X)
-        y = list(y)
+        X, y = shuffle_data(X, y)
 
     n_train = int(len(X) * train_split)
 
