@@ -86,10 +86,7 @@ def add(A, B):
         [[1.0, 1.0, 15.0], [-8.0, -9.0, 10.0]]
     """
 
-    if isinstance(B, (float, int)):
-        B = [B]
-
-    return Clinear_algebra.add(A, B)
+    return _template_func(A, B, Clinear_algebra.add)
 
 
 def subtract(A, B):
@@ -122,10 +119,7 @@ def subtract(A, B):
         [[-1.0, -9.0, -7.0], [2.0, 5.0, -10.0]]
     """
 
-    if isinstance(B, (float, int)):
-        B = [B]
-
-    return Clinear_algebra.subtract(A, B)
+    return _template_func(A, B, Clinear_algebra.subtract)
 
 
 def power(A, n):
@@ -169,10 +163,7 @@ def multiply(A, B):
         [[0.0, -8.0, 8.0], [-6.0, -4.0, 0.0]]
     """
 
-    if isinstance(B, (float, int)):
-        B = [B]
-
-    return Clinear_algebra.multiply(A, B)
+    return _template_func(A, B, Clinear_algebra.multiply)
 
 
 def divide(A, B):
@@ -196,10 +187,8 @@ def divide(A, B):
         [[0.0, -2.0, 2.0], [-1.5, -1.0, 0.0]]
     """
 
-    if isinstance(B, (float, int)):
-        B = [B]
     try:
-        return Clinear_algebra.divide(A, B)
+        return _template_func(A, B, Clinear_algebra.divide)
     except Clinear_algebra.ZeroDivisionError as e:
         # raises Python builtin error instead
         raise ZeroDivisionError(e)
@@ -288,3 +277,21 @@ def eigen(array, tolerance=1.0e-9, max_iterations=0, sort=True, normalise=True):
         v = [[x[i] / v[0][i] for i in range(len(x))] for x in v]
 
     return E, v
+
+
+def _template_func(A, B, func):
+    """
+    Helper function that takes function and applies to A and B, and changes B to list if it's a scalar
+    Args:
+        A (list):
+        B (list or float or int):
+        func (function):
+
+    Returns:
+        list: function result with params A and B
+    """
+
+    if isinstance(B, (float, int)):
+        B = [B]
+
+    return func(A, B)

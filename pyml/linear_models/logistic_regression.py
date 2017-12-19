@@ -1,6 +1,6 @@
 from pyml.linear_models.base import LinearBase
 from pyml.base import Classifier
-from pyml.maths import dot_product, sigmoid, power, argmax
+from pyml.maths import dot_product, sigmoid, argmax, softmax, transpose
 from pyml.metrics.scores import accuracy
 import random
 import math
@@ -137,8 +137,8 @@ class LogisticRegression(LinearBase, Classifier):
         if (self._bias and len(X[0]) == self._n_features + 1) or not self._bias:
 
             if self.n_classes > 2:
-                scores = [dot_product(X, coef) for coef in self.coefficients]
-                return [softmax([scores[i][x] for i in range(self.n_classes)]) for x in range(len(scores[0]))]
+                scores = transpose([dot_product(X, coef) for coef in self.coefficients])
+                return softmax(scores)
 
             else:
                 return sigmoid(dot_product(X, self.coefficients))
@@ -146,8 +146,8 @@ class LogisticRegression(LinearBase, Classifier):
         elif self._bias and len(X[0]) == self._n_features:
 
             if self.n_classes > 2:
-                scores = [dot_product([[1] + row for row in X], coef) for coef in self.coefficients]
-                return [softmax([scores[i][x] for i in range(self.n_classes)]) for x in range(len(scores[0]))]
+                scores = transpose([dot_product([[1] + row for row in X], coef) for coef in self.coefficients])
+                return softmax(scores)
 
             else:
                 return sigmoid(dot_product([[1] + row for row in X], self.coefficients))
@@ -210,20 +210,3 @@ class LogisticRegression(LinearBase, Classifier):
         int: returns the number of classes.
         """
         return self._n_classes
-
-
-def softmax(u):
-
-    """
-    Computes softmax of a vector u.
-
-    Args:
-        u (list): vector.
-
-    Returns:
-        list: softmax of vector u.
-    """
-
-    z_exp = [math.exp(u_i) for u_i in u]
-    sum_z_exp = sum(z_exp)
-    return [i / sum_z_exp for i in z_exp]

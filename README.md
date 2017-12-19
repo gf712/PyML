@@ -5,10 +5,10 @@ PyML
 [![Anaconda-Server Badge](https://anaconda.org/gf712/pyml/badges/downloads.svg)](https://anaconda.org/gf712/pyml)
 [![Anaconda-Server Badge](https://anaconda.org/gf712/pyml/badges/version.svg)](https://anaconda.org/gf712/pyml)
 
-Branch      | Linux/OSX | Coverage | Landscape |
+Branch      | Linux/OSX | Coverage | Maintainability |
 ------------|-----------|----------|-----------| 
-[master](https://github.com/boostorg/beast/tree/master)   | [![Build Status](https://travis-ci.org/gf712/PyML.svg?branch=master)](https://travis-ci.org/gf712/PyML) | [![Coverage Status](https://coveralls.io/repos/github/gf712/PyML/badge.svg)](https://coveralls.io/github/gf712/PyML) | [![Code Health](https://landscape.io/github/gf712/PyML/master/landscape.svg?style=flat)](https://landscape.io/github/gf712/PyML/master)
-[dev](https://github.com/boostorg/beast/tree/dev)  |  [![Build Status](https://travis-ci.org/gf712/PyML.svg?branch=dev)](https://travis-ci.org/gf712/PyML) | [![Coverage Status](https://coveralls.io/repos/github/gf712/PyML/badge.svg?branch=dev)](https://coveralls.io/github/gf712/PyML?branch=dev) | [![Code Health](https://landscape.io/github/gf712/PyML/dev/landscape.svg?style=flat)](https://landscape.io/github/gf712/PyML/dev)
+[master](https://github.com/boostorg/beast/tree/master)   | [![Build Status](https://travis-ci.org/gf712/PyML.svg?branch=master)](https://travis-ci.org/gf712/PyML) | [![Coverage Status](https://coveralls.io/repos/github/gf712/PyML/badge.svg)](https://coveralls.io/github/gf712/PyML) | [![Maintainability](https://api.codeclimate.com/v1/badges/0741a85a993857bfa5f7/maintainability)](https://codeclimate.com/github/gf712/PyML/maintainability)
+[dev](https://github.com/boostorg/beast/tree/dev)  |  [![Build Status](https://travis-ci.org/gf712/PyML.svg?branch=dev)](https://travis-ci.org/gf712/PyML) | [![Coverage Status](https://coveralls.io/repos/github/gf712/PyML/badge.svg?branch=dev)](https://coveralls.io/github/gf712/PyML?branch=dev) | [![Maintainability](https://api.codeclimate.com/v1/badges/0741a85a993857bfa5f7/maintainability)](https://codeclimate.com/github/gf712/PyML/dev/maintainability)
 
 PyML is a Python package with machine learning algorithms written in Python and C/C++.
  
