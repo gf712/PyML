@@ -19,14 +19,16 @@ inline void sigmoid(flatArray<T> *scores) {
 
 
 template <typename T>
-inline void predict(flatArray<T> &X, flatArray<T> &w, char predType[10], flatArray<T> *result) {
+inline flatArray<T>* predict(flatArray<T> &X, flatArray<T> &w, char predType[10]) {
 
-    *result = *X.dot(w);
+    auto result = X.dot(w);
 
     // if using classification, calculate sigmoid(h)
     if (strcmp(predType, "logit") == 0) {
         sigmoid(result);
     }
+
+    return result;
 }
 
 template <typename T>
@@ -55,12 +57,12 @@ inline T cost(flatArray<T>& loss){
 
 template <typename T>
 inline T calculateCost(flatArray<T>& X, flatArray<T>& theta, flatArray<T> &y,
-                       flatArray<T>* prediction, char predType[10]) {
+                       char predType[10]) {
 
     T result;
     char empty[0];
 
-    predict<T>(X, theta, empty, prediction);
+    auto prediction = predict<T>(X, theta, empty);
 
 
     if (strcmp(predType, "logit") == 0) {
@@ -74,28 +76,30 @@ inline T calculateCost(flatArray<T>& X, flatArray<T>& theta, flatArray<T> &y,
         result = cost(*prediction);
     }
 
+    delete prediction;
     return result;
 }
 
 
 template <typename T>
 inline void updateWeights(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta, flatArray<T>& XT, flatArray<T>* nu,
-                          flatArray<T>* error, double gamma, double learningRate, int m, T n, char predType[10],
+                          double gamma, double learningRate, int m, T n, char predType[10],
                           char method[10], T epsilon, flatArray<T>* G, int iteration) {
 
     // variable declaration
     flatArray<T>* updateTerm = nullptr;
+    flatArray<T>* error = nullptr;
 
     if (strcmp(method, "normal") == 0) {
 
-    // #######################################################
-    //                 Vanilla gradient term
-    // #######################################################
-    //
-    //                   updateTerm = ∇J(θ)
-    //
+        // #######################################################
+        //                 Vanilla gradient term
+        // #######################################################
+        //
+        //                   updateTerm = ∇J(θ)
+        //
         // get error for this step
-        predict<T>(X, *theta, predType, error);
+        error = predict<T>(X, *theta, predType);
         *error -= y;
 
         // calculate updateTerm = gradient
@@ -105,12 +109,12 @@ inline void updateWeights(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
 
     else if (strcmp(method, "nesterov") == 0) {
 
-    // #######################################################
-    //                 Nesterov gradient term
-    // #######################################################
-    //
-    //             updateTerm = ∇J(θ − γ · v[t-1])
-    //
+        // #######################################################
+        //                 Nesterov gradient term
+        // #######################################################
+        //
+        //             updateTerm = ∇J(θ − γ · v[t-1])
+        //
 
         // copy theta
         auto* tempTheta = new flatArray<T>(*theta);
@@ -122,7 +126,7 @@ inline void updateWeights(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
         }
 
         // calculate the gradient with new theta
-        predict<T>(X, *tempTheta, predType, error);
+        error = predict<T>(X, *tempTheta, predType);
         *error -= y;
 
         updateTerm = XT.dot(*error);
@@ -134,22 +138,22 @@ inline void updateWeights(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
 
     else if (strcmp(method, "adagrad") == 0) {
 
-    // #######################################################
-    //                 Adagrad gradient term
-    // #######################################################
-    //
-    //                   g[t] = ∇J(θ[t])
-    //
-    //                  G[t] = G[t - 1] + g[t] ** 2
-    //
-    //         updateTerm = g[t] / ((G[t] ** 0.5 + e)
-    //
+        // #######################################################
+        //                 Adagrad gradient term
+        // #######################################################
+        //
+        //                   g[t] = ∇J(θ[t])
+        //
+        //                  G[t] = G[t - 1] + g[t] ** 2
+        //
+        //         updateTerm = g[t] / ((G[t] ** 0.5 + e)
+        //
         flatArray<T>* g = nullptr;
         flatArray<T>* g_2 = nullptr;
         flatArray<T>* G_i = nullptr;
 
         // get predictions for this step
-        predict<T>(X, *theta, predType, error);
+        error = predict<T>(X, *theta, predType);
         (*error) -= y;
 
         g = XT.dot(*error);
@@ -170,17 +174,17 @@ inline void updateWeights(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
     }
 
     else if (strcmp(method, "adadelta") == 0) {
-    // #######################################################
-    //                 Adadelta gradient term
-    // #######################################################
-    //
-    //            RMS[∆θ][t] = (E[∆θ**2] + e) ** .5
-    //
-    //          ∆θt= (-RMS[∆θ[t-1]] / RMS[g[t]]) · g[t]
-    //
-    // Note: In this implementation the negative sign is ignored,
-    // since all update terms are subtracted from theta anyway
-    //
+        // #######################################################
+        //                 Adadelta gradient term
+        // #######################################################
+        //
+        //            RMS[∆θ][t] = (E[∆θ**2] + e) ** .5
+        //
+        //          ∆θt= (-RMS[∆θ[t-1]] / RMS[g[t]]) · g[t]
+        //
+        // Note: In this implementation the negative sign is ignored,
+        // since all update terms are subtracted from theta anyway
+        //
 
         flatArray<T>* g = nullptr;
         flatArray<T>* g_2 = nullptr;
@@ -193,7 +197,7 @@ inline void updateWeights(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
         E_prev->power(0.5, 1);
 
         // get predictions for this step
-        predict<T>(X, *theta, predType, error);
+        error = predict<T>(X, *theta, predType);
         *error -= y;
 
         g = XT.dot(*error);
@@ -248,7 +252,7 @@ inline void updateWeights(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
         auto* E_prev = new flatArray<T>(*G);
 
         // get predictions for this step
-        predict<T>(X, *theta, predType, error);
+        error = predict<T>(X, *theta, predType);
         *error -= y;
 
         g = XT.dot(*error);
@@ -312,6 +316,7 @@ inline void updateWeights(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
 
     END:
     delete updateTerm;
+    delete error;
 }
 
 
@@ -326,10 +331,8 @@ void batchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
     T JOld;
     T JNew;
     auto* G = zeroArray<T>(1, m);
-    auto* prediction = emptyArray<T>(1, n);
-    auto* error = emptyArray<T>(1, n);
 
-    JNew = calculateCost(X, *theta, y, prediction, predType);
+    JNew = calculateCost(X, *theta, y, predType);
     costArray->setNElement(JNew, iteration);
 
 
@@ -339,11 +342,13 @@ void batchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
         JOld = JNew;
 
         // update weights
-        updateWeights<T>(X, y, theta, XT, nu, error, alpha, learningRate, m, n, predType, method, fudgeFactor, G,
+        updateWeights<T>(X, y, theta, XT, nu, alpha, learningRate, m, n, predType, method, fudgeFactor, G,
                          iteration);
-        
+
+//        PyErr_SetString(PyExc_ValueError, std::to_string(y.getNElement(0)).c_str());
+
         // calculate cost for new weights
-        JNew = calculateCost<T>(X, *theta, y, prediction, predType);
+        JNew = calculateCost<T>(X, *theta, y, predType);
 
         e = fabs(JOld) - fabs(JNew);
 
@@ -353,8 +358,6 @@ void batchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
     }
 
     delete G;
-    delete prediction;
-    delete error;
 }
 
 
@@ -392,11 +395,8 @@ void minibatchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* th
     T JOld;
     T JNew;
     auto* G = zeroArray<T>(1, m);
-    auto* prediction = emptyArray<T>(1, n);
-    auto* batchError = emptyArray<T>(1, batchSize);
-    auto* batchErrorRemainder = emptyArray<T>(1, remainder);
 
-    JNew = calculateCost(X, *theta, y, prediction, predType);
+    JNew = calculateCost(X, *theta, y, predType);
     costArray->setNElement(JNew, iteration);
 
     auto batchIterations = static_cast<int>(floor(n / batchSize));
@@ -430,11 +430,11 @@ void minibatchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* th
             getBatches<T>(X, y, XT, XNew, yNew, XTNew, rNums, batchSize, batchNumber, n);
 
             // update weights using this batch
-            updateWeights<T>(*XNew, *yNew, theta, *XTNew, nu, batchError, alpha, learningRate, m, batchSize, predType,
+            updateWeights<T>(*XNew, *yNew, theta, *XTNew, nu, alpha, learningRate, m, batchSize, predType,
                              method, fudgeFactor, G, iteration);
 
             // calculate overall cost
-            JNew = calculateCost<T>(X, *theta, y, prediction, predType);
+            JNew = calculateCost<T>(X, *theta, y, predType);
 
             costArray->setNElement(JNew, k);
             batchNumber++;
@@ -458,11 +458,11 @@ void minibatchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* th
             getBatches<T>(X, y, XT, XNewi, yNewi, XTNewi, rNums, batchSize, batchNumber, n);
 
             // update weights using this batch
-            updateWeights<T>(*XNewi, *yNewi, theta, *XTNewi, nu, batchErrorRemainder, alpha, learningRate, m, remainder,
+            updateWeights<T>(*XNewi, *yNewi, theta, *XTNewi, nu, alpha, learningRate, m, remainder,
                              predType, method, fudgeFactor, G, iteration);
 
             // calculate overall cost
-            JNew = calculateCost<T>(X, *theta, y, prediction, predType);
+            JNew = calculateCost<T>(X, *theta, y, predType);
 
             costArray->setNElement(JNew, k);
 
@@ -478,9 +478,6 @@ void minibatchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* th
     }
 
     delete G;
-    delete prediction;
-    delete batchError;
-    delete batchErrorRemainder;
 }
 
 
@@ -540,4 +537,3 @@ int gradientDescent(flatArray<T>& X, flatArray<T> &y, flatArray<T> *theta, int m
     // return number of iterations needed to reach convergence
     return iteration;
 }
-
