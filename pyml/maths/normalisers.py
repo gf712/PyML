@@ -16,7 +16,7 @@ def sigmoid(u):
         TypeError: raised if list passed is not a list of scalars.
     """
 
-    if isinstance(u[0], (float, int)):
+    if isinstance(u[0], (float, int)) and len(u) > 0:
         return [1 / (1 + math.exp(-el)) for el in u]
 
     else:

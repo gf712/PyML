@@ -1,6 +1,5 @@
 import unittest
-from pyml.maths.math_utils import *
-from pyml.maths.linear_algebra import *
+from pyml.maths import *
 from pyml.utils import set_seed
 import random
 
@@ -202,3 +201,18 @@ class LinearAlgebraTest(unittest.TestCase):
     def test_determinant_2(self):
         A = [[1, 3, 2], [4, 1, 3], [2, 5, 2]]
         self.assertAlmostEqual(determinant(A), 17)
+
+
+class NormalisersTest(unittest.TestCase):
+
+    def test_softmax(self):
+
+        self.assertAlmostEqual(softmax([1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0])[0],
+                               0.023640543021591385)
+
+        self.assertRaises(TypeError, softmax, ['a', 'list', 'of', 'strings'])
+
+        self.assertAlmostEqual(sigmoid([0.69, 0.5, -0.5, 1, 10])[0],
+                               0.6659669267518202)
+
+        self.assertRaises(TypeError, sigmoid, [[[0, 1, 2, 3, 4]]])
