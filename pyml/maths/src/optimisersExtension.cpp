@@ -42,10 +42,10 @@ static PyObject *GD(PyObject *self, PyObject *args) {
     n = X->getRows();
     m = X->getCols();
 
-    if (PyList_Size(ptheta) != m) {
-        PyErr_SetString(PyExc_ValueError, "Theta should be the same size as the number of features.");
-        return nullptr;
-    }
+//    if (PyList_Size(ptheta) != m) {
+//        PyErr_SetString(PyExc_ValueError, "Theta should be the same size as the number of features.");
+//        return nullptr;
+//    }
 
     if (m > n) {
         PyErr_SetString(PyExc_ValueError, "More features than training examples!");

@@ -100,7 +100,7 @@ class LinearRegression(LinearBase):
 
         if (self._bias and len(X[0]) == self._n_features + 1) or\
                 not self._bias:
-            return dot_product(X, self.coefficients)
+            return dot_product(X, self._coefficients)
         elif self._bias and len(X[0]) == self._n_features:
             return dot_product([[1] + row for row in X], self._coefficients)
         else:
