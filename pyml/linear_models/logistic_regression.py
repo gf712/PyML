@@ -9,7 +9,8 @@ import math
 class LogisticRegression(LinearBase, Classifier):
     def __init__(self, seed=None, bias=True, learning_rate=0.01,
                  epsilon=0.01, max_iterations=10000, alpha=0.0,
-                 batch_size=0, method='normal', fudge_factor=10e-8):
+                 batch_size=0, method='normal', fudge_factor=10e-8,
+                 eval_verbose=0):
         """
         Linear regression implementation.
 
@@ -36,6 +37,8 @@ class LogisticRegression(LinearBase, Classifier):
             fudge_factor (float): fudge factor for Adagrad/Adadelta/RMSprop to
                 prevent zero divisions.
             seed (int or NoneType): set random seed.
+            eval_verbose (int): number of iterations after which to display
+                cost
 
         Examples:
             >>> from pyml.linear_models import LogisticRegression
@@ -58,7 +61,8 @@ class LogisticRegression(LinearBase, Classifier):
         LinearBase.__init__(self, learning_rate=learning_rate, epsilon=epsilon,
                             max_iterations=max_iterations, alpha=alpha,
                             batch_size=batch_size, method=method, seed=seed,
-                            _type='logit', fudge_factor=fudge_factor)
+                            _type='logit', fudge_factor=fudge_factor,
+                            eval_verbose=eval_verbose)
         Classifier.__init__(self)
 
         self._bias = bias

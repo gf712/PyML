@@ -7,7 +7,8 @@ class LinearRegression(LinearBase):
 
     def __init__(self, bias=True, solver='OLS', learning_rate=0.01,
                  epsilon=0.01, max_iterations=10000, alpha=0.0, batch_size=0,
-                 method='normal', fudge_factor=10e-8, seed=None):
+                 method='normal', fudge_factor=10e-8, seed=None,
+                 eval_verbose=0):
 
         """
 
@@ -36,6 +37,8 @@ class LinearRegression(LinearBase):
             fudge_factor (float): fudge factor for Adagrad/Adadelta/RMSprop to
                 prevent zero divisions.
             seed (int or NoneType): set random seed
+            eval_verbose (int): number of iterations after which to display
+                cost
 
         Examples:
             >>> from pyml.linear_models import LinearRegression
@@ -50,7 +53,8 @@ class LinearRegression(LinearBase):
         LinearBase.__init__(self, learning_rate=learning_rate, epsilon=epsilon,
                             max_iterations=max_iterations, alpha=alpha,
                             batch_size=batch_size, method=method, seed=seed,
-                            _type='regressor', fudge_factor=fudge_factor)
+                            _type='regressor', fudge_factor=fudge_factor,
+                            eval_verbose=eval_verbose)
 
         self._bias = bias
         if solver in ['OLS', 'gradient_descent']:

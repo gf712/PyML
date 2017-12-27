@@ -7,11 +7,9 @@ import warnings
 
 
 class LinearBase(BaseLearner, Predictor):
-    """
-    """
 
     def __init__(self, learning_rate, epsilon, max_iterations, alpha,
-                 fudge_factor, batch_size, method, seed, _type):
+                 fudge_factor, batch_size, method, seed, _type, eval_verbose):
         """
         Base class for linear models.
         Inherits methods from BaseLearner and Predictor.
@@ -37,11 +35,14 @@ class LinearBase(BaseLearner, Predictor):
             _type (str): tells backend to perform classification or regression
                 - 'regression'
                 - 'classification'
+            eval_verbose (int): number of iterations after which to display
+                cost
         """
 
         BaseLearner.__init__(self)
         Predictor.__init__(self)
 
+        self._eval_verbose = eval_verbose
         self._epsilon = epsilon
         self._max_iterations = max_iterations
         self._learning_rate = learning_rate
@@ -100,4 +101,5 @@ class LinearBase(BaseLearner, Predictor):
         return gradient_descent(X, theta, y, self._batch_size,
                                 self._max_iterations, self._epsilon,
                                 self._learning_rate, self._alpha, self._type,
-                                self._method, self._seed, self._fudge_factor)
+                                self._method, self._seed, self._fudge_factor,
+                                self._eval_verbose)

@@ -325,7 +325,7 @@ void batchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
                           flatArray<T>* costArray, flatArray<T>* nu, double e, double epsilon,
                           int maxIteration, char predType[10], double alpha,
                           double learningRate, int m, T n, int& iteration, char method[10],
-                          T fudgeFactor) {
+                          T fudgeFactor, int eval_verbose) {
 
     // calculate gradient using the whole dataset
     T JOld;
@@ -337,6 +337,14 @@ void batchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
 
 
     while (fabs(e) >= epsilon and iteration < maxIteration) {
+
+        if (eval_verbose > 0) {
+
+            if (iteration % eval_verbose == 0) {
+                PySys_WriteStdout("Iteration %i cost: %.4lf\n", iteration, JNew);
+            }
+
+        }
 
         // update J
         JOld = JNew;
@@ -358,6 +366,10 @@ void batchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* theta,
     }
 
     delete G;
+
+    if (eval_verbose > 0) {
+        PySys_WriteStdout("Final cost: %.4f\n", JNew);
+    }
 }
 
 
@@ -387,7 +399,7 @@ void minibatchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* th
                               flatArray<T>* costArray, flatArray<T>* nu, double e, double epsilon,
                               int maxIteration, char predType[10], double alpha,
                               double learningRate, int m, T n, int batchSize, int& iteration,
-                              char method[10], T fudgeFactor) {
+                              char method[10], T fudgeFactor, int eval_verbose) {
 
     // calculate gradient using mini batch (where 1 <= batch_size < m)
     int remainder = static_cast<int>(n) % batchSize;
@@ -404,6 +416,14 @@ void minibatchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* th
     int k = 0;
 
     while (fabs(e) >= epsilon and iteration < maxIteration) {
+
+        if (eval_verbose > 0) {
+
+            if (iteration % eval_verbose == 0) {
+                PySys_WriteStdout("Iteration %i cost: %.4lf\n", iteration, JNew);
+            }
+
+        }
 
         JOld = JNew;
 
@@ -425,7 +445,6 @@ void minibatchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* th
         XTNew = emptyArray<T>(m, batchSize);
 
         for (int i = 0; i < batchIterations; ++i) {
-
 
             getBatches<T>(X, y, XT, XNew, yNew, XTNew, rNums, batchSize, batchNumber, n);
 
@@ -477,6 +496,10 @@ void minibatchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* th
         iteration++;
     }
 
+    if (eval_verbose > 0) {
+        PySys_WriteStdout("Final cost: %.4f\n", JNew);
+    }
+
     delete G;
 }
 
@@ -484,7 +507,7 @@ void minibatchGradientDescent(flatArray<T>& X, flatArray<T>& y, flatArray<T>* th
 template <typename T>
 int gradientDescent(flatArray<T>& X, flatArray<T> &y, flatArray<T> *theta, int maxIteration, T epsilon,
                     T learningRate, T alpha, flatArray<T>* costArray, char predType[10], int batchSize,
-                    int seed, char method[10], T fudge_factor) {
+                    int seed, char method[10], T fudge_factor, int eval_verbose) {
 
     // set random variables
     srand(static_cast<unsigned int>(seed));
@@ -511,19 +534,19 @@ int gradientDescent(flatArray<T>& X, flatArray<T> &y, flatArray<T> *theta, int m
     if (batchSize <= 0) {
         // batch gradient descent
         batchGradientDescent(X, y, theta, *XT, costArray, nu, e, epsilon, maxIteration,
-                             predType, alpha, learningRate, m, n, iteration, method, fudge_factor);
+                             predType, alpha, learningRate, m, n, iteration, method, fudge_factor, eval_verbose);
     }
 
     else if (batchSize > 0 && batchSize < X.getRows()) {
         // mini batch gradient descent (if batch size = 1 it's the equivalent of stochastic gradient descent)
         minibatchGradientDescent(X, y, theta, *XT, costArray, nu, e, epsilon, maxIteration, predType,
-                                 alpha, learningRate, m, n, batchSize, iteration, method, fudge_factor);
+                                 alpha, learningRate, m, n, batchSize, iteration, method, fudge_factor, eval_verbose);
     }
 
     else if (batchSize >= X.getRows()) {
         // batch_size > number of examples, default to batch gradient descent
         batchGradientDescent(X, y, theta, *XT, costArray, nu, e, epsilon, maxIteration,
-                             predType, alpha, learningRate, m, n, iteration, method, fudge_factor);
+                             predType, alpha, learningRate, m, n, iteration, method, fudge_factor, eval_verbose);
     }
 
     else {

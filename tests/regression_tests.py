@@ -63,7 +63,7 @@ class GradientDescentTest(unittest.TestCase):
     def test_GD_opt_InitError(self):
         self.assertRaises(ValueError, LinearBase, 0.01, 0.01, 10, 0.9, 64, 0.1,
                           'amazing_optimiser_algo', None,
-                          'regressor')
+                          'regressor', 0)
 
 
 class LinearRegressionOLSTest(unittest.TestCase):
