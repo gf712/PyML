@@ -36,13 +36,56 @@ flatArray<T>* flatArray<T>::transpose() {
 
 
 template <class T>
-T flatArray<T>::sum() {
+flatArray<T>* flatArray<T>::sum(int axis) {
 
-    T result = 0;
+    flatArray<T>* result = nullptr;
 
-    for (int n = 0; n < size; ++n) {
-        result += array[n];
-    };
+    if (rows == 1) {
+        // vector
+        result = zeroArray<T>(1, 1);
+
+        for (int i = 0; i < cols; ++i) {
+            (*result)[0] += array[i];
+        }
+    }
+
+    else if (rows > 1) {
+        // matrix
+        if (axis == 0) {
+            // sum of each column
+
+            result = zeroArray<T>(1 , cols);
+
+            for (int i = 0; i < cols; ++i) {
+
+                T *colArray = getCol(i);
+
+                for (int j = 0; j < rows; ++j) {
+                    (*result)[i] += colArray[j];
+                }
+            }
+        }
+
+        else if (axis == 1) {
+            // sum of each row
+
+            result = zeroArray<T>(1, rows);
+
+            for (int i = 0; i < rows; ++i) {
+
+                T *rowArray = getRow(i);
+
+                for (int j = 0; j < cols; ++j) {
+                    (*result)[i] += rowArray[j];
+                }
+            }
+        }
+
+        else {
+            throw flatArrayUnknownAxis(axis);
+        }
+
+    }
 
     return result;
 }
@@ -648,7 +691,7 @@ flatArray<T>& flatArray<T>::invertSign(int replace) {
 
         flatArray<T> result = flatArray<T>(newArray, rows, cols);
 
-        delete newArray;
+        delete  [] newArray;
 
         return result;
     }

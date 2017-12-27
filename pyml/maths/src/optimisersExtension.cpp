@@ -11,7 +11,7 @@
 static PyObject *GD(PyObject *self, PyObject *args) {
 
     // variable declaration
-    int m, n, maxIterations, iterations, batchSize, seed;
+    int m, n, maxIterations, iterations, batchSize, seed, eval_verbose;
     double epsilon, learningRate, alpha, fudge_factor;
     flatArray<double>* costArray = nullptr;
     flatArray<double>* X = nullptr;
@@ -27,9 +27,9 @@ static PyObject *GD(PyObject *self, PyObject *args) {
     PyObject* pyTheta;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!O!O!iidddssid", &PyList_Type, &pX, &PyList_Type, &ptheta, &PyList_Type, &py,
+    if(!PyArg_ParseTuple(args, "O!O!O!iidddssidi", &PyList_Type, &pX, &PyList_Type, &ptheta, &PyList_Type, &py,
                          &batchSize, &maxIterations, &epsilon, &learningRate, &alpha, &predType, &method, &seed,
-                         &fudge_factor)) {
+                         &fudge_factor, &eval_verbose)) {
         PyErr_SetString(PyExc_TypeError, "Check arguments!");
         return nullptr;
     }
@@ -41,11 +41,6 @@ static PyObject *GD(PyObject *self, PyObject *args) {
 
     n = X->getRows();
     m = X->getCols();
-
-    if (PyList_Size(ptheta) != m) {
-        PyErr_SetString(PyExc_ValueError, "Theta should be the same size as the number of features.");
-        return nullptr;
-    }
 
     if (m > n) {
         PyErr_SetString(PyExc_ValueError, "More features than training examples!");
@@ -72,7 +67,7 @@ static PyObject *GD(PyObject *self, PyObject *args) {
 
     // gradient descent
     iterations = gradientDescent<double>(*X, *y, theta, maxIterations, epsilon, learningRate, alpha, costArray, predType,
-                                         batchSize, seed, method, fudge_factor);
+                                         batchSize, seed, method, fudge_factor, eval_verbose);
 
     // costArray only needs #iterations columns
     if (batchSize > 0 && batchSize < n) {

@@ -1,31 +1,110 @@
-sudo: false
+  sudo: false
 
-language: python
+  language: c
 
-python:
-    - 3.5
-    - 3.6
+  matrix:
+    include:
+      # works on Precise and Trusty
+      - os: linux
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+            packages:
+              - g++-4.9
+        env:
+           - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+           - CONDA_PY=3.5
 
-# Install packages
-install:
-    - sudo apt-get update
-    - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-    - bash miniconda.sh -b -p $HOME/miniconda
-    - export PATH="$HOME/miniconda/bin:$PATH"
+      - os: linux
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+            packages:
+              - g++-4.9
+        env:
+           - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+           - CONDA_PY=3.6
+
+      - os: linux
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+              - llvm-toolchain-precise-3.6
+            packages:
+              - clang-3.6
+        env:
+           - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+           - CONDA_PY=3.5
+
+      - os: linux
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+              - llvm-toolchain-precise-3.6
+            packages:
+              - clang-3.6
+        env:
+           - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+           - CONDA_PY=3.6
+
+      - os: osx
+        osx_image: xcode8
+        env:
+          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+          - CONDA_PY=3.5
+
+
+      - os: osx
+        osx_image: xcode8
+        env:
+          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+          - CONDA_PY=3.6
+
+#      - os: osx
+#        env:
+#          - MATRIX_EVAL="CC=clang && CXX=clang++"
+#          - MACOSX_DEPLOYMENT_TARGET=10.8
+#          - CONDA_PY=3.5
+#        osx_image: xcode8
+#        compiler: clang
+#
+#      - os: osx
+#        env:
+#          - MATRIX_EVAL="CC=clang && CXX=clang++"
+#          - MACOSX_DEPLOYMENT_TARGET=10.8
+#          - CONDA_PY=3.6
+#        osx_image: xcode8
+#        compiler: clang
+
+  before_install:
+    - source build_tools/travis/before_install.sh
+    - eval "${MATRIX_EVAL}"
+
+  # Install packages
+  install:
+    - source build_tools/travis/install_miniconda.sh
     - hash -r
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
+    - conda install conda-build
     # Useful for debugging any issues with conda
     - conda info -a
-    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
+    - conda create -q -n test-environment python=$CONDA_PY
     - source activate test-environment
     - pip install coveralls
     - pip install coverage
-    - python setup.py install
+    - pip install codecov
 
-script:
-    - coverage run setup.py test
+  script:
+      - conda build --quiet --python=$CONDA_PY .
+      - conda install pyml --use-local
+  #    - which gcc
+      - coverage run setup.py test
 
-after_success:
-    - coveralls
-    - codecov
+  after_success:
+      - coveralls
+      - codecov || echo "codecov upload failed"

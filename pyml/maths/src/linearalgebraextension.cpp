@@ -302,26 +302,52 @@ static PyObject* divide(PyObject* self, PyObject *args) {
 
 static PyObject* sum(PyObject* self, PyObject *args) {
 
-    // sum of all elements in a matrix/vector
+    // sum of all elements in a matrix/vector, numpy style
 
     // variable declaration
     flatArray<double>* A = nullptr;
     PyObject *pAArray;
+    int axis;
 
     // return error if we don't get all the arguments
-    if(!PyArg_ParseTuple(args, "O!", &PyList_Type, &pAArray)) {
+    if(!PyArg_ParseTuple(args, "O!i", &PyList_Type, &pAArray, &axis)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list and an integer!");
         return nullptr;
     }
 
     // use PyList_Size to get size of vector
     A = readFromPythonList<double>(pAArray);
+    flatArray<double>* result= nullptr;
+    PyObject* FinalResult = nullptr;
 
-    double result = A->sum();
+    try {
+        result = A->sum(axis);
+    }
 
-    PyObject *FinalResult = Py_BuildValue("d", result);
+    catch (flatArrayUnknownAxis &e) {
+        PyErr_SetString(UnknownAxis, e.what());
+        return nullptr;
+    }
+
+//    PyErr_SetString(PyExc_ValueError, std::to_string(result->getCols()).c_str());
+
+    if (result->getCols() == 1) {
+
+        FinalResult = Py_BuildValue("d", result->getNElement(0));
+
+    }
+
+    else {
+
+        PyObject *result_py_list = ConvertFlatArray_PyList(result, "float");
+
+        FinalResult = Py_BuildValue("O", result_py_list);
+
+        Py_DECREF(result_py_list);
+    }
 
     delete A;
+    delete result;
 
     return FinalResult;
 }
@@ -436,7 +462,7 @@ static PyObject* least_squares(PyObject* self, PyObject *args) {
     PyObject *FinalResult = Py_BuildValue("O", result_py_list);
 
     // memory deallocation
-    delete theta;
+    delete [] theta;
     delete X;
     delete y;
 
@@ -507,7 +533,7 @@ static PyObject* standardDeviation(PyObject* self, PyObject *args) {
     PyObject *pX = nullptr;
 
     // return error if we don't get all the arguments
-    if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &degreesOfFreedom, &axis)) {
+    if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &axis, &degreesOfFreedom)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list and one integer!");
         return nullptr;
     }
@@ -549,7 +575,7 @@ static PyObject* variance(PyObject* self, PyObject *args) {
     PyObject *FinalResult = nullptr;
 
     // return error if we don't get all the arguments
-    if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &degreesOfFreedom, &axis)) {
+    if (!PyArg_ParseTuple(args, "O!ii", &PyList_Type, &pX, &axis, &degreesOfFreedom)) {
         PyErr_SetString(PyExc_TypeError, "Expected a list and two integers!");
         return nullptr;
     }
@@ -667,7 +693,7 @@ static PyObject* version(PyObject* self) {
 }
 
 
-static PyMethodDef linearAlgebraMethods[] = {
+static PyMethodDef Clinear_algebraMethods[] = {
         // Python name    C function              argument representation  description
         {"dot_product",   dot_product,            METH_VARARGS,            "Calculate the dot product of two vectors"},
         {"power",         power,                  METH_VARARGS,            "Calculate element wise power"},
@@ -675,7 +701,7 @@ static PyMethodDef linearAlgebraMethods[] = {
         {"subtract",      subtract,               METH_VARARGS,            "Calculate element wise subtraction"},
         {"multiply",      multiply,               METH_VARARGS,            "Calculate element wise multiplication"},
         {"divide",        divide,                 METH_VARARGS,            "Calculate element wise division"},
-        {"sum",           sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
+        {"Csum",          sum,                    METH_VARARGS,            "Calculate the total sum of a vector"},
         {"determinant",   det,                    METH_VARARGS,            "Calculate the determinant of a square matrix"},
         {"transpose",     pyTranspose,            METH_VARARGS,            "Transpose a 2D matrix"},
         {"least_squares", least_squares,          METH_VARARGS,            "Perform least squares"},
@@ -689,12 +715,12 @@ static PyMethodDef linearAlgebraMethods[] = {
 };
 
 
-static struct PyModuleDef linearAlgebraModule = {
+static struct PyModuleDef Clinear_algebraModule = {
         PyModuleDef_HEAD_INIT,
-        "linearAlgebra", // module name
+        "Clinear_algebra", // module name
         "Collection of linear algebra functions in C to be used in Python", // documentation of module
         -1, // global state
-        linearAlgebraMethods // method defs
+        Clinear_algebraMethods // method defs
 };
 
 
@@ -702,7 +728,7 @@ PyMODINIT_FUNC PyInit_Clinear_algebra(void) {
 
     PyObject *m;
 
-    m = PyModule_Create(&linearAlgebraModule);
+    m = PyModule_Create(&Clinear_algebraModule);
 
     if (m == nullptr)
         return nullptr;
@@ -719,11 +745,11 @@ PyMODINIT_FUNC PyInit_Clinear_algebra(void) {
     Py_INCREF(UnknownAxis);
     Py_INCREF(LinearAlgebraException);
 
-    PyModule_AddObject(m, "error", DimensionMismatchException);
-    PyModule_AddObject(m, "out_of_bounds_error", OutOfBoundsException);
-    PyModule_AddObject(m, "zero_error", ZeroDivisionError);
-    PyModule_AddObject(m, "axis_error", UnknownAxis);
-    PyModule_AddObject(m, "linear_algebra_error", LinearAlgebraException);
+    PyModule_AddObject(m, "DimensionMismatchException", DimensionMismatchException);
+    PyModule_AddObject(m, "OutOfBoundsException", OutOfBoundsException);
+    PyModule_AddObject(m, "ZeroDivisionError", ZeroDivisionError);
+    PyModule_AddObject(m, "UnknownAxis", UnknownAxis);
+    PyModule_AddObject(m, "LinearAlgebraException", LinearAlgebraException);
 
     return m;
 }

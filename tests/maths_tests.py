@@ -1,6 +1,5 @@
 import unittest
-from pyml.maths.math_utils import *
-from pyml.maths.linear_algebra import *
+from pyml.maths import *
 from pyml.utils import set_seed
 import random
 
@@ -53,6 +52,15 @@ class MathsTest(unittest.TestCase):
         array = [[-5, 3, 10], [2, 1, -1]]
         argsorted_array = argmax(array, axis=1)
         self.assertEqual(argsorted_array, [2, 0])
+
+    def test_sum(self):
+        self.assertAlmostEqual(sum(self.A), 35.796210306462129)
+
+    def test_sum_0(self):
+        self.assertAlmostEqual(sum(self.A, axis=0)[0], 4.40005171000251)
+
+    def test_sum_1(self):
+        self.assertAlmostEqual(sum(self.A, axis=1)[0], 3.6822028792082095)
 
     def test_mean(self):
         self.assertAlmostEqual(mean(self.A), 0.44745262883077663)
@@ -129,22 +137,28 @@ class LinearAlgebraTest(unittest.TestCase):
         self.assertAlmostEqual(transpose(self.A)[5][8], 0.38628163852256203)
 
     def test_matrix_product(self):
-        self.assertAlmostEqual(dot_product(self.A, self.B)[5][8], 2.2269865779018874)
+        self.assertAlmostEqual(dot_product(self.A, self.B)[5][8],
+                               2.2269865779018874)
 
     def test_dot_product(self):
-        self.assertAlmostEqual(dot_product(self.A[0], transpose(self.B)[0])[0], 0.691239893627)
+        self.assertAlmostEqual(dot_product(self.A[0], transpose(self.B)[0])[0],
+                               0.691239893627)
 
     def test_add_matrix(self):
-        self.assertAlmostEqual(add(self.A, transpose(self.B))[0][-1], 0.16094185221109958)
+        self.assertAlmostEqual(add(self.A, transpose(self.B))[0][-1],
+                               0.16094185221109958)
 
     def test_add_scalar(self):
-        self.assertAlmostEqual(add(self.A, transpose(self.B)[0][-1])[0][-1], 0.16094185221109958)
+        self.assertAlmostEqual(add(self.A, transpose(self.B)[0][-1])[0][-1],
+                               0.16094185221109958)
 
     def test_subtract_matrix(self):
-        self.assertAlmostEqual(subtract(self.A, transpose(self.B))[0][3], 0.6442101271237023)
+        self.assertAlmostEqual(subtract(self.A, transpose(self.B))[0][3],
+                               0.6442101271237023)
 
     def test_subtract_scalar(self):
-        self.assertAlmostEqual(subtract(self.A, transpose(self.B)[0][3])[0][3], 0.6442101271237023)
+        self.assertAlmostEqual(subtract(self.A, transpose(self.B)[0][3])[0][3],
+                               0.6442101271237023)
 
     def test_power(self):
         self.assertAlmostEqual(power(self.A, 2)[0][5], 0.9336806492618525)
@@ -153,7 +167,8 @@ class LinearAlgebraTest(unittest.TestCase):
         self.assertAlmostEqual(multiply(self.A, 2)[0][0], 0.2792398429743861)
 
     def test_multiply_2(self):
-        self.assertAlmostEqual(multiply(self.A, transpose(self.B))[0][0], 0.04580368872627444)
+        self.assertAlmostEqual(multiply(self.A, transpose(self.B))[0][0],
+                               0.04580368872627444)
 
     def test_divide(self):
         self.assertAlmostEqual(divide(self.A[0], 0.5)[0], 0.2792398429743861)
@@ -171,7 +186,8 @@ class LinearAlgebraTest(unittest.TestCase):
     def test_eigen_normalised(self):
         S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]
         self.assertAlmostEqual(eigen(S, sort=True, normalise=False)[0][0], 4)
-        self.assertAlmostEqual(eigen(S, sort=True, normalise=False)[1][0][0], 0.5773502691313449)
+        self.assertAlmostEqual(eigen(S, sort=True, normalise=False)[1][0][0],
+                               0.5773502691313449)
 
     def test_eigen_unnormalised(self):
         S = [[3., -1, 0], [-1, 2, -1], [0, -1, 3]]
@@ -185,3 +201,18 @@ class LinearAlgebraTest(unittest.TestCase):
     def test_determinant_2(self):
         A = [[1, 3, 2], [4, 1, 3], [2, 5, 2]]
         self.assertAlmostEqual(determinant(A), 17)
+
+
+class NormalisersTest(unittest.TestCase):
+
+    def test_softmax(self):
+
+        self.assertAlmostEqual(softmax([1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0])[0],
+                               0.023640543021591385)
+
+        self.assertRaises(TypeError, softmax, ['a', 'list', 'of', 'strings'])
+
+        self.assertAlmostEqual(sigmoid([0.69, 0.5, -0.5, 1, 10])[0],
+                               0.6659669267518202)
+
+        self.assertRaises(TypeError, sigmoid, [[[0, 1, 2, 3, 4]]])

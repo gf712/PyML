@@ -8,9 +8,11 @@ class TestKNNClassifier(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.datapoints, cls.labels = gaussian(n=100, d=2, labels=3, sigma=0.1, seed=1970)
-        cls.X_train, cls.y_train, cls.X_test, cls.y_test = train_test_split(cls.datapoints, cls.labels,
-                                                                            train_split=0.95, seed=1970)
+        cls.datapoints, cls.labels = gaussian(n=100, d=2, labels=3, sigma=0.1,
+                                              seed=1970)
+        cls.X_train, cls.y_train, cls.X_test, cls.y_test = \
+            train_test_split(cls.datapoints, cls.labels, train_split=0.95,
+                             seed=1970)
         cls.classifier = KNNClassifier(n=5)
         cls.classifier.train(X=cls.X_train, y=cls.y_train)
 
@@ -19,7 +21,8 @@ class TestKNNClassifier(unittest.TestCase):
 
     def test_predict(self):
         predictions = self.classifier.predict(X=self.X_test)
-        self.assertEqual(predictions, [2, 2, 0, 0, 2, 0, 2, 2, 1, 1, 2, 0, 2, 2, 0])
+        self.assertEqual(predictions, [2, 2, 0, 0, 2, 0, 2, 2,
+                                       1, 1, 2, 0, 2, 2, 0])
 
     def test_score(self):
         accuracy = self.classifier.score(X=self.X_test, y_true=self.y_test)
@@ -31,8 +34,8 @@ class TestKNNRegressor(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.X, cls.y = regression(100, seed=1970)
-        cls.X_train, cls.y_train, cls.X_test, cls.y_test = train_test_split(cls.X, cls.y,
-                                                                            train_split=0.8, seed=1970)
+        cls.X_train, cls.y_train, cls.X_test, cls.y_test = \
+            train_test_split(cls.X, cls.y, train_split=0.8, seed=1970)
         cls.regressor = KNNRegressor(n=5)
         cls.regressor.train(X=cls.X_train, y=cls.y_train)
 
@@ -41,13 +44,17 @@ class TestKNNRegressor(unittest.TestCase):
 
     def test_predict(self):
         predictions = self.regressor.predict(X=self.X_test)
-        self.assertEqual(predictions[:5], [3.1161666191379163, 4.933573052500679, 6.611283497257544,
-                                           9.185848057766739, 3.110023909806445])
+        self.assertEqual(predictions[1:5], [4.933573052500679,
+                                            6.611283497257544,
+                                            9.185848057766739,
+                                            3.110023909806445])
 
     def test_score_mse(self):
-        mse = self.regressor.score(X=self.X_test, y_true=self.y_test, scorer='mse')
+        mse = self.regressor.score(X=self.X_test, y_true=self.y_test,
+                                   scorer='mse')
         self.assertEqual(mse, 1.5470835956432736)
 
     def test_score_mae(self):
-        mae = self.regressor.score(X=self.X_test, y_true=self.y_test, scorer='mae')
+        mae = self.regressor.score(X=self.X_test, y_true=self.y_test,
+                                   scorer='mae')
         self.assertEqual(mae, 1.024567537840727)

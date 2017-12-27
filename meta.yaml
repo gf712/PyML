@@ -10,14 +10,17 @@ build:
   script: python setup.py install --single-version-externally-managed --record record.txt
 
 requirements:
+
   build:
-    - python
+    - python {{PY_VER}}*,>=3.5
     - setuptools
-    - {{ compiler('cxx') }}
+#    - {{compiler('cxx')}}
+#    - gcc ==4.9 # [osx]
 
   run:
     - python
     - setuptools
+    - zlib
 
 test:
   requires:
@@ -30,7 +33,6 @@ test:
 
   commands:
     - pytest
-
 
 about:
 
